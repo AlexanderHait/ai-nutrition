@@ -14,4 +14,21 @@
 .analyticsStats{grid-template-columns:repeat(3,1fr)}.analyticsSub{display:block;color:#666;margin-top:6px;font-size:11px}.analyticsGrid{margin-bottom:16px}.analyticsHint{display:block;font-size:12px;margin-top:4px}.analyticsMacros{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.analyticsMacro{padding:15px;border:1px solid #26272a;border-radius:14px;background:#0c0d0f}.analyticsMacro span{display:block;color:#777;font-size:12px}.analyticsMacro b{display:block;margin-top:7px;font-size:19px}.attentionList{margin-top:8px}.attentionRow{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:13px 0;border-bottom:1px solid #202124}.attentionRow:last-child{border-bottom:0}.attentionRow small{display:block;color:#777;margin-top:4px}.attentionRow>span{color:#b98c7e;font-size:12px;text-align:right}.analyticsEmpty{padding:24px 0;color:#777;font-size:13px}.calorieChart{height:260px;display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-top:18px}.calorieCol{min-width:0;display:grid;grid-template-rows:24px 1fr 22px;align-items:end;text-align:center}.calorieValue{font-size:11px;color:#8d8d89;white-space:nowrap}.calorieTrack{height:190px;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid #252629}.calorieBar{width:min(48px,72%);background:#d7b55b;border-radius:8px 8px 2px 2px;min-height:0}.calorieCol small{padding-top:7px;color:#777;font-size:10px}
 @media(max-width:850px){.analyticsStats{grid-template-columns:1fr}.analyticsMacros{grid-template-columns:repeat(2,1fr)}.calorieChart{gap:6px;overflow-x:auto}.calorieCol{min-width:48px}}
 
-.telegramLoginButton{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:12px;border-radius:11px;background:#55ace3;color:#fff;font-weight:700;font-size:16px;padding:12px 16px;margin-top:12px}.telegramLoginButton:hover{filter:brightness(1.05)}.telegramPlane{font-size:22px;line-height:1;transform:rotate(-35deg)}.logoutButton{appearance:none;border:0;background:transparent;color:#a6a6a2;font:inherit;display:flex;align-items:center;gap:11px;padding:11px 12px;cursor:pointer;width:100%;text-align:left}.logoutButton:hover{background:#17181a;color:#fff;border-radius:10px}.sideBottom form{margin:0}.login input:-webkit-autofill,.login input:-webkit-autofill:hover,.login input:-webkit-autofill:focus{-webkit-text-fill-color:#fff;-webkit-box-shadow:0 0 0 1000px #0a0b0c inset;transition:background-color 9999s ease-in-out 0s}
+.telegramLoginButton{
+  display:flex;align-items:center;justify-content:center;gap:12px;width:100%;
+  min-height:52px;padding:0 20px;border-radius:12px;text-decoration:none;
+  background:#229ED9;color:white;font-weight:750;font-size:18px;
+  transition:filter .15s ease,transform .15s ease;
+}
+.telegramLoginButton:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.loginCard input[type="password"]{
+  background:#090b0d!important;color:#f5f5f5!important;border-color:#31343a!important;
+  -webkit-text-fill-color:#f5f5f5!important;
+}
+.loginCard input[type="password"]:-webkit-autofill,
+.loginCard input[type="password"]:-webkit-autofill:hover,
+.loginCard input[type="password"]:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 1000px #090b0d inset!important;
+  -webkit-text-fill-color:#f5f5f5!important;
+  caret-color:#f5f5f5!important;
+}

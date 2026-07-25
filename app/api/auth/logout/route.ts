@@ -1,20 +1,16 @@
-import { NextResponse } from "next/server";
-import { sessionCookie } from "@/lib/auth";
+import { NextResponse } from 'next/server';
+import { sessionCookie } from '@/lib/auth';
 
 function logout(req: Request) {
-  const res = NextResponse.redirect(new URL("/login", req.url), 303);
-  const secure = process.env.NODE_ENV === "production";
-
-  // Удаляем именно ту cookie, которую реально использует lib/auth.ts.
-  res.cookies.set(sessionCookie, "", {
+  const res = NextResponse.redirect(new URL('/login', req.url), 303);
+  res.cookies.set(sessionCookie, '', {
     httpOnly: true,
-    secure,
-    sameSite: "lax",
-    path: "/",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    expires: new Date(0),
     maxAge: 0,
   });
-  res.cookies.set("tg_oidc_state", "", { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: 0 });
-  res.cookies.set("tg_oidc_verifier", "", { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: 0 });
   return res;
 }
 

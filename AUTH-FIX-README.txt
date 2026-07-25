@@ -1,34 +1,26 @@
-AI-Nutrition: Telegram OIDC + Logout fix
+КРИТИЧЕСКИЙ ФИКС AUTH
 
-Причина текущих ошибок:
-1) В текущем проекте используется старый Telegram Login Widget. Он открывает oauth.telegram.org/auth с параметром bot_id, поэтому Telegram отвечает "deprecated".
-2) Shell открывает /api/auth/logout GET-ссылкой, а текущий route принимает только POST.
-3) Старый logout удаляет неправильные имена cookie, а реальная cookie проекта называется ain_session.
+Этот архив собран непосредственно поверх загруженного пользователем ai-nutrition-main (2).zip.
+В исходнике были найдены две точные причины:
+1) components/TelegramLogin.tsx всё ещё загружал telegram-widget.js (legacy) => oauth.telegram.org/auth?bot_id=... => deprecated.
+2) Shell использует GET /api/auth/logout, но route принимал только POST и удалял неправильные cookie. Реальная cookie называется ain_session.
 
-Что исправлено:
-- Telegram Widget полностью убран.
-- Кнопка "Войти через Telegram" ведёт на /api/auth/telegram.
-- /api/auth/telegram запускает стандартный OIDC Authorization Code Flow + PKCE и использует client_id.
-- callback обменивает code на token, проверяет ID Token по Telegram JWKS и создаёт клиентскую сессию.
-- Logout работает и через POST, и через GET, удаляет реальную ain_session.
-- Боковая кнопка "Выйти" теперь отправляет POST.
+Исправлено:
+- TelegramLogin теперь обычная кнопка на /api/auth/telegram.
+- /api/auth/telegram генерирует OIDC Authorization Code Flow + PKCE (client_id, code_challenge).
+- добавлен /api/auth/telegram/callback: token exchange, JWKS verification, проверка существования пользователя в profiles, создание ain_session.
+- logout принимает GET и POST и удаляет именно ain_session.
+- добавлен jose в package.json.
 
-Vercel Environment Variables:
+Vercel env:
 TELEGRAM_CLIENT_ID=8902031881
-TELEGRAM_CLIENT_SECRET=<секрет из BotFather, не публиковать>
+TELEGRAM_CLIENT_SECRET=<секрет из BotFather>
 NEXT_PUBLIC_SITE_URL=https://www.smartnutrition-ai.ru
-SESSION_SECRET=<уже существующий секрет>
+SESSION_SECRET=<существующий секрет>
 
-BotFather > Web Login:
-Redirect URI (точно):
-https://www.smartnutrition-ai.ru/api/auth/telegram/callback
+BotFather Web Login:
+Redirect URI: https://www.smartnutrition-ai.ru/api/auth/telegram/callback
+Trusted Origin: https://www.smartnutrition-ai.ru
 
-Trusted Origin:
-https://www.smartnutrition-ai.ru
-
-После загрузки файлов обязательно Redeploy production deployment.
-
-Проверка после деплоя:
-1) Открой https://www.smartnutrition-ai.ru/api/auth/telegram напрямую.
-2) В адресе Telegram после редиректа должен быть параметр client_id=8902031881. Если видишь bot_id=..., значит Vercel всё ещё обслуживает старый код.
-3) Logout должен вернуть на /login, без "Страница недоступна".
+ПОСЛЕ ЗАЛИВКИ ОБЯЗАТЕЛЬНО НОВЫЙ PRODUCTION DEPLOYMENT.
+ПРОВЕРКА: /api/auth/telegram должен открыть URL с ?client_id=..., НЕ ?bot_id=...

@@ -15,11 +15,12 @@ export default async function Login({
         <h1>AI‑Nutrition</h1>
         <p className="muted">Питание и прогресс без лишнего</p>
 
-        {error === "telegram" && (
-          <div className="notice">Не удалось подтвердить вход через Telegram. Попробуй ещё раз.</div>
-        )}
-        {error === "telegram_config" && (
-          <div className="notice">Не настроены TELEGRAM_CLIENT_ID / TELEGRAM_CLIENT_SECRET в Vercel.</div>
+        {error.startsWith("telegram") && (
+          <div className="notice">
+            {error === "telegram_unknown"
+              ? "Этот Telegram ещё не зарегистрирован в боте. Сначала открой бота и отправь /start."
+              : "Не удалось войти через Telegram. Попробуй ещё раз."}
+          </div>
         )}
         {error === "admin" && (
           <div className="notice">Неверный пароль администратора.</div>
