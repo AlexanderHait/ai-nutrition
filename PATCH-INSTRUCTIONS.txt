@@ -1,0 +1,15 @@
+AI-Nutrition — fix Telegram login + logout
+
+Добавлено:
+- components/TelegramLogin.tsx — более надежная инициализация Telegram Login Widget + явная ошибка, если iframe не загрузился.
+- components/LogoutButton.tsx — кнопка выхода.
+- app/api/auth/logout/route.ts — очистка сессионных cookies и редирект на /login.
+
+ВАЖНО:
+1. Кнопку <LogoutButton /> нужно вставить в общий layout/shell клиента и админа там, где отображается профиль.
+2. Для Telegram Login Widget обязательно:
+   - Vercel env: NEXT_PUBLIC_TELEGRAM_BOT_USERNAME = username бота без @
+   - Vercel env: NEXT_PUBLIC_SITE_URL = https://smartnutrition-ai.ru
+   - после изменения NEXT_PUBLIC_* сделать Redeploy
+   - BotFather → /setdomain → выбрать бота → указать smartnutrition-ai.ru
+   Иначе Telegram может не отрисовать/не авторизовать виджет.
