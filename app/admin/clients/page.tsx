@@ -7,11 +7,17 @@ function relativeActivity(value?:string){
   if(!value)return '—';
   const d=new Date(value);
   const diff=Date.now()-d.getTime();
-  const days=Math.floor(diff/86400000);
-  if(days>=3)return `${days} дн. назад`;
-  if(days===2)return '2 дня назад';
-  if(days===1)return 'вчера';
-  return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'});
+  const time=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'});
+  const dateKey=d.toLocaleDateString('sv-SE',{timeZone:'Europe/Moscow'});
+  const now=new Date();
+  const todayKey=now.toLocaleDateString('sv-SE',{timeZone:'Europe/Moscow'});
+  const yesterday=new Date(now.getTime()-86400000);
+  const yesterdayKey=yesterday.toLocaleDateString('sv-SE',{timeZone:'Europe/Moscow'});
+  if(dateKey===todayKey)return `Сегодня, ${time}`;
+  if(dateKey===yesterdayKey)return `Вчера, ${time}`;
+  const days=Math.max(2,Math.floor(diff/86400000));
+  if(days<=6)return `${days} дня назад`;
+  return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Europe/Moscow'});
 }
 
 export default async function Page(){
@@ -20,7 +26,7 @@ export default async function Page(){
   return <>
     <div className="pageHead"><div><p>AI‑Nutrition / Админка</p><h1>Клиенты</h1><span>Только то, что нужно для ежедневного контроля</span></div></div>
     <section className="card tableCard">
-      <div className="tableHead clientsGrid"><span>Клиент</span><span>Сегодня</span><span>Всего</span><span>Активность</span></div>
+      <div className="tableHead clientsGrid"><span>Клиент</span><span>Сегодня</span><span>Всего</span><span>Последняя активность</span></div>
       {profiles.map(p=>{
         const pm=meals.filter(m=>m.chat_id===Number(p.telegram_id));
         const t=pm.filter(m=>m.eaten_day===today);
