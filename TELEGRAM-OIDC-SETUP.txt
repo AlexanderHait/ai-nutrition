@@ -1,0 +1,17 @@
+Telegram OIDC setup
+
+Vercel Environment Variables:
+TELEGRAM_CLIENT_ID=8902031881
+TELEGRAM_CLIENT_SECRET=<Client Secret from BotFather>
+NEXT_PUBLIC_SITE_URL=https://www.smartnutrition-ai.ru
+
+BotFather > Web Login:
+Redirect URI (must match exactly):
+https://www.smartnutrition-ai.ru/api/auth/telegram/callback
+
+Trusted Origin:
+https://www.smartnutrition-ai.ru
+
+After changing Vercel env vars: Redeploy.
+
+Do not put TELEGRAM_CLIENT_SECRET in NEXT_PUBLIC_* variables.

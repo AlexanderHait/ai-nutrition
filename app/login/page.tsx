@@ -18,6 +18,9 @@ export default async function Login({
         {error === "telegram" && (
           <div className="notice">Не удалось подтвердить вход через Telegram. Попробуй ещё раз.</div>
         )}
+        {error === "telegram_config" && (
+          <div className="notice">Не настроены TELEGRAM_CLIENT_ID / TELEGRAM_CLIENT_SECRET в Vercel.</div>
+        )}
         {error === "admin" && (
           <div className="notice">Неверный пароль администратора.</div>
         )}
