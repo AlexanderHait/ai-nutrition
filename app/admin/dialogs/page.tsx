@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import {allData} from '@/lib/data';
+import DialogMessages from '@/components/DialogMessages';
 
 export const dynamic='force-dynamic';
 
@@ -69,15 +70,7 @@ export default async function Page({searchParams}:{searchParams:SearchParams}){
           </div>
           <Link className="textLink" href={`/admin/clients/${selected?.chatId}`}>Карточка клиента →</Link>
         </div>
-        <div className="messages">
-          {messages.slice(-100).map((m:any)=>{
-            const isUser=m.role==='user';
-            return <article key={m.id} className={`messageBubble ${isUser?'user':'assistant'}`}>
-              <div><b>{isUser?'Клиент':'AI'}</b><time>{new Date(m.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'})}</time></div>
-              <p>{m.content}</p>
-            </article>;
-          })}
-        </div>
+        <DialogMessages messages={messages} chatId={selected!.chatId}/>
       </div>
     </section>}
   </>;
