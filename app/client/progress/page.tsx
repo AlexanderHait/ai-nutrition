@@ -15,6 +15,7 @@ function cleanTelegramMarkdown(text: string) {
 export default async function Page() {
   const s = await requireClient();
   const d = await clientData(s.chatId!);
+  const kcalTarget = Number(d.settings?.kcal_target || 2000);
 
   const grouped = new Map<string, typeof d.meals>();
   for (const m of d.meals) {
@@ -26,14 +27,18 @@ export default async function Page() {
     day,
     total: sumMeals(meals),
   }));
+  const completeDays = days.filter((x) => x.total.kcal > 0);
+  const avgKcal = completeDays.length
+    ? completeDays.reduce((a, x) => a + x.total.kcal, 0) / completeDays.length
+    : 0;
 
-  const maxKcal = Math.max(1, ...days.map((x) => x.total.kcal));
   const latestWeight = d.weights?.[0];
   const previousWeight = d.weights?.[1];
   const weightDelta =
     latestWeight && previousWeight
       ? Number(latestWeight.weight_kg) - Number(previousWeight.weight_kg)
       : null;
+  const targetWeight = Number(d.settings?.target_weight_kg || 0);
 
   return (
     <>
@@ -41,31 +46,43 @@ export default async function Page() {
         <div>
           <p>Динамика</p>
           <h1>Прогресс</h1>
-          <span>Только показатели, которые реально полезно отслеживать</span>
+          <span>Калории, вес и ежедневные рекомендации</span>
         </div>
       </div>
 
-      <div className="grid2">
+      <div className="progressSummary">
+        <Summary l="Средние ккал" v={completeDays.length ? `${fmt(avgKcal)} ккал` : "—"} s={`цель ${fmt(kcalTarget)} ккал`} />
+        <Summary l="Дней с рационом" v={`${completeDays.length} / 7`} s="за последние 7 дней" />
+        <Summary
+          l="Вес"
+          v={latestWeight ? `${fmt(latestWeight.weight_kg, 1)} кг` : "—"}
+          s={targetWeight ? `цель ${fmt(targetWeight, 1)} кг` : "цель не задана"}
+        />
+      </div>
+
+      <div className="grid2 top">
         <section className="card">
-          <h2>Последние 7 дней</h2>
+          <h2>Калории · 7 дней</h2>
           {days.length ? (
-            <div style={{ display: "grid", gap: 14 }}>
-              {days.map((x) => (
-                <div key={x.day}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
-                    <span>
-                      {new Date(x.day + "T12:00:00").toLocaleDateString("ru-RU", {
-                        day: "2-digit",
-                        month: "2-digit",
-                      })}
-                    </span>
-                    <b>{fmt(x.total.kcal)} ккал</b>
+            <div className="progressDays">
+              {days.map((x) => {
+                const pct = kcalTarget ? Math.min(130, (x.total.kcal / kcalTarget) * 100) : 0;
+                const delta = x.total.kcal - kcalTarget;
+                return (
+                  <div className="progressDay" key={x.day}>
+                    <div>
+                      <span>{new Date(x.day + "T12:00:00").toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" })}</span>
+                      <b>{fmt(x.total.kcal)} ккал</b>
+                    </div>
+                    <div className="goalProgress">
+                      <i style={{ width: `${Math.min(100, pct)}%` }} />
+                    </div>
+                    <small className={Math.abs(delta) <= kcalTarget * 0.1 ? "onTarget" : ""}>
+                      {delta === 0 ? "точно по цели" : delta > 0 ? `+${fmt(delta)}` : `${fmt(delta)}`} ккал
+                    </small>
                   </div>
-                  <div className="progress" style={{ marginTop: 7 }}>
-                    <i style={{ width: `${(x.total.kcal / maxKcal) * 100}%` }} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="muted">Пока недостаточно данных.</p>
@@ -76,14 +93,19 @@ export default async function Page() {
           <h2>Вес</h2>
           {latestWeight ? (
             <>
-              <div style={{ fontSize: 38, fontWeight: 800 }}>{fmt(latestWeight.weight_kg, 1)} кг</div>
+              <div className="weightValue">{fmt(latestWeight.weight_kg, 1)} кг</div>
               {weightDelta !== null && (
                 <p className="muted">
                   С прошлого измерения: {weightDelta > 0 ? "+" : ""}
                   {fmt(weightDelta, 1)} кг
                 </p>
               )}
-              <div style={{ display: "grid", gap: 10, marginTop: 20 }}>
+              {targetWeight > 0 && (
+                <div className="weightTarget">
+                  До цели: <b>{fmt(Math.abs(Number(latestWeight.weight_kg) - targetWeight), 1)} кг</b>
+                </div>
+              )}
+              <div className="weightHistory">
                 {d.weights.slice(0, 6).map((w: any) => (
                   <div className="row" key={w.id}>
                     <span>{new Date(w.measured_at).toLocaleDateString("ru-RU")}</span>
@@ -99,7 +121,7 @@ export default async function Page() {
       </div>
 
       <section className="card top">
-        <h2>Последние AI‑отчёты</h2>
+        <h2>AI‑отчёты</h2>
         {d.digests.slice(0, 7).map((x: any) => (
           <details className="digestItem" key={x.id}>
             <summary>
@@ -114,5 +136,15 @@ export default async function Page() {
         {!d.digests.length && <p className="muted">Пока нет дневных отчётов.</p>}
       </section>
     </>
+  );
+}
+
+function Summary({ l, v, s }: { l: string; v: string; s: string }) {
+  return (
+    <div className="progressSummaryCard">
+      <span>{l}</span>
+      <b>{v}</b>
+      <small>{s}</small>
+    </div>
   );
 }

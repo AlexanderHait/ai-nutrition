@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireClient } from "@/lib/auth";
 import { clientData, dayKey, fmt, sumMeals } from "@/lib/data";
 
@@ -18,10 +19,15 @@ export default async function Page() {
   const today = dayKey();
   const tm = d.meals.filter((m) => m.eaten_day === today);
   const sum = sumMeals(tm);
-  const goal = Number(d.settings?.kcal_target || 2000);
+
+  const kcalTarget = Number(d.settings?.kcal_target || 2000);
+  const proteinTarget = Number(d.settings?.protein_target || 0);
+  const fatTarget = Number(d.settings?.fat_target || 0);
+  const carbTarget = Number(d.settings?.carb_target || 0);
+  const remaining = Math.max(0, kcalTarget - sum.kcal);
 
   const lastDigest = d.digests?.[0];
-  const lastMeals = d.meals.slice(0, 4);
+  const shownMeals = tm.length ? tm : d.meals.slice(0, 4);
 
   return (
     <>
@@ -29,32 +35,43 @@ export default async function Page() {
         <div>
           <p>Сегодня</p>
           <h1>{d.profile?.first_name ? `Привет, ${d.profile.first_name}` : "Твой рацион"}</h1>
-          <span>То же питание, которое ты сохраняешь в Telegram</span>
+          <span>{d.settings?.goal || "Питание и прогресс в одном месте"}</span>
         </div>
       </div>
 
-      <div className="heroKcal">
-        <div>
+      <section className="clientTodayHero">
+        <div className="clientTodayMain">
           <span>Калории</span>
-          <b>{fmt(sum.kcal)}</b>
-          <small>из {fmt(goal)} ккал</small>
+          <div><b>{fmt(sum.kcal)}</b><small> / {fmt(kcalTarget)} ккал</small></div>
+          <p>
+            {sum.kcal <= kcalTarget
+              ? `Осталось ${fmt(remaining)} ккал`
+              : `Выше цели на ${fmt(sum.kcal - kcalTarget)} ккал`}
+          </p>
         </div>
-        <div className="progress">
-          <i style={{ width: `${Math.min(100, goal ? (sum.kcal / goal) * 100 : 0)}%` }} />
+        <div className="goalProgress large">
+          <i style={{ width: `${Math.min(100, (sum.kcal / kcalTarget) * 100)}%` }} />
         </div>
-      </div>
+      </section>
 
-      <div className="stats">
-        <Stat l="Белки" v={`${fmt(sum.prot, 1)} г`} />
-        <Stat l="Жиры" v={`${fmt(sum.fat, 1)} г`} />
-        <Stat l="Углеводы" v={`${fmt(sum.carb, 1)} г`} />
-        <Stat l="Приёмов" v={String(tm.length)} />
+      <div className="clientMacroGrid">
+        <Macro l="Белки" value={sum.prot} target={proteinTarget} />
+        <Macro l="Жиры" value={sum.fat} target={fatTarget} />
+        <Macro l="Углеводы" value={sum.carb} target={carbTarget} />
+        <div className="clientMacroCard">
+          <span>Приёмов</span>
+          <b>{tm.length}</b>
+          <small>сегодня</small>
+        </div>
       </div>
 
       <div className="grid2 top">
         <section className="card">
-          <h2>{tm.length ? "Сегодня" : "Последние приёмы"}</h2>
-          {(tm.length ? tm : lastMeals).map((m) => (
+          <div className="sectionTitleRow">
+            <h2>{tm.length ? "Сегодня" : "Последние приёмы"}</h2>
+            <Link className="textLink" href="/client/nutrition">История →</Link>
+          </div>
+          {shownMeals.map((m) => (
             <div className="meal" key={m.id}>
               <div>
                 <b>{m.dish}</b>
@@ -70,17 +87,18 @@ export default async function Page() {
               </div>
               <div>
                 <b>{fmt(m.kcal)} ккал</b>
-                <small>
-                  Б {fmt(m.prot, 1)} · Ж {fmt(m.fat, 1)} · У {fmt(m.carb, 1)}
-                </small>
+                <small>Б {fmt(m.prot, 1)} · Ж {fmt(m.fat, 1)} · У {fmt(m.carb, 1)}</small>
               </div>
             </div>
           ))}
-          {!tm.length && !lastMeals.length && <p className="muted">Пока нет сохранённых приёмов пищи.</p>}
+          {!shownMeals.length && <p className="muted">Отправь еду боту — запись появится здесь автоматически.</p>}
         </section>
 
         <section className="card">
-          <h2>Последний отчёт AI</h2>
+          <div className="sectionTitleRow">
+            <h2>Последний отчёт AI</h2>
+            <Link className="textLink" href="/client/progress">Прогресс →</Link>
+          </div>
           {lastDigest ? (
             <>
               <p className="muted" style={{ marginTop: 0 }}>
@@ -104,11 +122,14 @@ export default async function Page() {
   );
 }
 
-function Stat({ l, v }: { l: string; v: string }) {
+function Macro({ l, value, target }: { l: string; value: number; target: number }) {
+  const pct = target ? Math.min(100, (value / target) * 100) : 0;
   return (
-    <div className="stat">
+    <div className="clientMacroCard">
       <span>{l}</span>
-      <b>{v}</b>
+      <b>{fmt(value, 1)} г</b>
+      <small>{target ? `из ${fmt(target, 1)} г` : "цель не задана"}</small>
+      {target > 0 && <div className="macroProgress"><i style={{ width: `${pct}%` }} /></div>}
     </div>
   );
 }

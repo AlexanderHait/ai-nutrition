@@ -3,9 +3,14 @@ import { clientData } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const s = await requireClient();
   const d = await clientData(s.chatId!);
+  const q = await searchParams;
 
   return (
     <>
@@ -13,9 +18,11 @@ export default async function Page() {
         <div>
           <p>Аккаунт</p>
           <h1>Профиль</h1>
-          <span>Цели, которые используются в личном кабинете</span>
+          <span>Цели, по которым сайт считает твой прогресс</span>
         </div>
       </div>
+
+      {q.saved === "1" && <div className="successNotice">Цели сохранены.</div>}
 
       <section className="card profileCard">
         <div className="profileHero">
@@ -28,7 +35,7 @@ export default async function Page() {
 
         <form action="/api/client/settings" method="post" className="form" style={{ marginTop: 26 }}>
           <label>
-            Цель
+            Основная цель
             <select name="goal" defaultValue={d.settings?.goal || ""}>
               <option value="">Не выбрана</option>
               <option value="Снижение веса">Снижение веса</option>
@@ -50,6 +57,18 @@ export default async function Page() {
 
           <div className="grid2">
             <label>
+              Текущий вес, кг
+              <input name="current_weight_kg" type="number" min="30" max="400" step="0.1" defaultValue={d.settings?.current_weight_kg || d.weights?.[0]?.weight_kg || ""} />
+            </label>
+            <label>
+              Целевой вес, кг
+              <input name="target_weight_kg" type="number" min="30" max="400" step="0.1" defaultValue={d.settings?.target_weight_kg || ""} />
+            </label>
+          </div>
+
+          <div className="formSectionTitle">Целевые БЖУ</div>
+          <div className="grid2">
+            <label>
               Белки, г
               <input name="protein_target" type="number" min="0" max="500" step="0.1" defaultValue={d.settings?.protein_target || ""} />
             </label>
@@ -58,7 +77,6 @@ export default async function Page() {
               <input name="fat_target" type="number" min="0" max="500" step="0.1" defaultValue={d.settings?.fat_target || ""} />
             </label>
           </div>
-
           <label>
             Углеводы, г
             <input name="carb_target" type="number" min="0" max="1000" step="0.1" defaultValue={d.settings?.carb_target || ""} />
@@ -69,24 +87,21 @@ export default async function Page() {
       </section>
 
       <section className="card top">
-        <h2>Вес</h2>
-        <form action="/api/client/weight" method="post" className="form">
-          <label>
-            Текущий вес, кг
-            <input
-              name="weight_kg"
-              type="number"
-              min="30"
-              max="400"
-              step="0.1"
-              defaultValue={d.settings?.current_weight_kg || ""}
-              required
-            />
-          </label>
-          <button className="primary" type="submit">Записать вес</button>
+        <h2>Новое измерение веса</h2>
+        <form action="/api/client/weight" method="post" className="quickWeightForm">
+          <input
+            name="weight_kg"
+            type="number"
+            min="30"
+            max="400"
+            step="0.1"
+            placeholder="Например, 68.4"
+            required
+          />
+          <button className="primary" type="submit">Записать</button>
         </form>
         <p className="muted" style={{ marginBottom: 0 }}>
-          Новая запись попадёт в историю прогресса.
+          Запись добавится в историю прогресса.
         </p>
       </section>
 

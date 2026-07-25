@@ -15,6 +15,8 @@ export async function POST(req: Request) {
   }
 
   const form = await req.formData();
+  const currentWeight = num(form.get("current_weight_kg"));
+
   const row = {
     chat_id: s.chatId,
     goal: String(form.get("goal") || "") || null,
@@ -23,14 +25,33 @@ export async function POST(req: Request) {
     fat_target: num(form.get("fat_target")),
     carb_target: num(form.get("carb_target")),
     height_cm: num(form.get("height_cm")),
+    current_weight_kg: currentWeight,
+    target_weight_kg: num(form.get("target_weight_kg")),
     updated_at: new Date().toISOString(),
   };
 
   const supabase = getSupabaseAdmin();
+  const { data: previous } = await supabase
+    .from("client_settings")
+    .select("current_weight_kg")
+    .eq("chat_id", s.chatId)
+    .maybeSingle();
+
   const { error } = await supabase.from("client_settings").upsert(row, { onConflict: "chat_id" });
 
   if (error) {
     return NextResponse.redirect(new URL("/client/profile?error=settings", req.url));
+  }
+
+  if (
+    currentWeight &&
+    Number(previous?.current_weight_kg || 0) !== currentWeight
+  ) {
+    await supabase.from("weight_logs").insert({
+      chat_id: s.chatId,
+      weight_kg: currentWeight,
+      measured_at: new Date().toISOString(),
+    });
   }
 
   return NextResponse.redirect(new URL("/client/profile?saved=1", req.url));
