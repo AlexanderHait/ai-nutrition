@@ -13,7 +13,7 @@ function siteUrl(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const clientId = process.env.TELEGRAM_CLIENT_ID;
+  const clientId = process.env.TELEGRAM_CLIENT_ID?.trim();
   if (!clientId) {
     return NextResponse.redirect(new URL("/login?error=telegram_config", req.url));
   }
@@ -23,6 +23,7 @@ export async function GET(req: Request) {
   const challenge = base64url(crypto.createHash("sha256").update(verifier).digest());
   const redirectUri = `${siteUrl(req)}/api/auth/telegram/callback`;
 
+  // Новый Telegram OIDC. Критично: client_id, НЕ bot_id.
   const auth = new URL("https://oauth.telegram.org/auth");
   auth.searchParams.set("client_id", clientId);
   auth.searchParams.set("redirect_uri", redirectUri);
@@ -32,13 +33,13 @@ export async function GET(req: Request) {
   auth.searchParams.set("code_challenge", challenge);
   auth.searchParams.set("code_challenge_method", "S256");
 
-  const res = NextResponse.redirect(auth);
+  const res = NextResponse.redirect(auth, 302);
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",
-    maxAge: 600,
+    maxAge: 10 * 60,
   };
   res.cookies.set(STATE_COOKIE, state, cookieOptions);
   res.cookies.set(VERIFIER_COOKIE, verifier, cookieOptions);

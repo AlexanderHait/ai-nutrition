@@ -1,2 +1,19 @@
-import Link from 'next/link';import {BarChart3,BookOpen,Home,MessageSquare,Users,UserRound,Utensils,TrendingUp,LogOut} from 'lucide-react';
-export default function Shell({children,role}:{children:React.ReactNode;role:'admin'|'client'}){const admin=[['/admin','Главная',Home],['/admin/clients','Клиенты',Users],['/admin/dialogs','Диалоги',MessageSquare],['/admin/analytics','Аналитика',BarChart3],['/admin/subscriptions','Подписки',BookOpen]] as const;const client=[['/client','Главная',Home],['/client/nutrition','Питание',Utensils],['/client/progress','Прогресс',TrendingUp],['/client/profile','Профиль',UserRound]] as const;return <div className="app"><aside className="side"><Link href={role==='admin'?'/admin':'/client'} className="brand"><span>AI</span>Nutrition</Link><nav>{(role==='admin'?admin:client).map(([h,l,I])=><Link href={h} key={h}><I size={18}/>{l}</Link>)}</nav><div className="sideBottom"><form action="/api/auth/logout" method="post"><button className="logoutButton" type="submit"><LogOut size={18}/>Выйти</button></form></div></aside><main className="content">{children}</main></div>}
+import Link from 'next/link';
+import {Home,Users,MessageSquare,BarChart3,BookOpen,Utensils,TrendingUp,UserRound,LogOut} from 'lucide-react';
+
+export default function Shell({children,role}:{children:React.ReactNode;role:'admin'|'client'}){
+  const admin=[['/admin','Главная',Home],['/admin/clients','Клиенты',Users],['/admin/dialogs','Диалоги',MessageSquare],['/admin/analytics','Аналитика',BarChart3],['/admin/subscriptions','Подписки',BookOpen]] as const;
+  const client=[['/client','Главная',Home],['/client/nutrition','Питание',Utensils],['/client/progress','Прогресс',TrendingUp],['/client/profile','Профиль',UserRound]] as const;
+  return <div className="app">
+    <aside className="side">
+      <Link href={role==='admin'?'/admin':'/client'} className="brand"><span>AI</span>Nutrition</Link>
+      <nav>{(role==='admin'?admin:client).map(([h,l,I])=><Link href={h} key={h}><I size={18}/>{l}</Link>)}</nav>
+      <div className="sideBottom">
+        <form action="/api/auth/logout" method="post">
+          <button className="logoutButton" type="submit"><LogOut size={18}/>Выйти</button>
+        </form>
+      </div>
+    </aside>
+    <main className="content">{children}</main>
+  </div>
+}

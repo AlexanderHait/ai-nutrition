@@ -20,6 +20,21 @@ function siteUrl(req: Request) {
   return (process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin).replace(/\/$/, "");
 }
 
+function parseCookies(req: Request) {
+  const cookieHeader = req.headers.get("cookie") || "";
+  return Object.fromEntries(
+    cookieHeader
+      .split(";")
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .map((v) => {
+        const i = v.indexOf("=");
+        if (i < 0) return [decodeURIComponent(v), ""];
+        return [decodeURIComponent(v.slice(0, i)), decodeURIComponent(v.slice(i + 1))];
+      }),
+  );
+}
+
 function decodePart(value: string) {
   return JSON.parse(Buffer.from(value, "base64url").toString("utf8"));
 }
@@ -41,43 +56,48 @@ async function verifyIdToken(token: string, clientId: string): Promise<TelegramC
     cache: "no-store",
   });
   if (!jwksRes.ok) throw new Error("jwks_failed");
-  const jwks = await jwksRes.json() as { keys?: JsonWebKey[] };
-  const jwk = jwks.keys?.find((key: any) => key.kid === header.kid);
+  const jwks = (await jwksRes.json()) as { keys?: JsonWebKey[] };
+  const jwk = jwks.keys?.find((key: JsonWebKey & { kid?: string }) => key.kid === header.kid);
   if (!jwk) throw new Error("key_not_found");
 
   const key = crypto.createPublicKey({ key: jwk, format: "jwk" });
-  const signed = Buffer.from(`${parts[0]}.${parts[1]}`);
-  const signature = Buffer.from(parts[2], "base64url");
-  const ok = crypto.verify("RSA-SHA256", signed, key, signature);
+  const ok = crypto.verify(
+    "RSA-SHA256",
+    Buffer.from(`${parts[0]}.${parts[1]}`),
+    key,
+    Buffer.from(parts[2], "base64url"),
+  );
   if (!ok) throw new Error("bad_signature");
 
   return claims;
+}
+
+function clearOidcCookies(res: NextResponse) {
+  res.cookies.set(STATE_COOKIE, "", { path: "/", maxAge: 0 });
+  res.cookies.set(VERIFIER_COOKIE, "", { path: "/", maxAge: 0 });
 }
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
   const returnedState = url.searchParams.get("state");
-  const error = url.searchParams.get("error");
+  const oauthError = url.searchParams.get("error");
+  const stored = parseCookies(req);
+  const expectedState = stored[STATE_COOKIE];
+  const verifier = stored[VERIFIER_COOKIE];
 
-  const cookieHeader = req.headers.get("cookie") || "";
-  const cookies = Object.fromEntries(
-    cookieHeader.split(";").map(v => v.trim()).filter(Boolean).map(v => {
-      const i = v.indexOf("=");
-      return [decodeURIComponent(v.slice(0, i)), decodeURIComponent(v.slice(i + 1))];
-    })
-  );
-  const expectedState = cookies[STATE_COOKIE];
-  const verifier = cookies[VERIFIER_COOKIE];
-
-  if (error || !code || !returnedState || !expectedState || returnedState !== expectedState || !verifier) {
-    return NextResponse.redirect(new URL("/login?error=telegram", req.url));
+  if (oauthError || !code || !returnedState || !expectedState || returnedState !== expectedState || !verifier) {
+    const res = NextResponse.redirect(new URL("/login?error=telegram", req.url));
+    clearOidcCookies(res);
+    return res;
   }
 
-  const clientId = process.env.TELEGRAM_CLIENT_ID;
-  const clientSecret = process.env.TELEGRAM_CLIENT_SECRET;
+  const clientId = process.env.TELEGRAM_CLIENT_ID?.trim();
+  const clientSecret = process.env.TELEGRAM_CLIENT_SECRET?.trim();
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(new URL("/login?error=telegram_config", req.url));
+    const res = NextResponse.redirect(new URL("/login?error=telegram_config", req.url));
+    clearOidcCookies(res);
+    return res;
   }
 
   try {
@@ -100,8 +120,13 @@ export async function GET(req: Request) {
       cache: "no-store",
     });
 
-    if (!tokenRes.ok) throw new Error(`token_${tokenRes.status}`);
-    const tokenData = await tokenRes.json() as { id_token?: string };
+    if (!tokenRes.ok) {
+      const body = await tokenRes.text();
+      console.error("Telegram token exchange failed", tokenRes.status, body.slice(0, 500));
+      throw new Error(`token_${tokenRes.status}`);
+    }
+
+    const tokenData = (await tokenRes.json()) as { id_token?: string };
     if (!tokenData.id_token) throw new Error("missing_id_token");
 
     const claims = await verifyIdToken(tokenData.id_token, clientId);
@@ -109,7 +134,7 @@ export async function GET(req: Request) {
     if (!Number.isSafeInteger(chatId) || chatId <= 0) throw new Error("bad_user_id");
 
     const name = claims.given_name || claims.name || claims.preferred_username || "Клиент";
-    const res = NextResponse.redirect(new URL("/client", req.url));
+    const res = NextResponse.redirect(new URL("/client", req.url), 303);
     res.cookies.set(sessionCookie, signSession({ role: "client", chatId, name }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -117,14 +142,12 @@ export async function GET(req: Request) {
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
-    res.cookies.delete(STATE_COOKIE);
-    res.cookies.delete(VERIFIER_COOKIE);
+    clearOidcCookies(res);
     return res;
-  } catch (e) {
-    console.error("Telegram OIDC callback failed:", e);
+  } catch (error) {
+    console.error("Telegram OIDC callback failed:", error);
     const res = NextResponse.redirect(new URL("/login?error=telegram", req.url));
-    res.cookies.delete(STATE_COOKIE);
-    res.cookies.delete(VERIFIER_COOKIE);
+    clearOidcCookies(res);
     return res;
   }
 }
