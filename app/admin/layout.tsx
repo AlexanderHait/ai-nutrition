@@ -1,1 +1,1 @@
-import{Shell}from"@/components/Shell";export default function L({children}:{children:React.ReactNode}){return <Shell mode="admin">{children}</Shell>}
+import Shell from '@/components/Shell';import {requireAdmin} from '@/lib/auth';export default async function L({children}:{children:React.ReactNode}){await requireAdmin();return <Shell role="admin">{children}</Shell>}

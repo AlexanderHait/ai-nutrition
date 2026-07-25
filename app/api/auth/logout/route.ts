@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';import {sessionCookie} from '@/lib/auth';export async function GET(req:Request){const r=NextResponse.redirect(new URL('/login',req.url));r.cookies.set(sessionCookie,'',{path:'/',maxAge:0});return r}

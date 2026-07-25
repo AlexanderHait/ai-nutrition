@@ -1,1 +1,1 @@
-import{redirect}from"next/navigation";export default function Home(){redirect("/admin")}
+import {redirect} from 'next/navigation';import {session} from '@/lib/auth';export default async function Page(){const s=await session();redirect(s?.role==='admin'?'/admin':s?.role==='client'?'/client':'/login')}

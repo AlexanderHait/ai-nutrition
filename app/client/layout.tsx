@@ -1,1 +1,1 @@
-import{Shell}from"@/components/Shell";export default function L({children}:{children:React.ReactNode}){return <Shell mode="client">{children}</Shell>}
+import Shell from '@/components/Shell';import {requireClient} from '@/lib/auth';export default async function L({children}:{children:React.ReactNode}){await requireClient();return <Shell role="client">{children}</Shell>}
