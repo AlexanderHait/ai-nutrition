@@ -1,0 +1,1 @@
+import{Title}from"@/components/UI";export default function P(){return <><Title title="Питание" subtitle="Все распознанные ботом приёмы пищи"/><div className="card meals"><article>🥣 <b>Овсянка с ягодами</b><span>250 г · 410 ккал</span></article><article>🥗 <b>Куриный салат</b><span>320 г · 486 ккал</span></article></div></>}

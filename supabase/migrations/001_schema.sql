@@ -1,0 +1,11 @@
+create extension if not exists "pgcrypto";
+create table if not exists profiles(id uuid primary key references auth.users(id) on delete cascade,role text not null default 'client',full_name text,telegram_user_id text unique,telegram_username text,height_cm numeric,current_weight_kg numeric,target_weight_kg numeric,goal text,created_at timestamptz not null default now());
+create table if not exists subscriptions(id uuid primary key default gen_random_uuid(),user_id uuid not null references profiles(id) on delete cascade,plan text not null,status text not null default 'active',price_rub integer not null,started_at timestamptz not null default now(),ends_at timestamptz);
+create table if not exists meals(id uuid primary key default gen_random_uuid(),user_id uuid not null references profiles(id) on delete cascade,meal_name text not null,portion_grams numeric,calories numeric not null,protein_g numeric not null,fat_g numeric not null,carbs_g numeric not null,photo_url text,ai_confidence numeric,source text not null default 'telegram',eaten_at timestamptz not null default now(),created_at timestamptz not null default now());
+create table if not exists bot_requests(id uuid primary key default gen_random_uuid(),user_id uuid references profiles(id) on delete set null,request_type text,status text not null default 'success',model text,input_tokens integer default 0,output_tokens integer default 0,cost_rub numeric default 0,confidence numeric,created_at timestamptz not null default now());
+create table if not exists weight_logs(id uuid primary key default gen_random_uuid(),user_id uuid not null references profiles(id) on delete cascade,weight_kg numeric not null,measured_at timestamptz not null default now());
+alter table profiles enable row level security;alter table subscriptions enable row level security;alter table meals enable row level security;alter table bot_requests enable row level security;alter table weight_logs enable row level security;
+create policy "own profile" on profiles for select to authenticated using(auth.uid()=id);
+create policy "own meals" on meals for select to authenticated using(auth.uid()=user_id);
+create policy "own subscriptions" on subscriptions for select to authenticated using(auth.uid()=user_id);
+create policy "own weights" on weight_logs for select to authenticated using(auth.uid()=user_id);

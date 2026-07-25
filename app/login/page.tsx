@@ -1,0 +1,1 @@
+import Link from"next/link";export default function P(){return <main className="auth"><div className="card login"><div className="brand">AI-Nutrition</div><h1>Вход</h1><label>Email<input/></label><label>Пароль<input type="password"/></label><Link href="/admin">Войти</Link><small>В production подключается Supabase Auth.</small></div></main>}

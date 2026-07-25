@@ -1,0 +1,1 @@
+import{Title}from"@/components/UI";export default function P(){return <><Title title="Профиль" subtitle="Личные данные и Telegram"/><div className="card form"><label>Имя<input defaultValue="Анна Петрова"/></label><label>Email<input defaultValue="anna@example.com"/></label><label>Telegram<input defaultValue="@anna_nutrition"/></label><button>Сохранить</button></div></>}

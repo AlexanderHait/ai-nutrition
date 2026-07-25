@@ -1,0 +1,1 @@
+import{Progress,Title}from"@/components/UI";export default function P(){return <><Title title="Прогресс" subtitle="Вес и выполнение цели"/><div className="card"><h2>68.5 кг → 60 кг</h2><Progress value={78}/><p>Тренд за 30 дней: −1.7 кг</p></div></>}
