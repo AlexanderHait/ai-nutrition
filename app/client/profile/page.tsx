@@ -89,6 +89,13 @@ export default async function Page() {
           Новая запись попадёт в историю прогресса.
         </p>
       </section>
+
+      <section className="card top mobileProfileLogout">
+        <h2>Аккаунт</h2>
+        <form action="/api/auth/logout" method="post">
+          <button className="secondaryDanger" type="submit">Выйти из профиля</button>
+        </form>
+      </section>
     </>
   );
 }
