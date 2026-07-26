@@ -156,3 +156,43 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   .supportComposer{grid-template-columns:1fr;padding:10px}.supportComposer .primary{width:100%;height:45px}
   .eventTitleRow{align-items:flex-start}.eventTitleRow time{font-size:8px}
 }
+
+
+/* V10 — compact nutrition, unread badges, clearer analytics */
+.desktopNav a{position:relative}
+.navBadge{margin-left:auto;display:grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--gold);color:#111;font-size:9px;font-style:normal;font-weight:900;box-shadow:0 0 0 3px rgba(224,190,104,.08)}
+.mobileNavIcon{position:relative;display:grid;place-items:center}
+.mobileBadge{position:absolute;top:-7px;right:-11px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--gold);color:#111;font-size:8px;font-style:normal;font-weight:900;border:2px solid #121317}
+
+.nutritionPageHead{margin-bottom:17px}
+.nutritionDays{display:grid;gap:11px}
+.nutritionDay{background:linear-gradient(180deg,rgba(18,19,23,.94),rgba(12,13,16,.98));border:1px solid #25272d;border-radius:17px;overflow:hidden;scroll-margin-top:82px}
+.nutritionDay.selectedDay{border-color:#675a38;box-shadow:0 0 0 3px rgba(224,190,104,.055)}
+.nutritionDayHead{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 17px;border-bottom:1px solid #22242a}
+.nutritionDayHead h2{margin:0;font-size:15px;text-transform:capitalize}.nutritionDayHead>div>span{display:block;color:#7f8280;font-size:11px;margin-top:3px}
+.nutritionDayMacros{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.nutritionDayMacros span{padding:5px 8px;border:1px solid #292b30;border-radius:9px;background:#101115;color:#a8aaa7;font-size:10px}
+.mealSessions{display:grid}
+.mealSession{border-bottom:1px solid #202228}.mealSession:last-child{border-bottom:0}
+.mealSession>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:11px 17px;cursor:pointer;transition:.15s background}
+.mealSession>summary::-webkit-details-marker{display:none}.mealSession>summary:hover{background:#141519}
+.mealSessionMain{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;min-width:0;flex:1}.mealSessionMain time{font-size:10px;color:#6f7270}.mealSessionMain b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mealSessionMain small{display:block;color:#6f7270;font-size:10px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mealSessionTotal{text-align:right;flex:none}.mealSessionTotal b{display:block;font-size:12px}.mealSessionTotal small{display:block;color:#737674;font-size:9px;margin-top:2px}
+.mealSessionItems{padding:2px 17px 9px 71px;background:#0d0e11}.compactMeal{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #1e2024}.compactMeal:last-child{border-bottom:0}.compactMeal b{display:block;font-size:11px}.compactMeal small{display:block;color:#686b69;font-size:9px;margin-top:1px}.compactMeal>span{font-size:10px;color:#a4a6a3;white-space:nowrap}
+
+.progressDayLink{display:block;padding:8px 9px;margin:0 -9px;border-radius:11px;transition:.15s background,.15s transform}.progressDayLink:hover{background:#16181b}.progressDayLink:active{transform:scale(.995)}
+.progressOpen{float:right;color:var(--gold);opacity:0;transition:.15s opacity}.progressDayLink:hover .progressOpen{opacity:1}
+
+.analyticsHero{display:flex;align-items:center;justify-content:space-between;gap:26px;padding:22px 24px}.analyticsHeroCopy span{display:block;color:#848784;font-size:11px}.analyticsHeroCopy b{display:block;font-size:34px;letter-spacing:-1px;margin-top:4px}.analyticsHeroCopy small{display:block;color:#686b69;margin-top:2px;font-size:10px}.analyticsMacros.compact{display:grid;grid-template-columns:repeat(3,minmax(100px,1fr));gap:8px;min-width:min(460px,55%)}
+.readableChart{height:250px}.readableChart .calorieCol{grid-template-rows:25px 1fr 33px 18px}.readableChart .calorieValue{font-size:10px}.readableChart .calorieCol small{display:grid;gap:1px;line-height:1.05}.readableChart .calorieCol small b{font-size:9px;color:#a6a8a5;text-transform:uppercase}.readableChart .calorieCol em{font-style:normal;font-size:8px;color:#5f6260;text-align:center}
+.analyticsGrid{grid-template-columns:1fr}.analyticsStats{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+@media(max-width:900px){
+  .nutritionDayHead{padding:12px 13px;align-items:flex-start}.nutritionDayMacros{gap:5px}.mealSession>summary{padding:10px 13px;align-items:flex-start}.mealSessionMain{grid-template-columns:38px minmax(0,1fr)}.mealSessionTotal small{display:none}.mealSessionItems{padding:2px 13px 8px 61px}
+  .progressOpen{opacity:1}
+  .analyticsHero{display:grid;gap:15px;padding:18px}.analyticsMacros.compact{min-width:0;width:100%;grid-template-columns:repeat(3,1fr)}.analyticsHeroCopy b{font-size:30px}.readableChart{height:225px;overflow-x:auto;grid-template-columns:repeat(7,minmax(52px,1fr))}
+  .analyticsStats{grid-template-columns:1fr 1fr}.analyticsStats .stat:last-child{grid-column:1/-1}
+}
+@media(max-width:430px){
+  .nutritionDayHead{display:grid;gap:8px}.nutritionDayMacros{justify-content:flex-start}.mealSession>summary{gap:10px}.mealSessionTotal{max-width:85px}.mealSessionMain b{font-size:11px}
+  .analyticsMacros.compact{gap:5px}.analyticsMacro{padding:10px}.analyticsMacro b{font-size:15px}
+}

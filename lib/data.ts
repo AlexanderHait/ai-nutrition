@@ -74,3 +74,49 @@ export const n=(v:any)=>Number(v||0);
 export const fmt=(v:any,d=0)=>n(v).toLocaleString('ru-RU',{maximumFractionDigits:d});
 export function dayKey(d=new Date()){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(d)}
 export function sumMeals(rows:Meal[]){return rows.reduce((a,m)=>({kcal:a.kcal+n(m.kcal),prot:a.prot+n(m.prot),fat:a.fat+n(m.fat),carb:a.carb+n(m.carb)}),{kcal:0,prot:0,fat:0,carb:0})}
+
+
+export type MealSession={
+  key:string;
+  day:string;
+  time:string;
+  eatenAt:string;
+  meals:Meal[];
+  total:{kcal:number;prot:number;fat:number;carb:number};
+};
+
+export function mealSessions(rows:Meal[], gapMinutes=12):MealSession[]{
+  const sorted=[...rows].sort((a,b)=>new Date(a.eaten_at).getTime()-new Date(b.eaten_at).getTime());
+  const sessions:MealSession[]=[];
+
+  for(const meal of sorted){
+    const ts=new Date(meal.eaten_at).getTime();
+    const prev=sessions[sessions.length-1];
+    const prevTs=prev?new Date(prev.eatenAt).getTime():0;
+    const sameDay=prev?.day===meal.eaten_day;
+    const closeEnough=prev&&sameDay&&(ts-prevTs)<=gapMinutes*60*1000;
+
+    if(closeEnough){
+      prev.meals.push(meal);
+      prev.total=sumMeals(prev.meals);
+      // Keep the latest timestamp as the session time so consecutive photo rows stay together.
+      prev.eatenAt=meal.eaten_at;
+      prev.time=new Date(meal.eaten_at).toLocaleTimeString('ru-RU',{
+        hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'
+      });
+    }else{
+      sessions.push({
+        key:`${meal.eaten_day}-${meal.id}`,
+        day:meal.eaten_day,
+        eatenAt:meal.eaten_at,
+        time:new Date(meal.eaten_at).toLocaleTimeString('ru-RU',{
+          hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'
+        }),
+        meals:[meal],
+        total:sumMeals([meal])
+      });
+    }
+  }
+
+  return sessions.reverse();
+}

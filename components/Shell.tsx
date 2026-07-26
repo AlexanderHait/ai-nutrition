@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
   BarChart3,
   BookOpen,
@@ -12,7 +13,7 @@ import {
   Headphones,
 } from "lucide-react";
 
-export default function Shell({
+export default async function Shell({
   children,
   role,
 }: {
@@ -35,6 +36,16 @@ export default function Shell({
     ["/client/profile", "Профиль", UserRound],
   ] as const;
 
+  let unreadDialogs = 0;
+  if (role === "admin") {
+    const { count } = await getSupabaseAdmin()
+      .from("support_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("sender", "client")
+      .is("read_by_admin_at", null);
+    unreadDialogs = count || 0;
+  }
+
   const items = role === "admin" ? admin : client;
 
   return (
@@ -46,12 +57,16 @@ export default function Shell({
         </Link>
 
         <nav className="desktopNav">
-          {items.map(([href, label, Icon]) => (
-            <Link href={href} key={href}>
-              <Icon size={18} strokeWidth={1.8} />
-              <span>{label}</span>
-            </Link>
-          ))}
+          {items.map(([href, label, Icon]) => {
+            const badge = role === "admin" && href === "/admin/dialogs" ? unreadDialogs : 0;
+            return (
+              <Link href={href} key={href}>
+                <Icon size={18} strokeWidth={1.8} />
+                <span>{label}</span>
+                {badge > 0 && <em className="navBadge">{badge > 99 ? "99+" : badge}</em>}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="sideBottom">
@@ -79,12 +94,18 @@ export default function Shell({
       <main className="content">{children}</main>
 
       <nav className={"mobileNav " + (role === "admin" ? "adminMobileNav" : "clientMobileNav")}>
-        {items.map(([href, label, Icon]) => (
-          <Link href={href} key={href}>
-            <Icon size={20} strokeWidth={1.8} />
-            <span>{label}</span>
-          </Link>
-        ))}
+        {items.map(([href, label, Icon]) => {
+          const badge = role === "admin" && href === "/admin/dialogs" ? unreadDialogs : 0;
+          return (
+            <Link href={href} key={href}>
+              <span className="mobileNavIcon">
+                <Icon size={20} strokeWidth={1.8} />
+                {badge > 0 && <em className="mobileBadge">{badge > 9 ? "9+" : badge}</em>}
+              </span>
+              <span>{label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );

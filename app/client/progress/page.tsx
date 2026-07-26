@@ -1,5 +1,6 @@
 import { requireClient } from "@/lib/auth";
 import { clientData, fmt, sumMeals } from "@/lib/data";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -69,7 +70,12 @@ export default async function Page() {
                 const pct = kcalTarget ? Math.min(130, (x.total.kcal / kcalTarget) * 100) : 0;
                 const delta = x.total.kcal - kcalTarget;
                 return (
-                  <div className="progressDay" key={x.day}>
+                  <Link
+                    className="progressDay progressDayLink"
+                    href={`/client/nutrition?day=${x.day}#day-${x.day}`}
+                    key={x.day}
+                    title="Открыть питание за этот день"
+                  >
                     <div>
                       <span>{new Date(x.day + "T12:00:00").toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" })}</span>
                       <b>{fmt(x.total.kcal)} ккал</b>
@@ -79,8 +85,9 @@ export default async function Page() {
                     </div>
                     <small className={Math.abs(delta) <= kcalTarget * 0.1 ? "onTarget" : ""}>
                       {delta === 0 ? "точно по цели" : delta > 0 ? `+${fmt(delta)}` : `${fmt(delta)}`} ккал
+                      <span className="progressOpen">Открыть →</span>
                     </small>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

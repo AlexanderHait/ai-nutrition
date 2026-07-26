@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireClient } from "@/lib/auth";
-import { clientData, dayKey, fmt, sumMeals } from "@/lib/data";
+import { clientData, dayKey, fmt, mealSessions, sumMeals } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +19,7 @@ export default async function Page() {
   const today = dayKey();
   const tm = d.meals.filter((m) => m.eaten_day === today);
   const sum = sumMeals(tm);
+  const todaySessions = mealSessions(tm);
 
   const kcalTarget = Number(d.settings?.kcal_target || 2000);
   const proteinTarget = Number(d.settings?.protein_target || 0);
@@ -60,8 +61,8 @@ export default async function Page() {
         <Macro l="Углеводы" value={sum.carb} target={carbTarget} />
         <div className="clientMacroCard">
           <span>Приёмов</span>
-          <b>{tm.length}</b>
-          <small>сегодня</small>
+          <b>{todaySessions.length}</b>
+          <small>{tm.length > todaySessions.length ? `${tm.length} позиций` : "сегодня"}</small>
         </div>
       </div>
 
