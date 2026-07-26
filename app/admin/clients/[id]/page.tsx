@@ -42,7 +42,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const todaySum = sumMeals(todayMeals);
   const recentMeals = d.meals.slice(0, 8);
   const lastDigest = d.digests[0];
-  const recentLogs = d.logs.slice(0, 6).reverse();
+  const recentEvents = (d.events || []).slice(0, 8);
 
   const settings = d.settings || {};
   const targetKcal = Number(settings.kcal_target || 0);
@@ -168,15 +168,26 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
       <section className="card top">
         <div className="sectionTitleRow">
-          <h2>Последние сообщения</h2>
-          <Link href={`/admin/dialogs?chat=${chatId}`} className="textLink">Весь диалог →</Link>
-        </div>
-        {recentLogs.length ? recentLogs.map((x: any) => (
-          <div className={"chat " + x.role} key={x.id}>
-            <b>{x.role === "user" ? "Клиент" : "AI"}</b>
-            <p>{cleanTelegramMarkdown(x.content || "")}</p>
+          <div>
+            <h2>Активность питания</h2>
+            <span className="muted">Значимые действия в боте, а не технические сообщения</span>
           </div>
-        )) : <Empty />}
+          <Link href={`/admin/dialogs?chat=${chatId}`} className="textLink">Написать клиенту →</Link>
+        </div>
+        <div className="eventTimeline">
+          {recentEvents.length ? recentEvents.map((x:any)=>(
+            <div className="eventItem" key={x.id}>
+              <i className={`eventIcon ${x.event_type||''}`}/>
+              <div>
+                <div className="eventTitleRow">
+                  <b>{x.title}</b>
+                  <time>{new Date(x.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'})}</time>
+                </div>
+                {x.body&&<p>{x.body}</p>}
+              </div>
+            </div>
+          )):<Empty />}
+        </div>
       </section>
     </>
   );

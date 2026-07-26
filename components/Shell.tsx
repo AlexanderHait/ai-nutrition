@@ -9,6 +9,7 @@ import {
   UserRound,
   Users,
   Utensils,
+  Headphones,
 } from "lucide-react";
 
 export default function Shell({
@@ -30,6 +31,7 @@ export default function Shell({
     ["/client", "Главная", Home],
     ["/client/nutrition", "Питание", Utensils],
     ["/client/progress", "Прогресс", TrendingUp],
+    ["/client/support", "Поддержка", Headphones],
     ["/client/profile", "Профиль", UserRound],
   ] as const;
 
@@ -76,7 +78,7 @@ export default function Shell({
 
       <main className="content">{children}</main>
 
-      <nav className={"mobileNav " + (role === "admin" ? "adminMobileNav" : "")}>
+      <nav className={"mobileNav " + (role === "admin" ? "adminMobileNav" : "clientMobileNav")}>
         {items.map(([href, label, Icon]) => (
           <Link href={href} key={href}>
             <Icon size={20} strokeWidth={1.8} />
