@@ -16,7 +16,9 @@ export async function allData(){
     {data:settings},
     {data:subscriptions},
     {data:support,error:se},
-    {data:weights,error:we}
+    {data:weights,error:we},
+    {data:payments,error:payE},
+    {data:catalog,error:catE}
   ]=await Promise.all([
     s.from('profiles').select('*').order('created_at',{ascending:false}),
     s.from('meals').select('*').eq('deleted',false).order('eaten_at',{ascending:false}),
@@ -25,7 +27,9 @@ export async function allData(){
     s.from('client_settings').select('*'),
     s.from('subscriptions').select('*').order('created_at',{ascending:false}),
     s.from('support_messages').select('*').order('created_at',{ascending:false}).limit(5000),
-    s.from('weight_logs').select('*').order('measured_at',{ascending:false}).limit(5000)
+    s.from('weight_logs').select('*').order('measured_at',{ascending:false}).limit(5000),
+    s.from('payment_events').select('*').order('created_at',{ascending:false}).limit(5000),
+    s.from('food_catalog').select('id,display_name,use_count,confidence,last_seen_at').order('use_count',{ascending:false}).limit(1000)
   ]);
   if(pe)throw pe;
   if(me)throw me;
@@ -37,7 +41,9 @@ export async function allData(){
     settings:settings||[],
     subscriptions:subscriptions||[],
     support:se?[]:(support||[]),
-    weights:we?[]:(weights||[])
+    weights:we?[]:(weights||[]),
+    payments:payE?[]:(payments||[]),
+    catalog:catE?[]:(catalog||[])
   };
 }
 

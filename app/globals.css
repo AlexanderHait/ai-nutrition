@@ -510,3 +510,22 @@ input,select,textarea{font-size:13px}
   .clientSessionCard summary{grid-template-columns:auto minmax(0,1fr) auto}
   .mealQualityChip{display:none}
 }
+
+
+/* V14 Growth Intelligence */
+.smartMealCard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:13px;align-items:center;margin-top:12px;padding:16px;border:1px solid #34302a;border-radius:17px;background:linear-gradient(135deg,#16140f,#101115 58%,#121317)}
+.smartMealIcon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#242015;color:var(--gold)}
+.smartMealBody>span{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#858278;font-weight:800}
+.smartMealBody h3{font-size:14px;margin:3px 0 8px;font-weight:720}
+.smartMealMacros{display:flex;flex-wrap:wrap;gap:7px 12px}.smartMealMacros b,.smartMealMacros small{font-size:10px}.smartMealMacros small{color:#92958f}
+.smartMealCard>a{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--gold)}
+.growthKpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+.funnelSteps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.funnelStep{padding:14px;border:1px solid #292c31;border-radius:14px;background:#0e0f12}
+.funnelStep span,.funnelStep small{display:block;color:#808380;font-size:9px}.funnelStep b{display:block;font-size:22px;margin:5px 0}
+.funnelStep>i{display:block;height:5px;margin-top:10px;border-radius:99px;background:#24262b;overflow:hidden}.funnelStep em{display:block;height:100%;background:linear-gradient(90deg,#caa650,#e6ca77)}
+.cacheHeadline{display:flex;align-items:baseline;gap:7px;margin:17px 0 2px}.cacheHeadline b{font-size:34px}.cacheHeadline span,.cacheMeta{color:#838683;font-size:10px}
+.cacheTop{display:grid;gap:7px;margin-top:15px}.cacheTop>div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #24262a}.cacheTop span{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cacheTop b{font-size:10px;color:var(--gold)}
+@media(max-width:1050px){.growthKpis{grid-template-columns:repeat(2,1fr)}.funnelSteps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.smartMealCard{grid-template-columns:auto 1fr}.smartMealCard>a{grid-column:2}.growthKpis{grid-template-columns:1fr 1fr}.funnelSteps{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.growthKpis{grid-template-columns:1fr}.funnelSteps{grid-template-columns:1fr}}

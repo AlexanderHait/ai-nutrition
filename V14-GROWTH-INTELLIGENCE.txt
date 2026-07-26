@@ -1,0 +1,22 @@
+AI-Nutrition V14 — Growth Intelligence
+
+CLIENT
+- Smart next-meal target based on remaining calories/macros and time of day.
+- No GPT request for this recommendation.
+- Existing data-quality warnings retained.
+
+ADMIN
+- Product funnel: registration -> first meal -> 3 food days -> active subscription.
+- Returned after 7 days metric.
+- Payments over the last 30 days from payment_events.
+- Active plan conversion.
+- Food Cache dashboard and most reused products.
+- Churn-risk list.
+
+COST / ACCURACY
+- Migration 005_food_catalog.sql creates global Food Cache.
+- Every valid saved meal teaches the cache automatically via a database trigger.
+- /v performs one batch cache lookup first.
+- Only cache misses are sent to the AI/web model.
+- Mixed /v messages can therefore resolve some foods for free and only send unknown foods to AI.
+- Explicit user grams still win.

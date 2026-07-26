@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, MessageCircle, Scale, Sparkles, Target, TrendingUp } from "lucide-react";
+import { AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, MessageCircle, Scale, Sparkles, Target, TrendingUp, UtensilsCrossed } from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { clientData, dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
 import { sessionQuality } from "@/lib/meal-quality";
@@ -47,6 +47,16 @@ export default async function Page(){
     const q=sessionQuality(s.meals); return {bad:a.bad+q.bad,check:a.check+q.check};
   },{bad:0,check:0});
   const proteinRemaining=Math.max(0,proteinTarget-sum.prot);
+  const fatRemaining=Math.max(0,fatTarget-sum.fat);
+  const carbRemaining=Math.max(0,carbTarget-sum.carb);
+  const hour=Number(new Intl.DateTimeFormat("ru-RU",{timeZone:"Europe/Moscow",hour:"2-digit",hour12:false}).format(new Date()));
+  const likelyMealsLeft=hour<13?3:hour<17?2:hour<21?1:1;
+  const nextMealKcal=Math.max(0,Math.round(Math.max(remaining,0)/likelyMealsLeft/50)*50);
+  const nextMealProtein=proteinTarget>0?Math.max(0,Math.round(proteinRemaining/likelyMealsLeft/5)*5):0;
+  const nextMealText=remaining<=0
+    ?"По калориям дневная цель уже закрыта. Следующий приём лучше сделать лёгким и ориентироваться на голод."
+    :`Ориентир на следующий приём: ~${fmt(nextMealKcal)} ккал${nextMealProtein?` и ${fmt(nextMealProtein)} г белка`:""}.`;
+
   const attention=
     todayQuality.bad>0
       ? {tone:"warn",icon:<AlertTriangle size={18}/>,title:"Есть данные, которые стоит проверить",text:`${todayQuality.bad} поз. с подозрительной массой или КБЖУ. Открой питание и сверь их.`}
@@ -100,6 +110,21 @@ export default async function Page(){
       <i>{attention.icon}</i>
       <div><span>Сейчас важно</span><b>{attention.title}</b><p>{attention.text}</p></div>
       <Link href="/client/nutrition">Открыть <ChevronRight size={15}/></Link>
+    </section>
+
+    <section className="smartMealCard">
+      <div className="smartMealIcon"><UtensilsCrossed size={20}/></div>
+      <div className="smartMealBody">
+        <span>Следующий приём</span>
+        <h3>{nextMealText}</h3>
+        <div className="smartMealMacros">
+          <b>{remaining>0?`${fmt(Math.max(remaining,0))} ккал осталось`:"Калории закрыты"}</b>
+          {proteinTarget>0&&<small>Белок: ещё {fmt(proteinRemaining)} г</small>}
+          {fatTarget>0&&<small>Жиры: ещё {fmt(fatRemaining)} г</small>}
+          {carbTarget>0&&<small>Углеводы: ещё {fmt(carbRemaining)} г</small>}
+        </div>
+      </div>
+      <Link href="/client/nutrition">Рацион <ChevronRight size={15}/></Link>
     </section>
 
     <div className="clientHomeGrid top">
