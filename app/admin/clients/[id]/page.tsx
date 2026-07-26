@@ -39,7 +39,7 @@ export default async function Page({params,searchParams}:{params:Promise<{id:str
   });
   const week=recentDays.slice(-7);
   const avg7=Math.round(week.reduce((a,x)=>a+x.total.kcal,0)/7);
-  const proteinLow=protTarget>0&&week.filter(x=>x.total.prot>0&&x.total.prot<protTarget*.75).length;
+  const proteinLow=protTarget>0 ? week.filter(x=>x.total.prot>0&&x.total.prot<protTarget*.75).length : 0;
   const activeDays=week.filter(x=>x.sessions>0).length;
   const unread=(d.support as any[]).filter(x=>x.sender==='client'&&!x.read_by_admin_at).length;
 
