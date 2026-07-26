@@ -1,0 +1,10 @@
+{
+  "name": "AI-Nutrition",
+  "short_name": "AI-Nutrition",
+  "description": "Личный AI-диетолог",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090a0b",
+  "theme_color": "#090a0b",
+  "icons": []
+}
