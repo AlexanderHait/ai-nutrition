@@ -8,14 +8,16 @@ export type Profile={id:number;telegram_id:number;first_name:string|null;usernam
 
 export async function allData(){
   const s=getSupabaseAdmin();
-  const [{data:profiles,error:pe},{data:meals,error:me},{data:logs,error:le},{data:digests,error:de}]=await Promise.all([
+  const [{data:profiles,error:pe},{data:meals,error:me},{data:logs,error:le},{data:digests,error:de},{data:settings},{data:subscriptions}]=await Promise.all([
     s.from('profiles').select('*').order('created_at',{ascending:false}),
     s.from('meals').select('*').eq('deleted',false).order('eaten_at',{ascending:false}),
     s.from('chat_logs').select('*').order('created_at',{ascending:false}).limit(3000),
-    s.from('digests').select('*').order('for_date',{ascending:false}).limit(2000)
+    s.from('digests').select('*').order('for_date',{ascending:false}).limit(2000),
+    s.from('client_settings').select('*'),
+    s.from('subscriptions').select('*').order('created_at',{ascending:false})
   ]);
   if(pe)throw pe;if(me)throw me;
-  return{profiles:(profiles||[]) as Profile[],meals:(meals||[]) as Meal[],logs:le?[]:(logs||[]),digests:de?[]:(digests||[])};
+  return{profiles:(profiles||[]) as Profile[],meals:(meals||[]) as Meal[],logs:le?[]:(logs||[]),digests:de?[]:(digests||[]),settings:settings||[],subscriptions:subscriptions||[]};
 }
 
 export async function clientData(chatId:number){

@@ -11,6 +11,7 @@ import {
   Users,
   Utensils,
   Headphones,
+  Send,
 } from "lucide-react";
 
 export default async function Shell({
@@ -25,6 +26,7 @@ export default async function Shell({
     ["/admin/clients", "Клиенты", Users],
     ["/admin/dialogs", "Диалоги", MessageSquare],
     ["/admin/analytics", "Аналитика", BarChart3],
+    ["/admin/mailings", "Рассылки", Send],
     ["/admin/subscriptions", "Подписки", BookOpen],
   ] as const;
 
