@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NavLinks from "@/components/NavLinks";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import {
   BarChart3,
@@ -59,16 +60,7 @@ export default async function Shell({
         </Link>
 
         <nav className="desktopNav">
-          {items.map(([href, label, Icon]) => {
-            const badge = role === "admin" && href === "/admin/dialogs" ? unreadDialogs : 0;
-            return (
-              <Link href={href} key={href}>
-                <Icon size={18} strokeWidth={1.8} />
-                <span>{label}</span>
-                {badge > 0 && <em className="navBadge">{badge > 99 ? "99+" : badge}</em>}
-              </Link>
-            );
-          })}
+          <NavLinks items={items} unreadDialogs={unreadDialogs} />
         </nav>
 
         <div className="sideBottom">
@@ -96,18 +88,7 @@ export default async function Shell({
       <main className="content">{children}</main>
 
       <nav className={"mobileNav " + (role === "admin" ? "adminMobileNav" : "clientMobileNav")}>
-        {items.map(([href, label, Icon]) => {
-          const badge = role === "admin" && href === "/admin/dialogs" ? unreadDialogs : 0;
-          return (
-            <Link href={href} key={href}>
-              <span className="mobileNavIcon">
-                <Icon size={20} strokeWidth={1.8} />
-                {badge > 0 && <em className="mobileBadge">{badge > 9 ? "9+" : badge}</em>}
-              </span>
-              <span>{label}</span>
-            </Link>
-          );
-        })}
+        <NavLinks items={items} unreadDialogs={unreadDialogs} mobile />
       </nav>
     </div>
   );

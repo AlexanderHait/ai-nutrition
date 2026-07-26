@@ -205,3 +205,147 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .mailingLayout{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mailingForm{display:grid;gap:12px;margin-top:17px}.mailingForm label{display:grid;gap:6px;font-size:10px;color:#8a8d89}.mailingForm textarea{resize:vertical}.mailActions{display:flex;gap:8px}.mailHistory{display:grid;margin-top:12px}.mailRow{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #22242a}.mailRow>i{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#1d1a12;color:var(--gold)}.mailRow svg{width:16px}.mailRow b{display:block;font-size:11px}.mailRow span{display:block;font-size:9px;color:#777;margin-top:2px}.mailRow strong{display:flex;align-items:center;gap:4px;font-size:10px;color:#999}
 @media(max-width:1100px){.adminKpis{grid-template-columns:1fr 1fr}.clientsGridV2{grid-template-columns:minmax(0,1fr) 100px 100px}.clientsGridV2>*:nth-child(2),.clientsGridV2>*:nth-child(3),.clientsGridV2>*:nth-child(6){display:none}.clientProfileGrid,.mailingLayout,.analyticsDashboard{grid-template-columns:1fr}}
 @media(max-width:600px){.adminKpis{grid-template-columns:1fr 1fr;gap:7px}.adminKpi{padding:12px;gap:9px}.adminKpi>i{width:34px;height:34px}.adminKpi b{font-size:19px}.quickAdmin{grid-template-columns:1fr}.clientHeroV2{align-items:flex-start;flex-wrap:wrap}.clientMessageBtn{margin-left:0;width:100%}.clientNameLine{align-items:flex-start;flex-direction:column;gap:5px}.clientNameLine h1{font-size:25px}.nutritionRingCard{grid-template-columns:1fr}.ringWrap{grid-column:1;grid-row:auto;margin:12px auto}.macroStrip{justify-content:center}.profileFactsV2{grid-template-columns:1fr 1fr}.mailActions{display:grid}.planOverview{grid-template-columns:1fr 1fr 1fr}}
+
+
+/* v11.3 — admin navigation state + clients table */
+.desktopNav a.active{
+  color:#fff;
+  background:linear-gradient(90deg,rgba(224,190,104,.14),rgba(224,190,104,.055));
+  box-shadow:inset 3px 0 0 var(--gold),inset 0 0 0 1px rgba(224,190,104,.17);
+}
+.desktopNav a.active svg{color:var(--gold)}
+.desktopNav a.active span{font-weight:700}
+
+.clientsGridV2{
+  display:grid;
+  grid-template-columns:minmax(220px,1.35fr) minmax(125px,.8fr) 100px minmax(135px,.85fr) 100px minmax(145px,.9fr);
+  gap:18px;
+  align-items:center;
+}
+.clientsTable .tableHead{
+  min-height:48px;
+  padding:0 20px;
+}
+.clientsTable .tableHead>span{
+  display:flex;
+  align-items:center;
+  height:100%;
+  white-space:nowrap;
+}
+.clientRowV2{
+  min-height:76px;
+  padding:14px 20px;
+}
+.clientIdentity{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+.clientIdentity>div:last-child{min-width:0}
+.clientIdentity b{
+  display:block;
+  font-size:14px;
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.clientIdentity small{
+  display:block;
+  margin-top:4px;
+  color:#777;
+  font-size:11px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.clientMiniAvatar{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  border:1px solid #33363c;
+  background:linear-gradient(145deg,#24262b,#17181b);
+  color:#d8d8d3;
+  font-size:13px;
+  font-weight:800;
+}
+.clientCell{
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+.clientMetric b{
+  display:block;
+  font-size:14px;
+  line-height:1.2;
+}
+.clientMetric small{
+  display:block;
+  margin-top:5px;
+  color:#717472;
+  font-size:10px;
+}
+.clientActivity{
+  color:#b3b4b0;
+  font-size:12px;
+  white-space:nowrap;
+}
+.clientActivity.stale{color:#b98181}
+
+.mobileNav a.active{
+  color:#fff;
+}
+.mobileNav a.active .mobileNavIcon{
+  color:var(--gold);
+}
+
+@media(max-width:1100px){
+  .clientsGridV2{
+    grid-template-columns:minmax(200px,1.2fr) 120px 115px 135px;
+  }
+  .clientsGridV2>*:nth-child(2),
+  .clientsGridV2>*:nth-child(3){display:none}
+  .clientsGridV2>*:nth-child(6){display:block}
+}
+@media(max-width:760px){
+  .clientsTable{
+    border:0;
+    background:transparent;
+    box-shadow:none;
+    overflow:visible;
+  }
+  .clientsTable .tableHead{display:none}
+  .clientsTable .clientRowV2{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px 14px;
+    margin-bottom:9px;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:15px;
+    background:linear-gradient(180deg,rgba(18,19,23,.96),rgba(13,14,17,.98));
+  }
+  .clientRowV2>*{display:block!important}
+  .clientRowV2 .clientIdentity{grid-column:1}
+  .clientRowV2 .clientCell{display:none!important}
+  .clientRowV2 .clientMetric:nth-of-type(4){
+    grid-column:2;
+    grid-row:1;
+    text-align:right;
+  }
+  .clientRowV2 .clientMetric:nth-of-type(5){
+    grid-column:1;
+    grid-row:2;
+    padding-left:50px;
+  }
+  .clientRowV2 .clientActivity{
+    grid-column:2;
+    grid-row:2;
+    text-align:right;
+    align-self:end;
+  }
+}
