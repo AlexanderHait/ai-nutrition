@@ -1,0 +1,22 @@
+AI-Nutrition — mobile Telegram auth fix
+
+Проблема:
+На мобильном Telegram Login Library / OAuth может вернуть пользователя в другом browser/webview context.
+Старый redirect flow хранил PKCE verifier/state в cookie, поэтому при смене контекста callback терял эти данные и вход завершался ошибкой.
+
+Исправление:
+- desktop: остаётся Telegram Login Library popup;
+- mobile: используется full-page OIDC Authorization Code + PKCE;
+- verifier хранится внутри подписанного state, а не в browser cookie;
+- callback больше не зависит от временных cookies;
+- после входа redirect всегда идёт на NEXT_PUBLIC_SITE_URL;
+- сообщения об ошибках стали конкретными.
+
+ОБЯЗАТЕЛЬНО В VERCEL:
+NEXT_PUBLIC_SITE_URL=https://www.smartnutrition-ai.ru
+
+BotFather → Web Login → Allowed URLs:
+https://www.smartnutrition-ai.ru
+https://www.smartnutrition-ai.ru/api/auth/telegram/callback
+
+После изменения env сделать Redeploy.

@@ -13,7 +13,12 @@ declare global {
     Telegram?: {
       Login?: {
         auth: (
-          options: { client_id: number; scope?: string[]; lang?: string; nonce?: string },
+          options: {
+            client_id: number;
+            scope?: string[];
+            lang?: string;
+            nonce?: string;
+          },
           callback: (result: TelegramAuthResult) => void,
         ) => void;
       };
@@ -24,15 +29,38 @@ declare global {
 const SCRIPT_ID = "telegram-login-library";
 const SCRIPT_SRC = "https://oauth.telegram.org/js/telegram-login.js?3";
 
+function isMobileBrowser() {
+  if (typeof navigator === "undefined") return false;
+
+  const ua = navigator.userAgent || "";
+  const touchMac =
+    navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+
+  return (
+    /Android|iPhone|iPad|iPod|Mobile/i.test(ua) ||
+    touchMac ||
+    window.matchMedia("(max-width: 820px)").matches
+  );
+}
+
 function loadTelegramLibrary(): Promise<void> {
-  if (typeof window === "undefined") return Promise.reject(new Error("browser only"));
+  if (typeof window === "undefined")
+    return Promise.reject(new Error("browser only"));
+
   if (window.Telegram?.Login?.auth) return Promise.resolve();
 
   return new Promise((resolve, reject) => {
-    const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
+    const existing = document.getElementById(
+      SCRIPT_ID,
+    ) as HTMLScriptElement | null;
+
     if (existing) {
       existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener("error", () => reject(new Error("Telegram library failed")), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error("Telegram library failed")),
+        { once: true },
+      );
       return;
     }
 
@@ -41,7 +69,8 @@ function loadTelegramLibrary(): Promise<void> {
     script.src = SCRIPT_SRC;
     script.async = true;
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Telegram library failed"));
+    script.onerror = () =>
+      reject(new Error("Telegram library failed"));
     document.head.appendChild(script);
   });
 }
@@ -54,9 +83,24 @@ export default function TelegramLogin() {
 
   useEffect(() => {
     mounted.current = true;
+
+    // Mobile uses the redirect flow, so the popup SDK does not need to block
+    // rendering while it loads.
+    if (isMobileBrowser()) {
+      setReady(true);
+      return () => {
+        mounted.current = false;
+      };
+    }
+
     loadTelegramLibrary()
       .then(() => mounted.current && setReady(true))
-      .catch(() => mounted.current && setError("Telegram-вход пока не загрузился."));
+      .catch(
+        () =>
+          mounted.current &&
+          setError("Telegram-вход пока не загрузился."),
+      );
+
     return () => {
       mounted.current = false;
     };
@@ -66,8 +110,17 @@ export default function TelegramLogin() {
     setLoading(true);
     setError("");
 
+    // Mobile Telegram can return from authorization in another browser/webview.
+    // Use a full-page stateless PKCE flow there.
+    if (isMobileBrowser()) {
+      window.location.assign("/api/auth/telegram");
+      return;
+    }
+
+    // Desktop: preserve the convenient web popup.
     try {
       await loadTelegramLibrary();
+
       const configRes = await fetch("/api/auth/telegram/nonce", {
         method: "POST",
         credentials: "include",
@@ -75,11 +128,22 @@ export default function TelegramLogin() {
       });
       if (!configRes.ok) throw new Error("config");
 
-      const { clientId, nonce } = (await configRes.json()) as { clientId: number; nonce: string };
-      if (!clientId || !nonce || !window.Telegram?.Login?.auth) throw new Error("library");
+      const { clientId, nonce } = (await configRes.json()) as {
+        clientId: number;
+        nonce: string;
+      };
+
+      if (!clientId || !nonce || !window.Telegram?.Login?.auth) {
+        throw new Error("library");
+      }
 
       window.Telegram.Login.auth(
-        { client_id: clientId, scope: ["profile"], lang: "ru", nonce },
+        {
+          client_id: clientId,
+          scope: ["profile"],
+          lang: "ru",
+          nonce,
+        },
         async (result) => {
           if (result?.error || !result?.id_token) {
             if (mounted.current) {
@@ -97,10 +161,16 @@ export default function TelegramLogin() {
               body: JSON.stringify({ id_token: result.id_token }),
             });
 
-            const data = (await res.json().catch(() => ({}))) as { ok?: boolean; redirect?: string; error?: string };
+            const data = (await res.json().catch(() => ({}))) as {
+              ok?: boolean;
+              redirect?: string;
+              error?: string;
+            };
+
             if (!res.ok || !data.ok) {
               if (data.error === "unknown_user") {
-                window.location.href = "/login?error=telegram_unknown";
+                window.location.href =
+                  "/login?error=telegram_unknown";
                 return;
               }
               throw new Error(data.error || "auth");
@@ -110,7 +180,9 @@ export default function TelegramLogin() {
           } catch {
             if (mounted.current) {
               setLoading(false);
-              setError("Не удалось завершить вход. Попробуй ещё раз.");
+              setError(
+                "Не удалось завершить вход. Попробуй ещё раз.",
+              );
             }
           }
         },
@@ -123,11 +195,22 @@ export default function TelegramLogin() {
 
   return (
     <div className="telegramLoginWrap">
-      <button className="telegramLoginButton" type="button" onClick={login} disabled={loading}>
+      <button
+        className="telegramLoginButton"
+        type="button"
+        onClick={login}
+        disabled={loading}
+      >
         <Send size={23} />
-        <span>{loading ? "Открываю Telegram…" : "Войти через Telegram"}</span>
+        <span>
+          {loading ? "Открываю Telegram…" : "Войти через Telegram"}
+        </span>
       </button>
-      {!ready && !error && <small className="loginHint">Загрузка безопасного входа…</small>}
+
+      {!ready && !error && (
+        <small className="loginHint">Загрузка безопасного входа…</small>
+      )}
+
       {error && <small className="loginError">{error}</small>}
     </div>
   );
