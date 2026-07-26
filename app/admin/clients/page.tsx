@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import {allData,dayKey,fmt,mealSessions,sumMeals} from '@/lib/data';
+import {allData,dayKey,fmt,mealDay,mealSessions,sumMeals} from '@/lib/data';
 
 export const dynamic='force-dynamic';
 
@@ -56,7 +56,7 @@ export default async function Page(){
       {profiles.map(p=>{
         const id=Number(p.telegram_id);
         const pm=meals.filter(m=>m.chat_id===id);
-        const t=pm.filter(m=>m.eaten_day===today);
+        const t=pm.filter(m=>mealDay(m)===today);
 
         const todaySessions=mealSessions(t);
         const allSessions=mealSessions(pm);

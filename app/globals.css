@@ -435,3 +435,78 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   .nutritionDayHead.modern{align-items:flex-start;gap:10px}.nutritionDayTotal small{display:none}.clientSessionCard summary{grid-template-columns:auto minmax(0,1fr) auto}.sessionTotal small,.sessionChevron{display:none}.sessionIconStack i{width:31px;height:31px}.sessionIconStack i:nth-child(n+3){display:none}
   .client14Chart{gap:3px}.client14Col>span{font-size:7px}.profileLayout{display:block}.profileAside{margin-top:10px}.supportIntro{grid-template-columns:1fr}
 }
+
+
+/* V13 — readability & product polish */
+:root{
+  --text:#f5f5f2;
+  --muted:#a3a6a3;
+  --muted2:#7e817e;
+  --panel:#111216;
+  --panel2:#17181d;
+  --line:#2b2e34;
+}
+body{
+  font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  font-size:14px;
+  line-height:1.55;
+  letter-spacing:-.006em;
+}
+.pageHead h1{font-size:40px;letter-spacing:-1.55px;font-weight:760}
+.pageHead span{font-size:13px;color:#a7aaa7}
+.card h2{font-size:17px;letter-spacing:-.28px}
+.desktopNav a{font-size:14px;min-height:44px;padding:11px 13px}
+.desktopNav a.active{background:linear-gradient(90deg,rgba(224,190,104,.12),rgba(224,190,104,.03));color:#f3df9c;box-shadow:inset 2px 0 0 var(--gold)}
+.desktopNav a svg{color:#9da09d}.desktopNav a.active svg{color:var(--gold)}
+.side{width:auto}.brand{font-size:20px}
+.muted{color:#9a9d9a!important}
+.textLink{font-size:13px;font-weight:650}
+.sectionTitleRow>svg{color:#a6a9a6}
+.clientWelcome>div>span{font-size:13px;color:#9da09d}
+.clientHeroCopy>span,.heroMacroRow>span{font-size:11px}
+.clientHeroCopy p{font-size:12px;color:#9a9d9a}
+.clientQuickStat small,.clientMetricCard small{font-size:10px;color:#8f928f}
+.clientQuickStat em,.clientMetricCard em{font-size:9px;color:#777b78}
+.clientQuickStat b{font-size:15px}
+.mealPreviewText b{font-size:13px}
+.mealPreviewText small{font-size:10px;color:#8d908d}
+.clientMealPreview strong{font-size:12px}
+.clientWeekCards span,.clientWeekCards small{font-size:9px}
+.clientWeekCards b{font-size:19px}
+.clientAttention{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:13px;
+  margin-top:12px;padding:14px 16px;border:1px solid #2c2f35;border-radius:16px;background:#111216
+}
+.clientAttention>i{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:#1e2025;color:var(--gold)}
+.clientAttention>div{display:grid;min-width:0}.clientAttention>div>span{font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:#777b78;font-weight:750}
+.clientAttention b{font-size:14px;margin-top:2px}.clientAttention p{margin:2px 0 0;color:#949794;font-size:11px}
+.clientAttention>a{display:flex;align-items:center;gap:3px;color:var(--gold);font-size:11px;font-weight:700}
+.clientAttention.good{border-color:#29372e}.clientAttention.good>i{color:#76bd91;background:#132019}
+.clientAttention.warn{border-color:#49352e}.clientAttention.warn>i{color:#e49a77;background:#241713}
+.clientAttention.focus{border-color:#4a4027}.clientAttention.focus>i{color:#e2c36d;background:#221d11}
+.clientSessionCard summary{grid-template-columns:auto minmax(0,1fr) auto auto auto}
+.mealQualityChip{display:inline-flex;align-items:center;gap:4px;padding:5px 7px;border-radius:999px;font-size:8px;font-weight:800;white-space:nowrap}
+.mealQualityChip.ok{background:#122019;color:#7ac093;border:1px solid #263a2e}
+.mealQualityChip.check{background:#241a12;color:#e1a274;border:1px solid #4a3525}
+.mealIssue{display:block;margin-top:4px;font-style:normal;color:#d99b78;font-size:8px}
+.sessionFoodRow b{font-size:12px}.sessionFoodRow small{font-size:9px}
+.clientNutritionCalendar .sectionTitleRow h2{margin-bottom:2px}
+.nutritionDayHead.modern h2{font-size:17px}
+.nutritionDayHead.modern span{font-size:10px;color:#878a87}
+.profileForm label{font-size:11px;color:#b0b3b0}
+.formSectionTitle{font-size:12px;font-weight:750;color:#e8e9e5;margin-bottom:11px}
+input,select,textarea{font-size:13px}
+.primary,.secondaryBtn{font-size:12px;font-weight:750}
+@media(max-width:900px){
+  body{font-size:13px}
+  .mobileNav a{font-size:10px;font-weight:650}
+  .mobileNav a.active{background:#1c1e22;color:#f0d787}
+  .mobileNav a.active svg{color:var(--gold)}
+  .pageHead h1{font-size:31px}
+}
+@media(max-width:760px){
+  .clientAttention{grid-template-columns:auto 1fr;padding:12px}
+  .clientAttention>a{grid-column:2}
+  .clientSessionCard summary{grid-template-columns:auto minmax(0,1fr) auto}
+  .mealQualityChip{display:none}
+}

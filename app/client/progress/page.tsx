@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Activity, Scale, Sparkles, Target, TrendingDown, TrendingUp } from "lucide-react";
 import { requireClient } from "@/lib/auth";
-import { clientData, dayKey, fmt, mealSessions, sumMeals } from "@/lib/data";
+import { clientData, dayKey, fmt, mealDay, mealSessions, sumMeals } from "@/lib/data";
 
 export const dynamic="force-dynamic";
 
@@ -15,7 +15,7 @@ export default async function Page(){
 
   const days=Array.from({length:14},(_,i)=>{
     const date=new Date();date.setDate(date.getDate()-(13-i));
-    const day=dayKey(date),rows=d.meals.filter(m=>m.eaten_day===day);
+    const day=dayKey(date),rows=d.meals.filter(m=>mealDay(m)===day);
     return{day,total:sumMeals(rows),sessions:mealSessions(rows).length};
   });
   const week=days.slice(-7),complete=week.filter(x=>x.sessions>0);

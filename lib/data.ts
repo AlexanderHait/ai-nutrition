@@ -99,6 +99,10 @@ export async function supportMessages(chatId:number){
 export const n=(v:any)=>Number(v||0);
 export const fmt=(v:any,d=0)=>n(v).toLocaleString('ru-RU',{maximumFractionDigits:d});
 export function dayKey(d=new Date()){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(d)}
+export function mealDay(m:Pick<Meal,'eaten_at'|'eaten_day'>){
+  if(m.eaten_day)return String(m.eaten_day).slice(0,10);
+  return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(new Date(m.eaten_at));
+}
 export function sumMeals(rows:Meal[]){return rows.reduce((a,m)=>({kcal:a.kcal+n(m.kcal),prot:a.prot+n(m.prot),fat:a.fat+n(m.fat),carb:a.carb+n(m.carb)}),{kcal:0,prot:0,fat:0,carb:0})}
 
 export type MealSession={
@@ -113,43 +117,24 @@ export type MealSession={
 export function mealSessions(rows:Meal[], gapMinutes=12):MealSession[]{
   const sorted=[...rows].sort((a,b)=>new Date(a.eaten_at).getTime()-new Date(b.eaten_at).getTime());
   const sessions:MealSession[]=[];
-
   for(const meal of sorted){
     const ts=new Date(meal.eaten_at).getTime();
+    const day=mealDay(meal);
     const prev=sessions[sessions.length-1];
     const prevTs=prev?new Date(prev.eatenAt).getTime():0;
-    const sameDay=prev?.day===meal.eaten_day;
-    const closeEnough=Boolean(prev&&sameDay&&(ts-prevTs)<=gapMinutes*60*1000);
-
-    if(closeEnough&&prev){
+    if(prev&&prev.day===day&&ts-prevTs<=gapMinutes*60000){
       prev.meals.push(meal);
-      prev.total=sumMeals(prev.meals);
       prev.eatenAt=meal.eaten_at;
-      prev.time=new Date(meal.eaten_at).toLocaleTimeString('ru-RU',{
-        hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'
-      });
-    }else{
-      sessions.push({
-        key:`${meal.eaten_day}-${meal.id}`,
-        day:meal.eaten_day,
-        eatenAt:meal.eaten_at,
-        time:new Date(meal.eaten_at).toLocaleTimeString('ru-RU',{
-          hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'
-        }),
-        meals:[meal],
-        total:sumMeals([meal])
-      });
+      prev.total=sumMeals(prev.meals);
+      continue;
     }
+    const time=new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'}).format(new Date(meal.eaten_at));
+    sessions.push({
+      key:`${day}-${meal.eaten_at}-${meal.id}`,
+      day,time,eatenAt:meal.eaten_at,meals:[meal],total:sumMeals([meal])
+    });
   }
-  return sessions.reverse();
-}
-
-export function goalKind(v:any){
-  const s=String(v||'').toLowerCase();
-  if(s.includes('loss')||s.includes('сниж')||s.includes('похуд'))return 'Снижение';
-  if(s.includes('gain')||s.includes('набор'))return 'Набор';
-  if(s.includes('maint')||s.includes('поддерж'))return 'Поддержание';
-  return 'Не указана';
+  return sessions.sort((a,b)=>new Date(b.eatenAt).getTime()-new Date(a.eatenAt).getTime());
 }
 
 export function pluralMeals(value:number){
@@ -158,4 +143,13 @@ export function pluralMeals(value:number){
   if(n1===1)return 'приём';
   if(n1>=2&&n1<=4)return 'приёма';
   return 'приёмов';
+}
+
+
+export function goalKind(value:any){
+  const s=String(value||"").toLowerCase();
+  if(s.includes("loss")||s.includes("сниж")||s.includes("похуд"))return "Снижение веса";
+  if(s.includes("gain")||s.includes("набор"))return "Набор массы";
+  if(s.includes("maint")||s.includes("поддерж"))return "Поддержание";
+  return value||"Цель не указана";
 }

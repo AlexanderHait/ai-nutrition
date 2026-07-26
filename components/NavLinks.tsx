@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
-  BookOpen,
+  CreditCard,
   Headphones,
-  Home,
+  LayoutDashboard,
   MessageSquare,
   Send,
   TrendingUp,
@@ -30,12 +30,12 @@ type IconKey =
 type Item = readonly [string, string, IconKey];
 
 const ICONS = {
-  home: Home,
+  home: LayoutDashboard,
   clients: Users,
   dialogs: MessageSquare,
   analytics: BarChart3,
   mailings: Send,
-  subscriptions: BookOpen,
+  subscriptions: CreditCard,
   nutrition: Utensils,
   progress: TrendingUp,
   support: Headphones,

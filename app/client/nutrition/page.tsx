@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { CalendarDays, ChevronDown, Sparkles } from "lucide-react";
+import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, Sparkles } from "lucide-react";
 import {requireClient} from "@/lib/auth";
-import {clientData,dayKey,fmt,mealSessions,pluralMeals,sumMeals} from "@/lib/data";
+import {clientData,dayKey,fmt,mealDay,mealSessions,pluralMeals,sumMeals} from "@/lib/data";
+import {mealQuality,sessionQuality} from "@/lib/meal-quality";
 import FoodIcon from "@/components/FoodIcon";
 
 export const dynamic="force-dynamic";
@@ -17,7 +18,7 @@ export default async function Page({searchParams}:{searchParams:SearchParams}){
   const today=dayKey();
 
   const groups=new Map<string,typeof d.meals>();
-  for(const m of d.meals){if(!groups.has(m.eaten_day))groups.set(m.eaten_day,[]);groups.get(m.eaten_day)!.push(m)}
+  for(const m of d.meals){const dk=mealDay(m);if(!groups.has(dk))groups.set(dk,[]);groups.get(dk)!.push(m)}
   let entries=[...groups.entries()].sort(([a],[b])=>b.localeCompare(a));
   if(selected)entries.sort(([a],[b])=>a===selected?-1:b===selected?1:b.localeCompare(a));
 
@@ -58,12 +59,13 @@ export default async function Page({searchParams}:{searchParams:SearchParams}){
                 <div className="sessionIconStack">{session.meals.slice(0,3).map(m=><i key={m.id}><FoodIcon dish={m.dish}/></i>)}</div>
                 <div className="sessionTitle"><time>{session.time}</time><b>{session.meals.length===1?session.meals[0].dish:`${session.meals.length} позиции`}</b><small>{session.meals.slice(0,3).map(x=>x.dish).join(" · ")}{session.meals.length>3?"…":""}</small></div>
                 <div className="sessionTotal"><b>{fmt(session.total.kcal)} ккал</b><small>Б {fmt(session.total.prot,1)} · Ж {fmt(session.total.fat,1)} · У {fmt(session.total.carb,1)}</small></div>
+                {sessionQuality(session.meals).ok?<span className="mealQualityChip ok"><CheckCircle2 size={13}/>OK</span>:<span className="mealQualityChip check"><AlertTriangle size={13}/>Проверить</span>}
                 <ChevronDown className="sessionChevron" size={17}/>
               </summary>
               <div className="sessionItems">
                 {session.meals.map(m=><div className="sessionFoodRow" key={m.id}>
                   <i><FoodIcon dish={m.dish}/></i>
-                  <span><b>{m.dish}</b><small>{fmt(m.grams)} г · Б {fmt(m.prot,1)} · Ж {fmt(m.fat,1)} · У {fmt(m.carb,1)}</small></span>
+                  <span><b>{m.dish}</b><small>{fmt(m.grams)} г · Б {fmt(m.prot,1)} · Ж {fmt(m.fat,1)} · У {fmt(m.carb,1)}</small>{mealQuality(m).level!=="ok"&&<em className="mealIssue">{mealQuality(m).reasons[0]}</em>}</span>
                   <strong>{fmt(m.kcal)} ккал</strong>
                 </div>)}
               </div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { CalendarDays, ChevronRight, MessageCircle, Scale, Sparkles, Target, TrendingUp } from "lucide-react";
+import { AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, MessageCircle, Scale, Sparkles, Target, TrendingUp } from "lucide-react";
 import { requireClient } from "@/lib/auth";
-import { clientData, dayKey, fmt, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
+import { clientData, dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
+import { sessionQuality } from "@/lib/meal-quality";
 import FoodIcon from "@/components/FoodIcon";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export default async function Page(){
   const s=await requireClient();
   const d=await clientData(s.chatId!);
   const today=dayKey();
-  const tm=d.meals.filter(m=>m.eaten_day===today);
+  const tm=d.meals.filter(m=>mealDay(m)===today);
   const sum=sumMeals(tm);
   const sessions=mealSessions(tm);
 
@@ -36,11 +37,24 @@ export default async function Page(){
   const recentDays=Array.from({length:7},(_,i)=>{
     const date=new Date();date.setDate(date.getDate()-(6-i));
     const day=dayKey(date);
-    const rows=d.meals.filter(m=>m.eaten_day===day);
+    const rows=d.meals.filter(m=>mealDay(m)===day);
     return{day,total:sumMeals(rows),sessions:mealSessions(rows).length};
   });
   const activeDays=recentDays.filter(x=>x.sessions>0).length;
   const avg=activeDays?Math.round(recentDays.reduce((a,x)=>a+x.total.kcal,0)/activeDays):0;
+
+  const todayQuality=sessions.reduce((a,s)=>{
+    const q=sessionQuality(s.meals); return {bad:a.bad+q.bad,check:a.check+q.check};
+  },{bad:0,check:0});
+  const proteinRemaining=Math.max(0,proteinTarget-sum.prot);
+  const attention=
+    todayQuality.bad>0
+      ? {tone:"warn",icon:<AlertTriangle size={18}/>,title:"Есть данные, которые стоит проверить",text:`${todayQuality.bad} поз. с подозрительной массой или КБЖУ. Открой питание и сверь их.`}
+      : proteinTarget>0&&proteinRemaining>=25
+        ? {tone:"focus",icon:<Target size={18}/>,title:`Осталось ~${fmt(proteinRemaining)} г белка`,text:"Следующий приём лучше собрать вокруг белкового продукта."}
+        : sessions.length===0
+          ? {tone:"neutral",icon:<Sparkles size={18}/>,title:"Рацион на сегодня ещё пуст",text:"Отправь фото или внеси еду через бота — данные сразу появятся здесь."}
+          : {tone:"good",icon:<CheckCircle2 size={18}/>,title:"День выглядит аккуратно",text:"Сохранённые позиции проходят базовую проверку. Продолжай фиксировать рацион."};
 
   return <>
     <header className="clientWelcome">
@@ -81,6 +95,12 @@ export default async function Page(){
       <Quick icon={<Scale/>} label="Вес" value={currentWeight?`${fmt(currentWeight,1)} кг`:"—"} sub={targetWeight?`цель ${fmt(targetWeight,1)} кг`:"цель не указана"}/>
       <Quick icon={<MessageCircle/>} label="Поддержка" value="На связи" sub="ответит человек"/>
     </div>
+
+    <section className={`clientAttention ${attention.tone}`}>
+      <i>{attention.icon}</i>
+      <div><span>Сейчас важно</span><b>{attention.title}</b><p>{attention.text}</p></div>
+      <Link href="/client/nutrition">Открыть <ChevronRight size={15}/></Link>
+    </section>
 
     <div className="clientHomeGrid top">
       <section className="card clientRecentMeals">
