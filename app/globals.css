@@ -529,3 +529,6 @@ input,select,textarea{font-size:13px}
 @media(max-width:1050px){.growthKpis{grid-template-columns:repeat(2,1fr)}.funnelSteps{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.smartMealCard{grid-template-columns:auto 1fr}.smartMealCard>a{grid-column:2}.growthKpis{grid-template-columns:1fr 1fr}.funnelSteps{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.growthKpis{grid-template-columns:1fr}.funnelSteps{grid-template-columns:1fr}}
+
+/* Telegram avatar sync */
+.tgAvatar{position:relative;overflow:hidden;flex:0 0 auto}.tgAvatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}.tgAvatar>span{position:relative;z-index:1}.tgAvatar.small{width:36px;height:36px;border-radius:11px;font-size:13px}.tgAvatar.medium{width:54px;height:54px}.tgAvatar.large{width:72px;height:72px;font-size:26px}.tgAvatar.huge{width:68px;height:68px;font-size:24px;border-radius:20px}.clientProfileChip>.tgAvatar{width:35px;height:35px;border-radius:11px}.adminHeadActions{display:flex;gap:8px;align-items:center}.adminHeadActions form{margin:0}

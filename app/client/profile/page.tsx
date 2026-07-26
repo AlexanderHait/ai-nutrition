@@ -1,3 +1,4 @@
+import TelegramAvatar from "@/components/TelegramAvatar";
 import { CheckCircle2, Flame, Scale, Target, UserRound } from "lucide-react";
 import {requireClient} from "@/lib/auth";
 import {clientData,fmt,goalKind} from "@/lib/data";
@@ -14,7 +15,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Record<s
     {q.saved==="1"&&<div className="successNotice"><CheckCircle2 size={17}/>Сохранено. Новые параметры уже доступны боту.</div>}
 
     <section className="clientProfileHero">
-      <div className="avatar huge">{String(d.profile?.first_name||"К")[0]}</div>
+      <TelegramAvatar profile={d.profile} size="huge"/>
       <div><h2>{d.profile?.first_name||"Клиент"}</h2><p>{d.profile?.username?"@"+d.profile.username:`Telegram ${s.chatId}`}</p>
         <div className="clientTags"><span><Target size={13}/>{goalKind(d.settings?.goal)}</span><span><Flame size={13}/>{fmt(kcal)} ккал</span>{current>0&&<span><Scale size={13}/>{fmt(current,1)} кг</span>}</div>
       </div>

@@ -140,6 +140,11 @@ export async function GET(req: Request) {
       return loginError(req, "telegram_unknown");
     }
 
+    const avatarUrl = typeof payload.picture === "string" ? payload.picture : "";
+    if (avatarUrl) {
+      await supabase.from("profiles").update({ avatar_url: avatarUrl, avatar_updated_at: new Date().toISOString() }).eq("telegram_id", telegramId);
+    }
+
     // Always return to the canonical site URL. This also prevents www/non-www
     // cookie inconsistencies after mobile authorization.
     const finalOrigin = (

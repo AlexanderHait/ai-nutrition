@@ -4,7 +4,7 @@ export type Meal={
   id:number;chat_id:number;dish:string;grams:number;kcal:number;prot:number;fat:number;carb:number;
   eaten_at:string;eaten_day:string;deleted:boolean
 };
-export type Profile={id:number;telegram_id:number;first_name:string|null;username:string|null;locale:string|null;created_at:string};
+export type Profile={id:number;telegram_id:number;first_name:string|null;username:string|null;locale:string|null;created_at:string;avatar_url?:string|null;avatar_file_id?:string|null};
 
 export async function allData(){
   const s=getSupabaseAdmin();

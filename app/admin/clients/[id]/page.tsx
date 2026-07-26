@@ -1,3 +1,4 @@
+import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from 'next/link';
 import {AlertTriangle,Apple,Beef,CalendarDays,Cookie,CupSoda,MessageSquare,Salad,Sandwich,Scale,Target,TrendingUp,Utensils} from 'lucide-react';
 import {clientData,dayKey,fmt,goalKind,mealSessions,pluralMeals,sumMeals} from '@/lib/data';
@@ -57,7 +58,7 @@ export default async function Page({params,searchParams}:{params:Promise<{id:str
   return <>
     <Link className="back" href="/admin/clients">← Назад к списку</Link>
     <div className="clientHeroV3">
-      <div className="avatar large">{String(d.profile.first_name||'К')[0]}</div>
+      <TelegramAvatar profile={d.profile} size="large"/>
       <div className="clientHeroInfo">
         <div className="clientNameLine"><h1>{d.profile.first_name||'Без имени'}</h1><span className={`planPill ${d.subscription?.plan||'none'}`}>{d.subscription?.status==='active'?String(d.subscription.plan).toUpperCase():'БЕЗ ПОДПИСКИ'}</span></div>
         <p>{d.profile.username?'@'+d.profile.username:`Telegram ${chatId}`}</p>

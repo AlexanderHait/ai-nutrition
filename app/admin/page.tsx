@@ -1,3 +1,4 @@
+import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from 'next/link';
 import {Activity,AlertTriangle,Crown,MessageSquare,Scale,Target,Users} from 'lucide-react';
 import {allData,dayKey,fmt,goalKind,sumMeals} from '@/lib/data';
@@ -67,7 +68,7 @@ export default async function Page(){
   return <>
     <header className="pageHead adminWelcome">
       <div><p>AI‑Nutrition / Админка</p><h1>Панель управления</h1><span>С утра сразу видно, кому нужно внимание и что происходит с базой.</span></div>
-      <Link className="primary compactBtn" href="/admin/mailings">Новая рассылка</Link>
+      <div className="adminHeadActions"><form action="/api/admin/sync-avatars" method="post"><button className="secondaryBtn compactBtn" type="submit">Обновить аватары</button></form><Link className="primary compactBtn" href="/admin/mailings">Новая рассылка</Link></div>
     </header>
 
     <div className="adminKpis">
@@ -85,7 +86,7 @@ export default async function Page(){
         </div>
         {attention.length?<div className="attentionCards">
           {attention.map(x=><Link href={`/admin/clients/${x.id}`} className="attentionCard" key={x.id}>
-            <div className="attentionAvatar">{x.name[0]?.toUpperCase()}</div>
+            <TelegramAvatar profile={profiles.find(p=>Number(p.telegram_id)===x.id)} size="small"/>
             <div><b>{x.name}</b><small>{x.username}</small><p>{x.reasons.slice(0,3).join(' · ')}</p></div>
             <span>Открыть</span>
           </Link>)}
@@ -106,7 +107,7 @@ export default async function Page(){
         <section className="card recentCompact">
           <div className="sectionTitleRow"><div><h2>Новые клиенты</h2><span className="muted">Последние регистрации</span></div></div>
           {profiles.slice(0,5).map(p=><Link className="recentClient" href={`/admin/clients/${p.telegram_id}`} key={p.id}>
-            <i>{String(p.first_name||p.username||'?')[0].toUpperCase()}</i>
+            <TelegramAvatar profile={p} size="small"/>
             <span><b>{p.first_name||'Без имени'}</b><small>{p.username?'@'+p.username:p.telegram_id}</small></span>
           </Link>)}
         </section>

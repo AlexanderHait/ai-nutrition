@@ -1,3 +1,4 @@
+import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from 'next/link';
 import {allData,dayKey,fmt,mealDay,mealSessions,sumMeals} from '@/lib/data';
 
@@ -77,7 +78,7 @@ export default async function Page(){
 
         return <Link href={`/admin/clients/${id}`} className="tableRow clientsGridV2 clientRowV2" key={p.id}>
           <div className="clientIdentity">
-            <div className="clientMiniAvatar">{String(p.first_name||p.username||'?').slice(0,1).toUpperCase()}</div>
+            <TelegramAvatar profile={p} size="small"/>
             <div>
               <b>{p.first_name||'Без имени'}</b>
               <small>{p.username?'@'+p.username:String(id)}</small>

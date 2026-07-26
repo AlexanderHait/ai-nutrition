@@ -1,3 +1,4 @@
+import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from "next/link";
 import { AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, MessageCircle, Scale, Sparkles, Target, TrendingUp, UtensilsCrossed } from "lucide-react";
 import { requireClient } from "@/lib/auth";
@@ -74,7 +75,7 @@ export default async function Page(){
         <span>{d.settings?.goal||"Отслеживай питание без лишней рутины"}</span>
       </div>
       <Link href="/client/profile" className="clientProfileChip">
-        <i>{String(d.profile?.first_name||"К")[0]}</i>
+        <TelegramAvatar profile={d.profile} size="small"/>
         <span><b>{d.profile?.first_name||"Профиль"}</b><small>{d.subscription?.status==="active"?String(d.subscription.plan).toUpperCase():"Настроить"}</small></span>
       </Link>
     </header>

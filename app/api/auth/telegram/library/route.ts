@@ -44,6 +44,11 @@ export async function POST(req: Request) {
     if (error) throw error;
     if (!profile) return NextResponse.json({ error: "unknown_user" }, { status: 403 });
 
+    const avatarUrl = typeof payload.picture === "string" ? payload.picture : "";
+    if (avatarUrl) {
+      await supabase.from("profiles").update({ avatar_url: avatarUrl, avatar_updated_at: new Date().toISOString() }).eq("telegram_id", telegramId);
+    }
+
     const res = NextResponse.json({ ok: true, redirect: "/client" });
     res.cookies.set(
       sessionCookie,
