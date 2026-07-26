@@ -16,10 +16,14 @@ export async function POST(req: Request) {
 
   const form = await req.formData();
   const currentWeight = num(form.get("current_weight_kg"));
+  const sex = String(form.get("sex") || "").trim();
+  const birthDate = String(form.get("birth_date") || "").trim();
 
   const row = {
     chat_id: s.chatId,
-    goal: String(form.get("goal") || "") || null,
+    goal: String(form.get("goal") || "").trim() || null,
+    sex: sex || null,
+    birth_date: birthDate || null,
     kcal_target: num(form.get("kcal_target")),
     protein_target: num(form.get("protein_target")),
     fat_target: num(form.get("fat_target")),
@@ -37,9 +41,12 @@ export async function POST(req: Request) {
     .eq("chat_id", s.chatId)
     .maybeSingle();
 
-  const { error } = await supabase.from("client_settings").upsert(row, { onConflict: "chat_id" });
+  const { error } = await supabase
+    .from("client_settings")
+    .upsert(row, { onConflict: "chat_id" });
 
   if (error) {
+    console.error("Saving client settings failed", error);
     return NextResponse.redirect(new URL("/client/profile?error=settings", req.url));
   }
 

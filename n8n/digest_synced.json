@@ -1,0 +1,391 @@
+{
+  "name": "digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 21
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        -96
+      ],
+      "id": "4be49d97-7e62-4c5a-b60c-4523a1a28c76",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// определяем начало и конец текущего дня (МСК)\nconst now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));\nconst pad = n => String(n).padStart(2, '0');\nconst date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;\n\nreturn [{\n  json: {\n    date,                                   // '2025-05-16'\n    dayStart: `${date}T00:00:00`,\n    dayEnd:   `${date}T23:59:59`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "26c077ee-56a2-49c2-bc54-790421e48ba0",
+      "name": "calcRange"
+    },
+    {
+      "parameters": {
+        "jsCode": "// items = массив строк из таблицы meals\nconst users = {};   // chat_id → агрегаты\n\nfor (const { json: r } of items) {\n  const id = r.chat_id;\n  const dt = new Date(r.eaten_at);\n\n  if (!users[id]) {\n    users[id] = {\n      chat_id: id,                        // ← для Telegram\n      gpt: {                              // ← для LLM\n        date: $items('calcRange')[0].json.date,\n        kcal: 0, prot: 0, fat: 0, carb: 0,\n        meals: []                         // строки «HH:MM — блюдо 200 г»\n      }\n    };\n  }\n\n  const u = users[id].gpt;\n\n  // суммарные КБЖУ\n  u.kcal += r.kcal;\n  u.prot += r.prot;\n  u.fat  += r.fat;\n  u.carb += r.carb;\n\n  // строка тайм-лайна\n  const hhmm = dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });\n  u.meals.push(`${hhmm} — ${r.dish} ${r.grams} г`);\n}\n\n// превращаем в массив items\nreturn Object.values(users).map(j => ({ json: j }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        -96
+      ],
+      "id": "e8c3fbc7-84a8-4b01-a440-b59c98bde723",
+      "name": "groupByUser"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-5.5",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-5.5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Ты нутри-диетолог-бот. На вход приходит отчет о питании пользователя в JSON:\n{\n  \"date\": \"YYYY-MM-DD\",\n  \"kcal\": число | null,\n  \"prot\": число | null,\n  \"fat\" : число | null,\n  \"carb\": число | null,\n  \"meals\": [ \"08:00 — …\", … ]        // массив может быть пуст\n}\n\n✅  Если данные по КБЖУ есть - сделай отчёт:\n\n• Итог КБЖУ за день: kcal, Б, Ж, У  \n• Замечания: (кратко, только если есть замечания по рациону пользователя)  \n• Совет на завтра: (1 конкретная рекомендация по улучшению самочувствия или питания)\n\nВ конце: \"Если будут вопросы — пиши :)\"\n\n--------------------------------\nФормат:\n\n• Telegram-Markdown Legacy \n• Сделай текст визуально приятным, важное выдели\n• жирный — одна `*`, курсив — одна `_`  \n• до 3 тематических эмоджи во всём сообщении  \n• Не выдавай ``` и не возвращай JSON.\n\n\nПЕРСОНАЛЬНЫЙ ПРОФИЛЬ С САЙТА:\n{{ JSON.stringify($('GET client settings').item.json || {}, null, 2) }}\n\nДополнительно:\n• Оцени итог дня относительно kcal_target/protein_target/fat_target/carb_target, если они заполнены.\n• Учитывай goal и текущий/целевой вес.\n• Не придумывай отсутствующие значения.\n• Совет на завтра должен быть связан с реальным отклонением от персональной цели, если оно есть.\n",
+              "role": "system"
+            },
+            {
+              "content": "={{ JSON.stringify($('groupByUser').item.json.gpt, null, 2) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1232,
+        -96
+      ],
+      "id": "8974eeec-ac24-4f85-9509-d5adfbb921cd",
+      "name": "digestGPT",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "meals",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "deleted",
+              "condition": "is",
+              "keyValue": "false"
+            },
+            {
+              "keyName": "eaten_at",
+              "condition": "lte",
+              "keyValue": "={{ $json.dayEnd }}"
+            },
+            {
+              "keyName": "eaten_at",
+              "condition": "gte",
+              "keyValue": "={{ $json.dayStart }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -96
+      ],
+      "id": "eb852de7-dfea-4229-844c-0add2de561f7",
+      "name": "GET today",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# РАССЫЛКА каждый день в 21:00 по мск\n\n\n\n",
+        "height": 352,
+        "width": 1718,
+        "color": 6
+      },
+      "id": "dc3dec22-72dd-4c73-b848-2ab077f52723",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        -208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/upsert_digest",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "__REPLACE_WITH_EXISTING_CREDENTIAL_OR_SECRET__"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_chat_id",
+              "value": "={{ $('groupByUser').item.json.chat_id }}"
+            },
+            {
+              "name": "_for_date",
+              "value": "={{ $('groupByUser').item.json.gpt.date }}"
+            },
+            {
+              "name": "_kcal",
+              "value": "={{ $('groupByUser').item.json.gpt.kcal }}"
+            },
+            {
+              "name": "_prot",
+              "value": "={{ $('groupByUser').item.json.gpt.prot }}"
+            },
+            {
+              "name": "_fat",
+              "value": "={{ $('groupByUser').item.json.gpt.fat }}"
+            },
+            {
+              "name": "_carb",
+              "value": "={{ $('groupByUser').item.json.gpt.carb }}"
+            },
+            {
+              "name": "_meals_json",
+              "value": "={{ $('groupByUser').item.json.gpt.meals }}"
+            },
+            {
+              "name": "_summary_md",
+              "value": "={{ $('digestGPT').item.json.message.content }}"
+            },
+            {
+              "name": "_msg_id",
+              "value": "={{ $json.result.message_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1984,
+        -96
+      ],
+      "id": "fbb33195-b9ab-42d0-a3cd-a0ec59e5836f",
+      "name": "SAVE SUPA  digest",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('groupByUser').item.json.chat_id }}",
+        "text": "={{ $json[\"message\"][\"content\"] || $json }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1776,
+        -96
+      ],
+      "id": "dbe3a5a9-3d96-4a06-912e-67cea5418f1a",
+      "name": "SEND",
+      "webhookId": "f28557c8-d474-47fe-9f04-5d6dbb9bd96c",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// убираем экранирование у формат-маркеров * и _\nif ($json.message?.content) {\n  $json.message.content = $json.message.content\n    // сначала двойные обратные слэши\n    .replace(/\\\\([*_])/g, '$1');\n}\nreturn $json;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -96
+      ],
+      "id": "507b71a0-2a0e-4aa3-9386-8bfda7e07aad",
+      "name": "Escape"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "client_settings",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $('groupByUser').item.json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        0
+      ],
+      "id": "2519d0fa-6a19-404b-8351-cb69a91e07d7",
+      "name": "GET client settings",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "calcRange",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calcRange": {
+      "main": [
+        [
+          {
+            "node": "GET today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "groupByUser": {
+      "main": [
+        [
+          {
+            "node": "GET client settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "digestGPT": {
+      "main": [
+        [
+          {
+            "node": "Escape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET today": {
+      "main": [
+        [
+          {
+            "node": "groupByUser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEND": {
+      "main": [
+        [
+          {
+            "node": "SAVE SUPA  digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escape": {
+      "main": [
+        [
+          {
+            "node": "SEND",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET client settings": {
+      "main": [
+        [
+          {
+            "node": "digestGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f9601072-eb78-4584-aafc-cad914d9ea7f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "169ae9c79d7aed5aceb64b989c1fc46ab74a2feb20b117eefd579dec340f104b"
+  },
+  "nodeGroups": [],
+  "id": "uhwTDG5ywtVfwV3J",
+  "tags": []
+}
