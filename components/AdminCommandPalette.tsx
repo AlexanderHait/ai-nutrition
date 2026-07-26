@@ -3,16 +3,16 @@
 import {useEffect,useMemo,useState} from "react";
 import {useRouter} from "next/navigation";
 import {BarChart3,Mail,MessageSquare,Search,Users,X} from "lucide-react";
-import type {LucideIcon} from "lucide-react";
 
 type Client={id:number;name:string;username:string};
-type CommandResult={label:string;href:string;icon:LucideIcon;sub?:string};
+type IconName="users"|"dialogs"|"analytics"|"mail";
+type CommandResult={label:string;href:string;icon:IconName;sub?:string};
 
 const actions:CommandResult[]=[
-  {label:"Открыть клиентов",href:"/admin/clients",icon:Users},
-  {label:"Открыть диалоги",href:"/admin/dialogs",icon:MessageSquare},
-  {label:"Открыть аналитику",href:"/admin/analytics",icon:BarChart3},
-  {label:"Создать рассылку",href:"/admin/mailings",icon:Mail},
+  {label:"Открыть клиентов",href:"/admin/clients",icon:"users"},
+  {label:"Открыть диалоги",href:"/admin/dialogs",icon:"dialogs"},
+  {label:"Открыть аналитику",href:"/admin/analytics",icon:"analytics"},
+  {label:"Создать рассылку",href:"/admin/mailings",icon:"mail"},
 ];
 
 export default function AdminCommandPalette({clients}:{clients:Client[]}){
@@ -36,7 +36,7 @@ export default function AdminCommandPalette({clients}:{clients:Client[]}){
     const clientRows:CommandResult[]=clients
       .filter(c=>!q||c.name.toLowerCase().includes(q)||c.username.toLowerCase().includes(q))
       .slice(0,7)
-      .map(c=>({label:c.name,sub:c.username||`Telegram ${c.id}`,href:`/admin/clients/${c.id}`,icon:Users}));
+      .map(c=>({label:c.name,sub:c.username||`Telegram ${c.id}`,href:`/admin/clients/${c.id}`,icon:"users"}));
     const actionRows:CommandResult[]=actions.filter(a=>!q||a.label.toLowerCase().includes(q));
     return [...actionRows,...clientRows];
   },[clients,query]);
@@ -56,7 +56,7 @@ export default function AdminCommandPalette({clients}:{clients:Client[]}){
         </div>
         <div className="commandResults">
           {results.length?results.map((r,i)=>{
-            const Icon=r.icon;
+            const Icon=r.icon==="dialogs"?MessageSquare:r.icon==="analytics"?BarChart3:r.icon==="mail"?Mail:Users;
             return <button key={`${r.href}-${i}`} type="button" onClick={()=>go(r.href)}>
               <i><Icon size={17}/></i><span><b>{r.label}</b>{r.sub ? <small>{r.sub}</small> : null}</span>
             </button>
