@@ -2,9 +2,45 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
+import {
+  BarChart3,
+  BookOpen,
+  Headphones,
+  Home,
+  MessageSquare,
+  Send,
+  TrendingUp,
+  UserRound,
+  Users,
+  Utensils,
+} from "lucide-react";
 
-type Item = readonly [string, string, LucideIcon];
+type IconKey =
+  | "home"
+  | "clients"
+  | "dialogs"
+  | "analytics"
+  | "mailings"
+  | "subscriptions"
+  | "nutrition"
+  | "progress"
+  | "support"
+  | "profile";
+
+type Item = readonly [string, string, IconKey];
+
+const ICONS = {
+  home: Home,
+  clients: Users,
+  dialogs: MessageSquare,
+  analytics: BarChart3,
+  mailings: Send,
+  subscriptions: BookOpen,
+  nutrition: Utensils,
+  progress: TrendingUp,
+  support: Headphones,
+  profile: UserRound,
+} satisfies Record<IconKey, React.ComponentType<{ size?: number; strokeWidth?: number }>>;
 
 function isActive(pathname: string, href: string) {
   if (href === "/admin" || href === "/client") return pathname === href;
@@ -24,7 +60,8 @@ export default function NavLinks({
 
   return (
     <>
-      {items.map(([href, label, Icon]) => {
+      {items.map(([href, label, iconKey]) => {
+        const Icon = ICONS[iconKey];
         const badge = href === "/admin/dialogs" ? unreadDialogs : 0;
         const active = isActive(pathname, href);
 

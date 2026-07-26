@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import NavLinks from "@/components/NavLinks";
 import AdminCommandPalette from "@/components/AdminCommandPalette";
 import {
-  BarChart3,BookOpen,Home,LogOut,MessageSquare,TrendingUp,UserRound,Users,Utensils,Headphones,Send
+  LogOut
 } from "lucide-react";
 
 export default async function Shell({
@@ -12,19 +12,19 @@ export default async function Shell({
   children:React.ReactNode;role:"admin"|"client";
 }){
   const admin=[
-    ["/admin","Главная",Home],
-    ["/admin/clients","Клиенты",Users],
-    ["/admin/dialogs","Диалоги",MessageSquare],
-    ["/admin/analytics","Аналитика",BarChart3],
-    ["/admin/mailings","Рассылки",Send],
-    ["/admin/subscriptions","Подписки",BookOpen],
+    ["/admin","Главная","home"],
+    ["/admin/clients","Клиенты","clients"],
+    ["/admin/dialogs","Диалоги","dialogs"],
+    ["/admin/analytics","Аналитика","analytics"],
+    ["/admin/mailings","Рассылки","mailings"],
+    ["/admin/subscriptions","Подписки","subscriptions"],
   ] as const;
   const client=[
-    ["/client","Главная",Home],
-    ["/client/nutrition","Питание",Utensils],
-    ["/client/progress","Прогресс",TrendingUp],
-    ["/client/support","Поддержка",Headphones],
-    ["/client/profile","Профиль",UserRound],
+    ["/client","Главная","home"],
+    ["/client/nutrition","Питание","nutrition"],
+    ["/client/progress","Прогресс","progress"],
+    ["/client/support","Поддержка","support"],
+    ["/client/profile","Профиль","profile"],
   ] as const;
 
   let unreadDialogs=0;
