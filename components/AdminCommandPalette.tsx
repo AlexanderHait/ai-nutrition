@@ -3,10 +3,12 @@
 import {useEffect,useMemo,useState} from "react";
 import {useRouter} from "next/navigation";
 import {BarChart3,Mail,MessageSquare,Search,Users,X} from "lucide-react";
+import type {LucideIcon} from "lucide-react";
 
 type Client={id:number;name:string;username:string};
+type CommandResult={label:string;href:string;icon:LucideIcon;sub?:string};
 
-const actions=[
+const actions:CommandResult[]=[
   {label:"Открыть клиентов",href:"/admin/clients",icon:Users},
   {label:"Открыть диалоги",href:"/admin/dialogs",icon:MessageSquare},
   {label:"Открыть аналитику",href:"/admin/analytics",icon:BarChart3},
@@ -31,11 +33,11 @@ export default function AdminCommandPalette({clients}:{clients:Client[]}){
 
   const results=useMemo(()=>{
     const q=query.trim().toLowerCase();
-    const clientRows=clients
+    const clientRows:CommandResult[]=clients
       .filter(c=>!q||c.name.toLowerCase().includes(q)||c.username.toLowerCase().includes(q))
       .slice(0,7)
       .map(c=>({label:c.name,sub:c.username||`Telegram ${c.id}`,href:`/admin/clients/${c.id}`,icon:Users}));
-    const actionRows=actions.filter(a=>!q||a.label.toLowerCase().includes(q));
+    const actionRows:CommandResult[]=actions.filter(a=>!q||a.label.toLowerCase().includes(q));
     return [...actionRows,...clientRows];
   },[clients,query]);
 
@@ -56,7 +58,7 @@ export default function AdminCommandPalette({clients}:{clients:Client[]}){
           {results.length?results.map((r,i)=>{
             const Icon=r.icon;
             return <button key={`${r.href}-${i}`} type="button" onClick={()=>go(r.href)}>
-              <i><Icon size={17}/></i><span><b>{r.label}</b>{'sub' in r&&r.sub&&<small>{r.sub}</small>}</span>
+              <i><Icon size={17}/></i><span><b>{r.label}</b>{r.sub ? <small>{r.sub}</small> : null}</span>
             </button>
           }):<div className="commandEmpty">Ничего не найдено</div>}
         </div>
