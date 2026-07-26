@@ -5,7 +5,9 @@ export default function TelegramAvatar({
 }:{profile:any;size?:"small"|"medium"|"large"|"huge";className?:string}){
   const id=Number(profile?.telegram_id||0);
   const direct=String(profile?.avatar_url||"").trim();
-  const src=direct || (id?`/api/avatar/${id}`:"");
+  const version=profile?.avatar_updated_at?encodeURIComponent(String(profile.avatar_updated_at)):"";
+  const proxy=id?`/api/avatar/${id}${version?`?v=${version}`:""}`:"";
+  const src=direct || proxy;
   const initial=String(profile?.first_name||profile?.username||"К")[0]?.toUpperCase()||"К";
   if(!src)return <div className={`avatar tgAvatar ${size} ${className}`}>{initial}</div>;
   return <div className={`avatar tgAvatar ${size} ${className}`}>

@@ -1,0 +1,8 @@
+V16 PROFILE SYNC
+- Client can refresh own Telegram avatar and @username from profile page.
+- Admin can refresh a selected client's Telegram avatar and @username.
+- getChat is used for current first_name/username.
+- getUserProfilePhotos is used for current avatar.
+- avatar_url from OAuth is cleared on manual refresh so stale OAuth pictures cannot override current Bot API photo.
+- avatar URL gets a version query from avatar_updated_at to bypass browser cache after refresh.
+- No GPT/AI calls are involved.

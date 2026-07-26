@@ -1,5 +1,5 @@
 import TelegramAvatar from "@/components/TelegramAvatar";
-import { CheckCircle2, Flame, Scale, Target, UserRound } from "lucide-react";
+import { CheckCircle2, Flame, RefreshCw, Scale, Target, UserRound } from "lucide-react";
 import {requireClient} from "@/lib/auth";
 import {clientData,fmt,goalKind} from "@/lib/data";
 export const dynamic="force-dynamic";
@@ -13,12 +13,19 @@ export default async function Page({searchParams}:{searchParams:Promise<Record<s
   return <>
     <div className="pageHead"><div><p>Профиль</p><h1>Мои данные</h1><span>Эти параметры используются сайтом и AI‑нутрициологом.</span></div></div>
     {q.saved==="1"&&<div className="successNotice"><CheckCircle2 size={17}/>Сохранено. Новые параметры уже доступны боту.</div>}
+    {q.sync==="ok"&&<div className="successNotice"><CheckCircle2 size={17}/>Данные Telegram обновлены.</div>}
+    {q.sync==="error"&&<div className="errorNotice">Не удалось обновить данные Telegram. Попробуй ещё раз позже.</div>}
 
     <section className="clientProfileHero">
       <TelegramAvatar profile={d.profile} size="huge"/>
-      <div><h2>{d.profile?.first_name||"Клиент"}</h2><p>{d.profile?.username?"@"+d.profile.username:`Telegram ${s.chatId}`}</p>
+      <div className="profileHeroCopy"><h2>{d.profile?.first_name||"Клиент"}</h2><p>{d.profile?.username?"@"+d.profile.username:`Telegram ${s.chatId}`}</p>
         <div className="clientTags"><span><Target size={13}/>{goalKind(d.settings?.goal)}</span><span><Flame size={13}/>{fmt(kcal)} ккал</span>{current>0&&<span><Scale size={13}/>{fmt(current,1)} кг</span>}</div>
+        <small className="telegramSyncMeta">{d.profile?.avatar_updated_at?`Telegram обновлён ${new Date(d.profile.avatar_updated_at).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`:"Telegram ещё не синхронизирован"}</small>
       </div>
+      <form action="/api/profile/telegram-sync" method="post" className="telegramSyncForm">
+        <input type="hidden" name="return_to" value="/client/profile"/>
+        <button className="secondaryBtn" type="submit"><RefreshCw size={15}/>Обновить из Telegram</button>
+      </form>
     </section>
 
     <div className="profileLayout top">

@@ -1,6 +1,6 @@
 import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from 'next/link';
-import {AlertTriangle,Apple,Beef,CalendarDays,Cookie,CupSoda,MessageSquare,Salad,Sandwich,Scale,Target,TrendingUp,Utensils} from 'lucide-react';
+import {AlertTriangle,Apple,Beef,CalendarDays,Cookie,CupSoda,MessageSquare,RefreshCw,Salad,Sandwich,Scale,Target,TrendingUp,Utensils} from 'lucide-react';
 import {clientData,dayKey,fmt,goalKind,mealSessions,pluralMeals,sumMeals} from '@/lib/data';
 export const dynamic='force-dynamic';
 
@@ -67,6 +67,11 @@ export default async function Page({params,searchParams}:{params:Promise<{id:str
       <div className="clientHeroActions">
         <Link className="primary compactBtn" href={`/admin/dialogs?chat=${chatId}`}><MessageSquare size={16}/>Написать{unread?` (${unread})`:''}</Link>
         <Link className="secondaryBtn" href="#nutrition"><CalendarDays size={16}/>Питание</Link>
+        <form action="/api/profile/telegram-sync" method="post" className="telegramSyncForm inline">
+          <input type="hidden" name="chat_id" value={chatId}/>
+          <input type="hidden" name="return_to" value={`/admin/clients/${chatId}`}/>
+          <button className="secondaryBtn" type="submit" title="Обновить аватар и @username из Telegram"><RefreshCw size={15}/>Telegram</button>
+        </form>
       </div>
     </div>
 

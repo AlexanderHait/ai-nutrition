@@ -532,3 +532,19 @@ input,select,textarea{font-size:13px}
 
 /* Telegram avatar sync */
 .tgAvatar{position:relative;overflow:hidden;flex:0 0 auto}.tgAvatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}.tgAvatar>span{position:relative;z-index:1}.tgAvatar.small{width:36px;height:36px;border-radius:11px;font-size:13px}.tgAvatar.medium{width:54px;height:54px}.tgAvatar.large{width:72px;height:72px;font-size:26px}.tgAvatar.huge{width:68px;height:68px;font-size:24px;border-radius:20px}.clientProfileChip>.tgAvatar{width:35px;height:35px;border-radius:11px}.adminHeadActions{display:flex;gap:8px;align-items:center}.adminHeadActions form{margin:0}
+
+
+/* V16 Telegram profile refresh */
+.telegramSyncForm{margin-left:auto}.telegramSyncForm.inline{margin-left:0}
+.telegramSyncForm .secondaryBtn{white-space:nowrap}
+.profileHeroCopy{min-width:0;flex:1}
+.telegramSyncMeta{display:block;margin-top:9px;color:#6f736f;font-size:9px}
+.errorNotice{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:10px;border:1px solid #5a2c2c;border-radius:12px;background:#1a1010;color:#e2a4a4;font-size:11px}
+.tgAvatar{position:relative;overflow:hidden}.tgAvatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}.tgAvatar span{position:relative;z-index:1}
+@media(max-width:700px){
+  .clientProfileHero{align-items:flex-start;flex-wrap:wrap}
+  .clientProfileHero .telegramSyncForm{width:100%;margin-left:82px}
+  .clientProfileHero .telegramSyncForm button{width:100%;justify-content:center}
+  .clientHeroActions .telegramSyncForm.inline{display:flex;flex:1}
+  .clientHeroActions .telegramSyncForm.inline button{width:100%;justify-content:center}
+}
