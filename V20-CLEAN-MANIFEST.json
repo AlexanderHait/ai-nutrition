@@ -1,0 +1,33 @@
+{
+  "release": "AI-Nutrition V20 Clean Site",
+  "removed_legacy_files": [
+    "AUTH-FIX-README.txt",
+    "MOBILE-AUTH-FIX.txt",
+    "PATCH-INSTRUCTIONS.txt",
+    "README-CLIENT.txt",
+    "README-UPDATE.txt",
+    "SYNC-README.txt",
+    "TELEGRAM-OIDC-SETUP.txt",
+    "V10-CHANGES.txt",
+    "V12-PRODUCT-UPGRADE.txt",
+    "V12.5-CLIENT-UI.txt",
+    "V13-PRODUCT-UPGRADE.txt",
+    "V14-GROWTH-INTELLIGENCE.txt",
+    "V16-PROFILE-SYNC.txt",
+    "V17-OPTIMIZATION-README.txt",
+    "V19-AUDITED-DEPLOY.txt",
+    "V19-HARDENED-DEPLOY.txt",
+    "V19.1-RELIABILITY-DEPLOY.txt",
+    "V19.1-SMOKE-TEST-REPORT.txt",
+    "V9-DEPLOY.txt",
+    "legacy-reference/digest_synced.json",
+    "legacy-reference/tx_text_synced.json"
+  ],
+  "kept_current_docs": [
+    "PRODUCT-CORE-README.txt",
+    "README.md",
+    "TRAINER-VIDEO-KNOWLEDGE-REPORT.md",
+    "V20-DEPLOY.txt"
+  ],
+  "note": "Older SQL migrations are intentionally retained because a clean install may depend on them."
+}
