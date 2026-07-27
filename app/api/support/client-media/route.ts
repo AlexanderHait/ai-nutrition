@@ -6,46 +6,33 @@ export const runtime="nodejs";
 
 const MAX_BYTES=10*1024*1024;
 const ALLOWED=new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/heic",
-  "image/heif",
+  "image/jpeg","image/png","image/webp","image/heic","image/heif",
 ]);
 
 function safeExt(file:File){
-  const byType:Record<string,string>={
-    "image/jpeg":"jpg",
-    "image/png":"png",
-    "image/webp":"webp",
-    "image/heic":"heic",
-    "image/heif":"heif",
+  const map:Record<string,string>={
+    "image/jpeg":"jpg","image/png":"png","image/webp":"webp",
+    "image/heic":"heic","image/heif":"heif",
   };
-  return byType[file.type]||"jpg";
+  return map[file.type]||"jpg";
 }
 
 export async function POST(req:NextRequest){
   let uploadedPath:string|null=null;
-
   try{
     const auth=await session();
-    if(auth?.role!=="admin"){
+    if(auth?.role!=="client"||!auth.chatId){
       return NextResponse.json({error:"Unauthorized"},{status:401});
     }
 
     const form=await req.formData();
-    const chatId=Number(form.get("chat_id"));
     const content=String(form.get("content")||"").trim().slice(0,3000);
     const value=form.get("file");
     const file=value instanceof File&&value.size>0?value:null;
 
-    if(!Number.isSafeInteger(chatId)||chatId<=0){
-      return NextResponse.json({error:"Некорректный chat_id"},{status:400});
-    }
     if(!content&&!file){
       return NextResponse.json({error:"Добавьте текст или фото"},{status:400});
     }
-
     if(file){
       if(file.size>MAX_BYTES){
         return NextResponse.json({error:"Фото должно быть не больше 10 МБ"},{status:413});
@@ -55,19 +42,15 @@ export async function POST(req:NextRequest){
       }
     }
 
-    // IMPORTANT: one canonical server client for the whole app.
-    // It uses NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY.
     const supabase=getSupabaseAdmin();
-
     let attachmentMime:string|null=null;
     let attachmentName:string|null=null;
     let attachmentSize:number|null=null;
 
     if(file){
       const ext=safeExt(file);
-      uploadedPath=`${chatId}/admin-${Date.now()}-${crypto.randomUUID()}.${ext}`;
+      uploadedPath=`${auth.chatId}/client-web-${Date.now()}-${crypto.randomUUID()}.${ext}`;
       const bytes=Buffer.from(await file.arrayBuffer());
-
       const {data:stored,error:uploadError}=await supabase.storage
         .from("support-media")
         .upload(uploadedPath,bytes,{
@@ -88,8 +71,8 @@ export async function POST(req:NextRequest){
     const {data,error}=await supabase
       .from("support_messages")
       .insert({
-        chat_id:chatId,
-        sender:"admin",
+        chat_id:auth.chatId,
+        sender:"client",
         content:content||(file?"Фото":""),
         attachment_path:uploadedPath,
         attachment_mime:attachmentMime,
@@ -100,40 +83,15 @@ export async function POST(req:NextRequest){
       .single();
 
     if(error||!data){
-      // Only clean an orphaned Storage file when DB persistence failed.
-      // After DB insert succeeds, the attachment is NEVER removed here.
       if(uploadedPath){
         await supabase.storage.from("support-media").remove([uploadedPath]);
       }
       throw new Error(`support_messages insert failed: ${error?.message||"no row returned"}`);
     }
 
-    // Defensive invariant: a sent file must have a persisted attachment_path.
-    if(file&&!data.attachment_path){
-      throw new Error("Attachment was uploaded but was not persisted in support_messages");
-    }
-
-    // Delivery is event-driven in Supabase/n8n. This extra webhook call is best-effort
-    // for installations where the DB webhook is not active; claim_support_reply_v20
-    // prevents duplicate Telegram delivery.
-    const replyWebhook=
-      process.env.TEDDY_SUPPORT_REPLY_WEBHOOK||
-      "https://rizen133.app.n8n.cloud/webhook/teddy-support-reply-v20";
-
-    try{
-      await fetch(replyWebhook,{
-        method:"POST",
-        headers:{"content-type":"application/json"},
-        body:JSON.stringify({message_id:data.id}),
-        signal:AbortSignal.timeout(5000),
-      });
-    }catch(deliveryError){
-      console.error("support telegram delivery request failed",deliveryError);
-    }
-
     return NextResponse.json({ok:true,message:data});
   }catch(error){
-    console.error("support send error",error);
+    console.error("client support media error",error);
     return NextResponse.json(
       {error:error instanceof Error?error.message:"Не удалось отправить сообщение"},
       {status:500},

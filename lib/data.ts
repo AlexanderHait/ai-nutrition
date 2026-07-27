@@ -72,7 +72,7 @@ export async function clientData(chatId:number){
 export async function supportThreads(){
   const s=getSupabaseAdmin();
   const {data:messages,error}=await s.from('support_messages')
-    .select('id,chat_id,sender,content,created_at,read_by_admin_at')
+    .select('id,chat_id,sender,content,created_at,read_by_admin_at,attachment_path,attachment_name,attachment_mime')
     .order('created_at',{ascending:false}).limit(1200);
   if(error) throw error;
 
@@ -245,7 +245,7 @@ export async function clientNutritionData(chatId:number,days=45){
 
 export async function clientSupportData(chatId:number){
   const s=getSupabaseAdmin();
-  const {data,error}=await s.from('support_messages').select('id,chat_id,sender,content,created_at,read_by_admin_at').eq('chat_id',chatId).order('created_at',{ascending:true}).limit(250);
+  const {data,error}=await s.from('support_messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true}).limit(250);
   if(error)throw error;return data||[];
 }
 
