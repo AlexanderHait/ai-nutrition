@@ -19,10 +19,16 @@ export default async function Shell({
     ["/admin/analytics","Аналитика","analytics"],
     ["/admin/catalog","Food Cache","catalog"],
     ["/admin/subscriptions","Подписки","subscriptions"],
+    ["/admin/premium-health","Premium Health","activity"],
+    ["/admin/system","Система","activity"],
+    ["/admin/knowledge","База знаний","catalog"],
+    ["/admin/replay","Replay","activity"],
     ["/admin/mailings","Рассылки","mailings"],
   ] as const;
   const client=[
     ["/client","Главная","home"],
+    ["/client/coach","TeddY Coach","coach"],
+    ["/client/onboarding","Настройка Coach","profile"],
     ["/client/nutrition","Питание","nutrition"],
     ["/client/progress","Прогресс","progress"],
     ["/client/plan","Подписка","plan"],

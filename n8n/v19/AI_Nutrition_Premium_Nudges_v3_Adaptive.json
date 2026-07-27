@@ -1,0 +1,213 @@
+{
+  "id": "premiumNudgesV3",
+  "name": "AI_Nutrition_Premium_Nudges_v3_Adaptive",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 14
+            },
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cac61856-abd7-4f70-9edd-626ea402b67d",
+      "name": "Nudges 14:00 + 18:00"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/premium_contexts_v20",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_days",
+              "value": 14
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "f2584259-dd4f-4651-b364-2e2ae12dbac4",
+      "name": "GET Premium Contexts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let a=$json;if(a?.body)a=a.body;if(a?.data)a=a.data;if(!Array.isArray(a))a=items.map(i=>i.json).flatMap(x=>Array.isArray(x)?x:[]);\nconst tz='Europe/Moscow',hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',hour12:false}).format(new Date())),today=new Intl.DateTimeFormat('sv-SE',{timeZone:tz}).format(new Date()),n=v=>Number(v||0);\nconst out=[];for(const x of a){const c=x.context||{},pr=c.preferences||{},ad=c.adaptive_coach||{};\nif(pr.smart_nudges===false||pr.notification_level==='minimal')continue;\nif(pr.notification_level==='normal'&&hour<17)continue;\nconst best=Array.isArray(ad.best_contact_hours)?ad.best_contact_hours.map(Number).filter(Number.isFinite):[];\nif(best.length&&Math.min(...best.map(h=>Math.abs(h-hour)))>2&&pr.notification_level!=='active')continue;\nconst s=c.settings||{},T=c.today?.eaten||{},kt=n(s.kcal_target),pt=n(s.protein_target),pace=c.today?.pacing||{};let text='',type='';\nif(pace.status==='on_track'&&n(T.meals)>0&&(!pt||n(T.prot)>=pt*.75))continue;if(n(T.meals)===0){type='no_food';text='🌙 *Небольшое напоминание*\\n\\nСегодня питание ещё не записано. Если уже ел — пришли фото или внеси день через /day.'}else if(kt&&n(T.kcal)<kt*.58){type='large_gap';text=`🍽 *На вечер остался большой объём*\\n\\nСейчас записано ~${Math.round(n(T.kcal))} из ${Math.round(kt)} ккал. Лучше сделать полноценный приём сейчас, чем оставлять всё на поздний вечер.`}else if(pt&&n(T.prot)<pt*.65){type='protein_gap';text=`🥩 *Белок сегодня отстаёт*\\n\\nСейчас ~${Math.round(n(T.prot))} из ${Math.round(pt)} г. В следующем приёме сделай белковый продукт основой.`}if(text)out.push({json:{chat_id:Number(x.chat_id),for_date:today,nudge_type:type,text}})}return out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "2a967649-4a04-49f7-b087-b00b2034a8a6",
+      "name": "Build Smart Nudges"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        -60
+      ],
+      "id": "b6fb687b-9a3e-4f74-afa7-cf5d3d2eed73",
+      "name": "SEND Smart Nudge",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/premium_nudges",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{$json.chat_id}}"
+            },
+            {
+              "name": "nudge_type",
+              "value": "={{$json.nudge_type}}"
+            },
+            {
+              "name": "content",
+              "value": "={{$json.text}}"
+            },
+            {
+              "name": "for_date",
+              "value": "={{$json.for_date}}"
+            },
+            {
+              "name": "sent_at",
+              "value": "={{new Date().toISOString()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        80
+      ],
+      "id": "dcc06561-b337-4628-b72d-95e1f98f9b6f",
+      "name": "LOG Smart Nudge",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "GET Premium Contexts": {
+      "main": [
+        [
+          {
+            "node": "Build Smart Nudges",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Smart Nudges": {
+      "main": [
+        [
+          {
+            "node": "SEND Smart Nudge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG Smart Nudge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nudges 14:00 + 18:00": {
+      "main": [
+        [
+          {
+            "node": "GET Premium Contexts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "35f190db-183e-4e02-90ad-5a1e9a268302",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

@@ -226,13 +226,14 @@ export async function clientProfileData(chatId:number){
 export async function clientProgressData(chatId:number){
   const s=getSupabaseAdmin();
   const d14=new Date();d14.setDate(d14.getDate()-13);const fromDay=dayKey(d14);
-  const [{data:settings},{data:meals},{data:weights},{data:digests}]=await Promise.all([
+  const [{data:settings},{data:meals},{data:weights},{data:digests},{data:subscription}]=await Promise.all([
     s.from('client_settings').select('*').eq('chat_id',chatId).maybeSingle(),
     s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(800),
     s.from('weight_logs').select('id,weight_kg,measured_at').eq('chat_id',chatId).order('measured_at',{ascending:false}).limit(10),
-    s.from('digests').select('id,for_date,kcal,summary_md').eq('chat_id',chatId).order('for_date',{ascending:false}).limit(8)
+    s.from('digests').select('id,for_date,kcal,summary_md').eq('chat_id',chatId).order('for_date',{ascending:false}).limit(8),
+    s.from('subscriptions').select('plan,status,ends_at,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1).maybeSingle()
   ]);
-  return{settings,meals:(meals||[]) as Meal[],weights:weights||[],digests:digests||[]};
+  return{settings,meals:(meals||[]) as Meal[],weights:weights||[],digests:digests||[],subscription};
 }
 
 export async function clientNutritionData(chatId:number,days=45){
@@ -255,7 +256,7 @@ export async function adminDashboardData(){
   const [{data:profiles},{data:settings},{data:subscriptions},{data:meals},{data:logs},{data:weights},{data:support}]=await Promise.all([
     s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').order('created_at',{ascending:false}).limit(500),
     s.from('client_settings').select('chat_id,goal,kcal_target'),
-    s.from('subscriptions').select('chat_id,plan,status,created_at').order('created_at',{ascending:false}),
+    s.from('subscriptions').select('chat_id,plan,status,ends_at,created_at').order('created_at',{ascending:false}),
     s.from('meals').select('chat_id,kcal,eaten_at,eaten_day').eq('deleted',false).gte('eaten_day',today).limit(3000),
     s.from('chat_logs').select('chat_id,created_at').gte('created_at',weekIso).order('created_at',{ascending:false}).limit(3000),
     s.from('weight_logs').select('chat_id,measured_at').order('measured_at',{ascending:false}).limit(2000),
@@ -271,7 +272,7 @@ export async function analyticsData(){
     s.from('profiles').select('telegram_id,created_at'),
     s.from('meals').select('chat_id,eaten_at,eaten_day').eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(12000),
     s.from('client_settings').select('chat_id,goal'),
-    s.from('subscriptions').select('chat_id,plan,status,created_at').order('created_at',{ascending:false}),
+    s.from('subscriptions').select('chat_id,plan,status,ends_at,created_at').order('created_at',{ascending:false}),
     s.from('payment_events').select('chat_id,amount_rub,status,created_at').gte('created_at',fromIso).order('created_at',{ascending:false}).limit(4000)
   ]);
   return{profiles:profiles||[],meals:(meals||[]) as Meal[],settings:settings||[],subscriptions:subscriptions||[],payments:payments||[]};
@@ -281,4 +282,118 @@ export async function foodCatalogData(){
   const s=getSupabaseAdmin();
   const {data,error}=await s.from('food_catalog').select('id,display_name,brand,use_count,confidence,last_seen_at,kcal_per_100,prot_per_100,fat_per_100,carb_per_100').order('use_count',{ascending:false}).limit(250);
   if(error)throw error;return data||[];
+}
+
+
+export async function clientPremiumData(chatId:number){
+  const s=getSupabaseAdmin();
+  const today=dayKey();
+  const [{data:subscription},{data:preferences},{data:plan},{data:report},{data:proposal},{data:memory},{data:events}]=await Promise.all([
+    s.from('subscriptions').select('plan,status,ends_at,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+    s.from('premium_preferences').select('*').eq('chat_id',chatId).maybeSingle(),
+    s.from('premium_daily_plans').select('*').eq('chat_id',chatId).eq('for_date',today).maybeSingle(),
+    s.from('premium_weekly_reports').select('*').eq('chat_id',chatId).order('week_end',{ascending:false}).limit(1).maybeSingle(),
+    s.from('premium_target_proposals').select('*').eq('chat_id',chatId).eq('status','pending').order('created_at',{ascending:false}).limit(1).maybeSingle(),
+    s.from('client_food_memory').select('display_name,use_count,avg_grams,last_seen_at').eq('chat_id',chatId).order('use_count',{ascending:false}).limit(12),
+    s.from('premium_feature_events').select('feature,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(12)
+  ]);
+  return{subscription,preferences,plan,report,proposal,memory:memory||[],events:events||[]};
+}
+
+export async function adminPremiumData(){
+  const s=getSupabaseAdmin();
+  const since=new Date(Date.now()-30*86400000).toISOString();
+  const [{data:subs},{data:preferences},{data:plans},{data:reports},{data:events},{data:proposals}]=await Promise.all([
+    s.from('subscriptions').select('chat_id,plan,status,price_rub,ends_at,created_at').order('created_at',{ascending:false}).limit(2500),
+    s.from('premium_preferences').select('*').limit(2500),
+    s.from('premium_daily_plans').select('chat_id,for_date,created_at').gte('created_at',since).limit(5000),
+    s.from('premium_weekly_reports').select('chat_id,week_end,created_at').gte('created_at',since).limit(2500),
+    s.from('premium_feature_events').select('chat_id,feature,created_at').gte('created_at',since).limit(8000),
+    s.from('premium_target_proposals').select('chat_id,status,created_at').gte('created_at',since).limit(2500)
+  ]);
+  return{subs:subs||[],preferences:preferences||[],plans:plans||[],reports:reports||[],events:events||[],proposals:proposals||[]};
+}
+
+
+export async function premiumIntelligence(chatId:number){
+ const s=getSupabaseAdmin();
+ const [{data:ctx},{data:recs},{data:checkins},{data:mem}]=await Promise.all([
+   s.rpc('nutrition_context',{_chat_id:chatId,_days:14}),
+   s.from('premium_recommendations').select('*').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(8),
+   s.from('premium_checkins').select('*').eq('chat_id',chatId).order('week_end',{ascending:false}).limit(4),
+   s.from('client_memory').select('*').eq('chat_id',chatId).order('confidence',{ascending:false}).limit(20)
+ ]);
+ return{context:ctx||{},recommendations:recs||[],checkins:checkins||[],clientMemory:mem||[]};
+}
+
+export async function premiumHealth(){
+ const s=getSupabaseAdmin();
+ const {data:subs}=await s.from('subscriptions').select('chat_id,plan,status,ends_at,created_at').order('created_at',{ascending:false}).limit(4000);
+ const latest=new Map<number,any>();for(const x of subs||[])if(!latest.has(Number(x.chat_id)))latest.set(Number(x.chat_id),x);
+ const ids=[...latest.values()].filter((x:any)=>x.status==='active'&&x.plan==='premium'&&(!x.ends_at||new Date(x.ends_at)>new Date())).map((x:any)=>Number(x.chat_id));
+ if(!ids.length)return[];
+ const [{data:profiles},{data:snapshots},{data:checkins},{data:recs}]=await Promise.all([
+   s.from('profiles').select('telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at').in('telegram_id',ids),
+   s.from('premium_context_snapshots').select('*').in('chat_id',ids),
+   s.from('premium_checkins').select('*').in('chat_id',ids).order('week_end',{ascending:false}).limit(3000),
+   s.from('premium_recommendations').select('chat_id,feedback,feedback_reason,created_at').in('chat_id',ids).gte('created_at',new Date(Date.now()-14*86400000).toISOString()).limit(5000)
+ ]);
+ return ids.map(id=>({chatId:id,profile:(profiles||[]).find((p:any)=>Number(p.telegram_id)===id),snapshot:(snapshots||[]).find((x:any)=>Number(x.chat_id)===id),checkin:(checkins||[]).find((x:any)=>Number(x.chat_id)===id),badFeedback:(recs||[]).filter((x:any)=>Number(x.chat_id)===id&&x.feedback==='not_fit').length}));
+}
+
+
+export async function systemHealth(){
+ const db=getSupabaseAdmin();
+ const since24=new Date(Date.now()-86400000).toISOString(),since7=new Date(Date.now()-7*86400000).toISOString();
+ const [{data:events},{data:ai},{data:recognition},{data:jobs},{data:circuits},{count:updates},{count:duplicates},{count:meals}]=await Promise.all([
+   db.from('system_events').select('*').gte('created_at',since7).order('created_at',{ascending:false}).limit(150),
+   db.from('ai_usage_events').select('*').gte('created_at',since7).order('created_at',{ascending:false}).limit(5000),
+   db.from('recognition_events').select('confidence_food,confidence_portion,confidence_nutrition,needs_confirmation,latency_ms,created_at').gte('created_at',since7).limit(5000),
+   db.from('processing_jobs').select('status,job_type,attempts,created_at,finished_at').gte('created_at',since7).limit(5000),
+   db.from('service_circuit_breakers').select('*').order('updated_at',{ascending:false}),
+   db.from('telegram_updates_processed').select('*',{count:'exact',head:true}).gte('processed_at',since24),
+   db.from('telegram_update_duplicates').select('*',{count:'exact',head:true}).gte('detected_at',since24),
+   db.from('meals').select('*',{count:'exact',head:true}).gte('created_at',since24)
+ ]);
+ const aiRows=ai||[],rec=recognition||[],js=jobs||[],errs=(events||[]).filter((x:any)=>['error','critical'].includes(x.severity));
+ const success=aiRows.filter((x:any)=>x.success!==false).length;
+ const lat=aiRows.map((x:any)=>Number(x.latency_ms||0)).filter((x:number)=>x>0).sort((a:number,b:number)=>a-b);
+ const avg=(a:number[])=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;
+ const recScores=rec.map((x:any)=>(Number(x.confidence_food||0)*.45+Number(x.confidence_portion||0)*.30+Number(x.confidence_nutrition||0)*.25)*100);
+ const recLat=rec.map((x:any)=>Number(x.latency_ms||0)).filter((x:number)=>x>0);
+ return{events:events||[],circuits:circuits||[],errors24:errs.filter((x:any)=>new Date(x.created_at)>=new Date(since24)).length,updates24:updates||0,duplicates24:duplicates||0,meals24:meals||0,
+  ai7:aiRows.length,aiSuccess:aiRows.length?Math.round(success/aiRows.length*100):100,aiAvgMs:avg(lat),aiP95Ms:lat.length?lat[Math.min(lat.length-1,Math.floor(lat.length*.95))]:0,
+  recognition7:rec.length,recognitionAvg:recScores.length?Math.round(recScores.reduce((a,b)=>a+b,0)/recScores.length):0,recognitionReview:rec.filter((x:any)=>x.needs_confirmation).length,recognitionAvgMs:avg(recLat),
+  jobsQueued:js.filter((x:any)=>x.status==='queued').length,jobsDead:js.filter((x:any)=>x.status==='dead').length};
+}
+
+export async function clientOnboardingData(chatId:number){
+ const db=getSupabaseAdmin();
+ const [{data:onboarding},{data:life},{data:memory}]=await Promise.all([
+  db.from('premium_onboarding').select('*').eq('chat_id',chatId).maybeSingle(),
+  db.from('subscription_lifecycle').select('*').eq('chat_id',chatId).maybeSingle(),
+  db.from('client_memory').select('*').eq('chat_id',chatId).order('confidence',{ascending:false}).limit(20)
+ ]);
+ return{onboarding,lifecycle:life,memory:memory||[]};
+}
+
+export async function knowledgeAdminData(){
+ const db=getSupabaseAdmin();
+ const [{data:sources},{data:items}]=await Promise.all([
+  db.from('coach_sources').select('*').order('created_at',{ascending:false}).limit(200),
+  db.from('coach_knowledge').select('*').order('created_at',{ascending:false}).limit(1000)
+ ]);
+ return{sources:sources||[],items:items||[]};
+}
+
+export async function replayAdminData(){
+ const db=getSupabaseAdmin();
+ const {data}=await db.from('replay_events').select('*').order('created_at',{ascending:false}).limit(100);
+ return data||[];
+}
+
+export async function subscriptionLifecycleData(chatId:number){
+ const db=getSupabaseAdmin();
+ const {data}=await db.from('subscription_lifecycle').select('*').eq('chat_id',chatId).maybeSingle();
+ return data;
 }

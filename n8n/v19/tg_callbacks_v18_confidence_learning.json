@@ -1,0 +1,4420 @@
+{
+  "name": "tg_callbacks_v18_confidence_learning",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# нажал ДА = ВЫБЕРИ ВЕС",
+        "height": 292,
+        "width": 1178,
+        "color": 4
+      },
+      "id": "11bc81b3-cf31-49ab-834e-f6eb21e6c2b0",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        77488,
+        10624
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        76864,
+        11328
+      ],
+      "id": "a4c984f7-1c63-42c0-b871-ccc59acdfd2e",
+      "name": "When Executed by Ingress",
+      "webhookId": "e4d6b058-dc8c-4130-9abd-41243518e824",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "52493568-0b68-46b8-b18a-894cf77bcac1",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "manual_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "manual"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5eeb9b3f-d4ce-45f6-bb62-32244fd9a99a",
+                    "leftValue": "={{ $json.message.photo[0] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f1495ad-2eb2-4729-af5a-23c949adce8c",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "dish_yes_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "dish_yes"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "dish_no_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "c9ead52e-1b81-453a-bd9b-1d18dcbd82bb"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "dish_no"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "646db5d3-3518-4edf-9374-cef371fa7ba9",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "alt_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "alt"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1bcf1e75-3e73-465b-8bbb-2665b845e7e9",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "weight_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "weight"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1c168e7b-7aa7-43f3-8d7d-e5796100ddcb",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "multi_save_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "multi_save"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e20d1c32-011a-4944-b3eb-5be6efce09e5",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "multi_edit_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "multi_edit"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b3f13294-8654-4680-8eed-d40b8b099257",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "multi_delete_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "multi_delete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0a6e6054-afdf-4bda-8725-964a31447457",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "med_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "multi_editor"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "90573faf-164a-418f-a4a8-b69d3e7aaf3d",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "cancel_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6166763a-38e9-494a-aea0-20bdc9626314",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text_cmd"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ffbf9fae-c44b-4e41-8f8b-6e328ea88ef2",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "menu_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "menu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        77072,
+        11216
+      ],
+      "id": "f97465c9-ca9e-402a-a007-50daa62e690b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "// alt_0_7  →  parts = ['alt','0','7']\nconst [, idx, id] = $json.callback_query.data.split('_');\n\nreturn [{\n  json: {\n    chat_id    : $json.callback_query.message.chat.id,   // ID чата, где лежит сообщение-клавиатура\n    draft_id   : Number(id),                             // 7\n    alt_idx    : Number(idx),                            // 0 / 1 / 2\n    del_msg_id : $json.callback_query.message.message_id // ID сообщения, которое надо удалить\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77552,
+        11344
+      ],
+      "id": "ef4cd7c2-8b9a-4a9a-8ed6-61b59155c6ed",
+      "name": "Parse alt"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "await_alt"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77936,
+        11344
+      ],
+      "id": "0ea6845d-507a-4b39-a80b-5642f4d89b3d",
+      "name": "GET 3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.chat_id }}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chosen_name",
+              "fieldValue": "={{$json.dish_ru}}"
+            },
+            {
+              "fieldId": "grams_pred",
+              "fieldValue": "={{$json.grams_est}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "await_weight"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78256,
+        11360
+      ],
+      "id": "3da58890-11c4-4fb4-b1b1-2b5c5e0a4fe6",
+      "name": "UPDATE 3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# нажал НЕТ + ЕЩЕ 2 варианта",
+        "height": 292,
+        "width": 1178,
+        "color": 3
+      },
+      "id": "48a59eaa-748c-4480-adde-6852de98aa51",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        77488,
+        10944
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# нажал на 1/2 = ВЫБЕРИ ВЕС",
+        "height": 292,
+        "width": 1178,
+        "color": 3
+      },
+      "id": "cc991bc1-4fa2-4a2c-9328-7714434b7d78",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        77488,
+        11264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# РЕЗУЛЬТАТ\n\n",
+        "height": 392,
+        "width": 1758,
+        "color": 4
+      },
+      "id": "c488d67c-af4a-4d9b-ab8e-07bb19be9011",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        77488,
+        11584
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.chat_id }}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "grams_pred",
+              "fieldValue": "={{$json.grams}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "done"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78880,
+        11808
+      ],
+      "id": "bbd64aa1-0f98-4136-a924-c02314f94513",
+      "name": "UPDATE  4",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "=*{{ $json.dish }} – {{ $json.grams }} г*\n\n*Калорий:* {{ $json.kcal }}\n*Б:* {{ $json.prot }} *Ж:* {{ $json.fat }} *У:* {{ $json.carb }}\n\n✔️ _сохранил в память_",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🚫 не сохранять",
+                    "additionalFields": {
+                      "callback_data": "=cancel_{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        79056,
+        11616
+      ],
+      "id": "7ceda3b5-bcf1-43a8-b9c9-de3edd052f57",
+      "name": "DONE",
+      "webhookId": "54ba5fcc-0866-4f93-aa38-bad03e1710e6",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "await_dish"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77936,
+        11024
+      ],
+      "id": "7f815738-62d9-4b1f-993f-746f3bb3eef0",
+      "name": "GET 2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.chat_id }}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "await_alt"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78256,
+        11040
+      ],
+      "id": "23fe2819-d14e-464f-b650-86e8eaf1ead0",
+      "name": "UPDATE 2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.chat_id }}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chosen_name",
+              "fieldValue": "={{$json.dish_ru}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "await_weight"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78256,
+        10720
+      ],
+      "id": "35dfe90e-c2d3-42dd-ad6e-1df4c1e01f47",
+      "name": "UPDATE 1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "await_dish"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77936,
+        10704
+      ],
+      "id": "a2318df0-aa8c-400e-8660-aae66e4c746a",
+      "name": "GET 1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "Выбери массу порции:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{$json.buttons[0].text}}",
+                    "additionalFields": {
+                      "callback_data": "={{$json.buttons[0].data}}"
+                    }
+                  },
+                  {
+                    "text": "={{$json.buttons[1].text}}",
+                    "additionalFields": {
+                      "callback_data": "={{$json.buttons[1].data}}"
+                    }
+                  },
+                  {
+                    "text": "={{$json.buttons[2].text}}",
+                    "additionalFields": {
+                      "callback_data": "={{$json.buttons[2].data}}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78448,
+        11344
+      ],
+      "id": "903a0c16-77de-42a6-9e00-86431cedd070",
+      "name": "await_weight 3",
+      "webhookId": "d3d32e66-ff1c-42d9-9bfe-cf7f223f745b",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "Выбери массу порции:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.buttons[0].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.buttons[0].data }}"
+                    }
+                  },
+                  {
+                    "text": "={{ $json.buttons[1].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.buttons[1].data }}"
+                    }
+                  },
+                  {
+                    "text": "={{ $json.buttons[2].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.buttons[2].data }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78448,
+        10704
+      ],
+      "id": "8f99cf98-3b0d-4a34-bee1-4cbdaa972988",
+      "name": "await_weight 1",
+      "webhookId": "d3d32e66-ff1c-42d9-9bfe-cf7f223f745b",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "=*Выберите альтернативу:*\n\n{{ $json.alt_lines.join('\\n') }}\n",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{$json.buttons[0].text}}",
+                    "additionalFields": {
+                      "callback_data": "={{$json.buttons[0].data}}"
+                    }
+                  },
+                  {
+                    "text": "={{$json.buttons[1].text}}",
+                    "additionalFields": {
+                      "callback_data": "={{$json.buttons[1].data}}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78448,
+        11024
+      ],
+      "id": "e7de99de-6bb9-4f32-ae78-e6f468ec5832",
+      "name": "await_alt",
+      "webhookId": "d3d32e66-ff1c-42d9-9bfe-cf7f223f745b",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// weight_200_7  →  parts = ['weight','200','7']\nconst [, grams, id] = $json.callback_query.data.split('_');\n\nreturn [{\n  json: {\n    chat_id    : $json.callback_query.message.chat.id,   // тот же chat_id\n    draft_id   : Number(id),                             // 7\n    grams      : Number(grams),                          // 200\n    del_msg_id : $json.callback_query.message.message_id // ID клавиатуры веса\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77568,
+        11680
+      ],
+      "id": "4fa2be9f-d80d-4126-bee4-340336c1a3a7",
+      "name": "Split weight"
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $json.chat_id }}",
+        "messageId": "={{ $json.del_msg_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        77760,
+        11808
+      ],
+      "id": "280db27f-77d5-43f8-9f4b-7416aa3608c5",
+      "name": "DEL await_weight",
+      "webhookId": "182771d4-324c-4a5e-9b6b-cb35d00a0a98",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $json.chat_id }}",
+        "messageId": "={{ $json.del_msg_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        77728,
+        11360
+      ],
+      "id": "a8fc513a-c6c7-4585-904d-89c8c288e4e2",
+      "name": "DEL await_alt",
+      "webhookId": "182771d4-324c-4a5e-9b6b-cb35d00a0a98",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $json.chat_id }}",
+        "messageId": "={{ $json.del_msg_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        77728,
+        11040
+      ],
+      "id": "c5f47dcf-64be-41d6-96bc-2a0e1131ddbb",
+      "name": "DEL dish_no",
+      "webhookId": "182771d4-324c-4a5e-9b6b-cb35d00a0a98",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $json.chat_id }}",
+        "messageId": "={{ $json.del_msg_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        77728,
+        10720
+      ],
+      "id": "e91e3a0b-d9c8-4c7b-92f6-c5fd85940c00",
+      "name": "DEL dish_yes",
+      "webhookId": "182771d4-324c-4a5e-9b6b-cb35d00a0a98",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * INPUT ожидает:\n *   • items[0].json  — строка-row из Supabase (`draft`)\n *   • $json.alt_idx  — 0 / 1 / 2  (пришло из «alt_0_<id>»)\n *\n * Правка: alt_idx указывает на элемент candidates[1…3],\n * поэтому делаем сдвиг +1.\n */\n\n// 0. Достаём draft: бывает либо объектом, либо массивом с одним элементом\nconst draft = Array.isArray(items[0].json)\n  ? items[0].json[0]\n  : items[0].json;\n\n// 1. candidates: если это строка — парсим\nconst candidates = typeof draft.candidates === 'string'\n  ? JSON.parse(draft.candidates)\n  : draft.candidates || [];\n\n// 2. выбираем нужную альтернативу (alt_idx + 1)\nconst offs = ($json.alt_idx ?? 0) + 1;\nconst cand = candidates[offs] || {\n  dish  : '(не найдено)',\n  grams : draft.grams_pred || 200,\n};\n\n// 3. считаем три варианта массы\nconst g    = Number(cand.grams) || 200;\nconst step = g < 120 ? 20 : 50;\nconst btns = [g - step, g, g + step].filter(x => x > 0);\n\nreturn [{\n  json: {\n    chat_id   : draft.chat_id,\n    draft_id  : draft.message_id,           // пригодится для UPDATE\n    dish_ru   : cand.dish,\n    grams_est : g,\n    buttons   : btns.map(x => ({\n      text : `${x} г`,\n      data : `weight_${x}_${draft.message_id}`,\n    })),\n  },\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78080,
+        11344
+      ],
+      "id": "51cce514-da52-43b3-a1b4-c432013516ee",
+      "name": "WEIGHT 3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "/** INPUT ожидает:\n *  • items[0].json  ← строка из Supabase (`draft`)\n *  • $json.alt_idx  ← 0 / 1 / 2  (пришло из «alt_0_id»)\n */\n\n/* 0. draft может лежать либо прямо в .json, либо в .json[0]\n      (зависит от Always Output Data) */\nconst draft = Array.isArray(items[0].json)\n  ? items[0].json[0]\n  : items[0].json;\n\n/* 1. candidates: если строка → JSON.parse */\nconst candidates = typeof draft.candidates === 'string'\n  ? JSON.parse(draft.candidates)\n  : draft.candidates || [];\n\n/* 2. индекс альтернативы */\nconst idx = $json.alt_idx ?? 0;\nconst cand = candidates[idx] || { dish:'(не найдено)', grams: draft.grams_pred || 200 };\n\n/* 3. считаем кнопки веса */\nconst g    = cand.grams;\nconst step = g < 120 ? 20 : 50;\nconst btns = [g-step, g, g+step].filter(x=>x>0);\n\nreturn [{\n  json:{\n    chat_id   : draft.chat_id,\n    draft_id  : draft.message_id,        // пригодится для UPDATE\n    dish_ru   : cand.dish,\n    grams_est : g,\n    buttons   : btns.map(x=>({\n                  text : `${x} г`,\n                  data : `weight_${x}_${draft.message_id}`\n               }))\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78080,
+        10704
+      ],
+      "id": "443c755f-1a64-4c9e-b4e3-a50098ef8550",
+      "name": "WEIGHT 1",
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n *  Упрощаем: код лишь формирует данные,\n *  а финальный текст собираем прямо в Telegram-узле.\n */\n\n// 0. Достаём draft (учёт Always-Output Data)\nconst raw = items[0].json[0] ?? items[0].json;\n\n// 1. Парсим candidates, если пришла строкой\nconst candidates = typeof raw.candidates === 'string'\n  ? JSON.parse(raw.candidates)\n  : raw.candidates || [];\n\n// 2. Берём альтернативы (макс. 3) — без первого\nconst alts = candidates.slice(1, 4);\n\n// 3. Подготовим «красивые» строки для списка\nconst altLines = alts.map((c, i) => `${i + 1}. ${c.dish}`);\n\n// 4. Кнопки 1-2-3\nconst buttons = alts.map((_, i) => ({\n  text : String(i + 1),\n  data : `alt_${i}_${raw.message_id}`,\n}));\n\nreturn [{\n  json: {\n    chat_id   : raw.chat_id,\n    draft_id  : raw.message_id,\n\n    // для Telegram-узла\n    alt_lines : altLines,   // массив ['1. …', '2. …', …]\n    buttons,                // inline-кнопки\n  },\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78080,
+        11024
+      ],
+      "id": "2e7e78d3-2fe2-410c-a790-adef666f2efd",
+      "name": "MORE",
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "tableId": "meals",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "dish",
+              "fieldValue": "={{ $json.dish }}"
+            },
+            {
+              "fieldId": "grams",
+              "fieldValue": "={{ $json.grams }}"
+            },
+            {
+              "fieldId": "eaten_at",
+              "fieldValue": "={{ $json.eaten_at }}"
+            },
+            {
+              "fieldId": "kcal",
+              "fieldValue": "={{ $json.kcal }}"
+            },
+            {
+              "fieldId": "fat",
+              "fieldValue": "={{ $json.fat }}"
+            },
+            {
+              "fieldId": "carb",
+              "fieldValue": "={{ $json.carb }}"
+            },
+            {
+              "fieldId": "prot",
+              "fieldValue": "={{ $json.prot }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78880,
+        11616
+      ],
+      "id": "12475d92-d479-4d7b-b987-f4abd0a01b63",
+      "name": "CREATE meals",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Пример callback_data:  dish_yes_7\nconst parts   = $json.callback_query.data.split('_');\nconst draftId = parts.pop();                        // '7'\n\n// ID сообщения с кнопками «Да / Нет»,\n// которое нужно удалить после обработки\nconst delMsgId = $json.callback_query.message.message_id;\n\nreturn [{\n  json: {\n    draft_id   : Number(draftId),                 // 7\n    chat_id    : $json.callback_query.from.id,    // 7758…\n    del_msg_id : delMsgId                         // для Delete-узла\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77552,
+        10704
+      ],
+      "id": "7ef4e078-0c08-45b0-b559-b4f1d37448b9",
+      "name": "Parse dish_YES"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Пример callback_data:  dish_yes_7\nconst parts   = $json.callback_query.data.split('_');\nconst draftId = parts.pop();                        // '7'\n\n// ID сообщения с кнопками «Да / Нет»,\n// которое нужно удалить после обработки\nconst delMsgId = $json.callback_query.message.message_id;\n\nreturn [{\n  json: {\n    draft_id   : Number(draftId),                 // 7\n    chat_id    : $json.callback_query.from.id,    // 7758…\n    del_msg_id : delMsgId                         // для Delete-узла\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77552,
+        11024
+      ],
+      "id": "f6e7ad93-e8ff-42f1-938a-737da1ba9d28",
+      "name": "Parse dish_NO"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        78160,
+        11696
+      ],
+      "id": "202162f7-9510-4864-b4a4-c0034f92cd5e",
+      "name": "Merge",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.photo_file_id }}",
+        "additionalFields": {}
+      },
+      "id": "ba4bdb3d-89fd-43a7-b909-d27f9f1bf051",
+      "name": "Get Image",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        77712,
+        10304
+      ],
+      "typeVersion": 1.2,
+      "webhookId": "8b210039-e135-420d-a5f1-53fc3ca1e836",
+      "retryOnFail": false,
+      "maxTries": 2,
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {
+          "fileName": "={{ $json.result.file_path }}"
+        }
+      },
+      "id": "9b1525bd-cb68-4eaf-964e-f2e18c148820",
+      "name": "Convert",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        78112,
+        10304
+      ],
+      "typeVersion": 1.1,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bd8a8c20-939e-49b0-93d0-bb58b8719ebb",
+              "name": "chat_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f89d0646-9f73-4067-bbf7-af9913b5f688",
+              "name": "message_id",
+              "value": "={{$json.message.message_id}}",
+              "type": "string"
+            },
+            {
+              "id": "07282534-971f-4430-8d45-5f3e15d3c167",
+              "name": "photo_file_id",
+              "value": "={{$json.message.photo[$json.message.photo.length - 1].file_id}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        77552,
+        10304
+      ],
+      "id": "a59f6b88-78f9-4ced-b34b-ab7ac75fa32d",
+      "name": "Get ready"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Да",
+                    "additionalFields": {
+                      "callback_data": "={{$json.cb_yes}}"
+                    }
+                  },
+                  {
+                    "text": "Нет",
+                    "additionalFields": {
+                      "callback_data": "={{$json.cb_no}}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78928,
+        10400
+      ],
+      "id": "ce3f1f40-0a8d-4cd2-91b6-a0d3e4320e4d",
+      "name": "dish YES or NO",
+      "webhookId": "dc6a9f65-91bd-46e4-8c95-17b2ebe68d7c",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "tableId": "meals_draft",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{ $json.chat_id }}"
+            },
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{ $json.message_id }}"
+            },
+            {
+              "fieldId": "photo_file_id",
+              "fieldValue": "={{ $json.photo_file_id }}"
+            },
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{ $json.candidates }}"
+            },
+            {
+              "fieldId": "grams_pred",
+              "fieldValue": "={{ $json.grams_pred }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78928,
+        10224
+      ],
+      "id": "ca26af51-7f78-49b6-861b-e39e40760468",
+      "name": "CREATE candidates",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "360c7be2-b049-4c62-bb83-5fafd0850722",
+              "name": "chat_id",
+              "value": "={{$json.chat_id}}",
+              "type": "string"
+            },
+            {
+              "id": "584b9ab5-5ba9-42f9-a9d9-7bb9bb115361",
+              "name": "message_id",
+              "value": "={{$json.message_id}}",
+              "type": "string"
+            },
+            {
+              "id": "8d7a3167-4cbb-4051-8c23-a0b88438c815",
+              "name": "photo_file_id",
+              "value": "={{$json.photo_file_id}}",
+              "type": "string"
+            },
+            {
+              "id": "246a834e-e731-4239-aa92-60eb7c75d79f",
+              "name": "candidates",
+              "value": "={{$json.candidates}}",
+              "type": "string"
+            },
+            {
+              "id": "69f21e55-55ef-4cf0-b73d-b3e39144e057",
+              "name": "grams_pred",
+              "value": "={{$json.grams_pred}}",
+              "type": "string"
+            },
+            {
+              "id": "1b41e033-b7ce-47b0-8f57-0f8dc109ecab",
+              "name": "status",
+              "value": "={{$json.status}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        78752,
+        10224
+      ],
+      "id": "9b4d89d2-af73-424b-9297-efc93a8ed8d1",
+      "name": "EDIT candidates",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# ФОТО БЛЮДА = 1 ВАРИАНТ",
+        "height": 392,
+        "width": 1698,
+        "color": 6
+      },
+      "id": "95882819-2ed3-4d01-b41f-553ff69c5d48",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        77488,
+        10176
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot{{$env.TELEGRAM_BOT_TOKEN}}/sendChatAction",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $json.message.from.id }}"
+            },
+            {
+              "name": "action",
+              "value": "typing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        77072,
+        11024
+      ],
+      "id": "0e72dff6-dfcc-48f5-b742-5eafe67ce162",
+      "name": "HTTP typing...",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "id": "83869f97-28a7-433b-867c-883d5a662479",
+      "name": "Extract",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        77952,
+        10304
+      ],
+      "typeVersion": 1,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "txTextV29",
+          "mode": "list",
+          "cachedResultName": "tx_text_v29_v20"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        77600,
+        12464
+      ],
+      "id": "0adc39fc-02fa-4d0f-9f4f-8dd9ae5cab96",
+      "name": "tg_text"
+    },
+    {
+      "parameters": {
+        "content": "# ТЕКСТ и /\n",
+        "height": 312,
+        "width": 318,
+        "color": 7
+      },
+      "id": "8e980008-29e6-4920-9942-a7a55ef787f3",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        77488,
+        12368
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# НЕ СОХРАНЯТЬ\n",
+        "height": 312,
+        "width": 958,
+        "color": 7
+      },
+      "id": "b215bb3b-650a-4ccc-86a6-dab6f753434b",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        77488,
+        12016
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "// cancel_62\nconst mealId = Number($json.callback_query.data.split('_').pop());\n\nreturn [{\n  json:{\n    meal_id : mealId,\n    chat_id : $json.callback_query.from.id,\n    msg_id  : $json.callback_query.message.message_id\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77552,
+        12128
+      ],
+      "id": "a72f387c-d452-4951-b4ac-ea82989c5895",
+      "name": "Parse cancel"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.meal_id }}"
+            },
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "deleted",
+              "fieldValue": "={{true}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77728,
+        12128
+      ],
+      "id": "b4c82c45-d76a-46ed-a29a-e41936c6324a",
+      "name": "UPDATE meals",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{ $json.chat_id }}"
+            },
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77888,
+        12128
+      ],
+      "id": "024dfdd1-1256-4fa7-9ea1-aa611c403db5",
+      "name": "GET meals",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $items('GET meals')[0].json;      // dish, grams, kcal …\nconst ctx = $items('Parse cancel')[0].json;   // chat_id, msg_id\n\nreturn [{\n  json: {\n    chat_id : ctx.chat_id,\n    msg_id  : ctx.msg_id,\n\n    // что пойдёт в текст\n    dish  : row.dish,\n    grams : row.grams,\n    kcal  : row.kcal,\n    prot  : row.prot,\n    fat   : row.fat,\n    carb  : row.carb\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78048,
+        12128
+      ],
+      "id": "f40926a1-0bd7-417e-b59b-d263e734fd32",
+      "name": "build cancel"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $json.chat_id }}",
+        "messageId": "={{ $json.msg_id }}",
+        "text": "=*{{ $json.dish }} – {{ $json.grams }} г*\n\n*Калорий:* {{ $json.kcal }}\n*Б:* {{ $json.prot }} *Ж:* {{ $json.fat }} *У:* {{ $json.carb }}\n\n🚫 _не сохранил_\n",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78240,
+        12128
+      ],
+      "id": "8ed49d56-f72f-43c7-88e6-bed30f8d2df0",
+      "name": "EDITED",
+      "webhookId": "d03fb55d-8c26-4782-92a9-d0c9c351a440",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4o-2024-11-20",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4O-2024-11-20"
+        },
+        "text": "={{`\nТы анализируешь ОДНО фото еды или пищевой упаковки ОДИН РАЗ.\nВерни ТОЛЬКО валидный JSON, без Markdown и пояснений.\n\nПользовательская подпись:\n${$items(\"Parse photo caption\")[0].json.parsed_caption || \"(нет)\"}\n\nВес из подписи:\n${$items(\"Parse photo caption\")[0].json.caption_grams ?? \"не указан\"} г\n\nПРИОРИТЕТ ПОДПИСИ ПОЛЬЗОВАТЕЛЯ:\n- Подпись пользователя — это отдельный источник данных, а не декоративный текст.\n- Если пользователь написал название блюда, бренд, магазин, сеть или производителя, СЧИТАЙ ЭТО ДОСТОВЕРНЫМ УКАЗАНИЕМ.\n- Не заменяй явно написанный пользователем SPAR на Мираторг, ВкусВилл или другой похожий продукт.\n- Если подпись говорит \"кордон блю с ветчиной и сыром SPAR\", identity должна остаться именно \"Кордон блю с ветчиной и сыром SPAR\".\n- Фото используй для проверки типа еды, количества позиций и визуальных деталей, но не для переопределения явно указанного пользователем бренда/магазина.\n- Если подпись содержит точную идентификацию товара/места покупки, поставь source_mode=\"web\", чтобы следующий этап искал именно этот товар в интернете.\n- Если подпись содержит только вес, работай по фото как обычно.\n\nГЛАВНОЕ ПРАВИЛО:\nНа фото может быть:\n1) обычная готовая еда БЕЗ упаковки;\n2) продукт/еда рядом с упаковкой;\n3) только упаковка/этикетка;\n4) несколько отдельных блюд.\n\nТы ОБЯЗАН сначала определить, что реально видно на фото.\nНе возвращай пустой dish, если на фото отчётливо видна съедобная еда.\n\nA. ОБЫЧНАЯ ЕДА БЕЗ ЭТИКЕТКИ\n- Определи каждое отдельное блюдо/компонент, который визуально различим.\n- dish = нормальное понятное название блюда.\n- package_context=false.\n- source_mode=\"visual\".\n- Если вес указан пользователем, grams должен быть РОВНО этим числом.\n- Если пользовательский вес не указан, оцени массу визуально настолько разумно, насколько возможно.\n- Не требуй этикетку для обычной еды.\n- Пример: панированное куриное филе с ветчиной и сыром -> \"Кордон блю с ветчиной и сыром\".\n\nB. УПАКОВКА / ЭТИКЕТКА\n- Если упаковка действительно видна, буквальное название на ней важнее визуальной догадки.\n- label_name = буквальное название.\n- dish = нормальная капитализация label_name.\n- Не заменяй читаемое название похожим продуктом.\n- package_context=true.\n\nC. ВЕС\n- Если caption_grams указан, grams ОБЯЗАН быть ровно этим числом для соответствующей позиции.\n- Никогда не заменяй пользовательский вес массой упаковки или визуальной оценкой.\n- Если на фото одна еда и указан один вес — этот вес относится к этой еде.\n- package_mass_g / serving_weight_g можно вернуть отдельно.\n\nD. КБЖУ С ЭТИКЕТКИ\n- source_mode=\"label\" ТОЛЬКО когда на фото уверенно читаются ВСЕ 4 значения:\n  kcal, белки, жиры, углеводы.\n- Буквально перепиши их в label_text/package_text.\n- Если хотя бы одно значение не читается — source_mode=\"web\", нечитаемые label_* = null.\n- Ничего не додумывай от имени этикетки.\n\nE. КОЛИЧЕСТВО ПОЗИЦИЙ\n- containers_detected = количество реально найденных пищевых позиций.\n- Для одного цельного блюда обычно 1 позиция.\n- Не дроби начинку одного блюда на отдельные позиции без необходимости.\n- Если видно несколько отдельных блюд/гарниров — верни каждое отдельно.\n\nF. САМОПРОВЕРКА\nПеред ответом проверь:\n- если еда отчётливо видна, items НЕ пустой;\n- у каждой позиции dish НЕ пустой;\n- если указан caption_grams, grams совпадает;\n- source_mode соответствует фактическому источнику;\n- JSON валиден.\n\nФОРМАТ:\n{\n  \"containers_detected\": 1,\n  \"items\": [\n    {\n      \"dish\": \"Кордон блю с ветчиной и сыром\",\n      \"label_name\": \"\",\n      \"brand\": \"\",\n      \"grams\": 125,\n      \"package_mass_g\": null,\n      \"serving_weight_g\": null,\n      \"confidence\": 0.88,\n      \"label_name_confidence\": 0,\n      \"package_context\": false,\n      \"package_text\": \"\",\n      \"source_mode\": \"visual\",\n      \"label_basis\": null,\n      \"label_serving_g\": null,\n      \"label_kcal\": null,\n      \"label_prot\": null,\n      \"label_fat\": null,\n      \"label_carb\": null,\n      \"label_text\": \"\"\n    }\n  ]\n}\n\nТолько JSON.\n`}}",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        78320,
+        10304
+      ],
+      "id": "000bcfb9-2446-4e3a-9adf-0bc48d7561b6",
+      "name": "VISION single pass",
+      "retryOnFail": true,
+      "notesInFlow": false,
+      "executeOnce": false,
+      "maxTries": 2,
+      "waitBetweenTries": 1000,
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        79776,
+        11808
+      ],
+      "id": "76449a70-e5ac-444a-83ec-0ac14865e28c",
+      "name": "OpenRouter Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"dish\": \"овощной салат с сыром\",\n  \"kcal\": 122,\n  \"prot\": 3.8,\n  \"fat\": 8.2,\n  \"carb\": 9.2\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        79920,
+        11808
+      ],
+      "id": "5418bdf2-e96f-4d0c-905d-8f8c82ff4ce1",
+      "name": "Structured Output Parser",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Parse macros  (универсально для:\n *  – старого jsonOutput: true\n *  – нового Structured Output Parser c массивом или без)\n */\n\n// 1. данные от Split weight (chat_id, grams, draft_id, …)\nconst sw = $items('Split weight')[0].json;\n\n// 2. что пришло от LLM / parser\n//    – если это массив → берём первый элемент\n//    – если внутри есть .output → берём его, иначе сам объект\nconst raw = Array.isArray($json) ? $json[0] : $json;\nconst gpt = raw.output ?? raw;       // { dish, kcal, prot, fat, carb }\n\n// 3. helper → строка даты-времени в МСК ISO +03:00\nconst toMsk = () => {\n  const msk = new Date(\n    new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' })\n  );\n  const p = n => String(n).padStart(2, '0');\n  return `${msk.getFullYear()}-${p(msk.getMonth() + 1)}-${p(msk.getDate())}` +\n         `T${p(msk.getHours())}:${p(msk.getMinutes())}:00+03:00`;\n};\n\n// 4. собираем итоговый объект (плоский)\nreturn [{\n  json: {\n    ...sw,      // chat_id, grams, draft_id, …\n    ...gpt,     // dish, kcal, prot, fat, carb\n    eaten_at: toMsk()\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80112,
+        11664
+      ],
+      "id": "c0cd1bc3-01d1-4460-9847-5fd393c4cebf",
+      "name": "Parse macros 2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chosen_name }}, {{ $json.grams_pred }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Ты нутри-калькулятор.  \nНа вход получаешь JSON  \n{ \"dish\":\"строка\", \"grams\":число }. \n\nОтвечай строго JSON одной строкой:\n\n{\n \"dish\":\"строка\",\n \"kcal\":число,\n \"prot\":число,\n \"fat\":число,\n \"carb\":число\n}\n\nБез пояснений, без ```."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        79760,
+        11664
+      ],
+      "id": "07815416-d7aa-418c-afaf-8b7c77cb245e",
+      "name": "NUTRION OR",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "=await_dish"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77936,
+        11776
+      ],
+      "id": "897b5b70-6dbb-4c8e-b0e4-09fde26e3543",
+      "name": "GET await_dish",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "await_weight"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77936,
+        11616
+      ],
+      "id": "07dd42d9-8ba2-4aa8-86dc-33d450de952b",
+      "name": "GET await_weight",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "### другая LLM\n\n\n",
+        "height": 392,
+        "width": 618,
+        "color": 5
+      },
+      "id": "a737fe09-3912-4fa3-8e4e-a3befccffea0",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        79680,
+        11584
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "tableId": "meals_draft",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{ $json.chat_id }}"
+            },
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{ $json.message_id }}"
+            },
+            {
+              "fieldId": "photo_file_id",
+              "fieldValue": "={{ $json.photo_file_id }}"
+            },
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{ $json.items_json }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "await_multi_confirm"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78880,
+        10224
+      ],
+      "id": "9885a4b7-2331-4091-b3a4-9501983ec006",
+      "name": "SAVE multi draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Сохранить всё",
+                    "additionalFields": {
+                      "callback_data": "=multi_save_{{ $json.message_id }}"
+                    }
+                  },
+                  {
+                    "text": "✏️ Исправить",
+                    "additionalFields": {
+                      "callback_data": "=multi_edit_{{ $json.message_id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78880,
+        10400
+      ],
+      "id": "eb05f8f2-7f07-4feb-b54f-fa8ea2e35e48",
+      "name": "SEND multi confirm",
+      "webhookId": "fbe45ddf-9609-4194-9196-ce904ece7050",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json.callback_query.data;\nconst parts = data.split('_');\nconst action = parts[1]; // save/edit\nconst draftId = Number(parts[2]);\nreturn [{json:{\n  action,\n  draft_id:draftId,\n  chat_id:$json.callback_query.from.id,\n  del_msg_id:$json.callback_query.message.message_id\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77568,
+        12016
+      ],
+      "id": "613f9804-0d7c-4d03-bf97-86f05044ed35",
+      "name": "Parse multi confirm"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            },
+            {
+              "keyName": "status",
+              "keyValue": "await_multi_confirm"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77792,
+        12016
+      ],
+      "id": "ed203979-c811-4cfc-80eb-a4ceae3115ac",
+      "name": "GET multi draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = Array.isArray(items[0].json) ? items[0].json[0] : items[0].json;\nlet meals = raw.candidates;\nif (typeof meals === 'string') meals = JSON.parse(meals);\nif (!Array.isArray(meals)) throw new Error('В draft нет списка блюд');\n\nconst ctx = $items('Parse multi confirm')[0].json;\nconst msk = new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Moscow'}));\nconst p=n=>String(n).padStart(2,'0');\nconst eaten_at = `${msk.getFullYear()}-${p(msk.getMonth()+1)}-${p(msk.getDate())}T${p(msk.getHours())}:${p(msk.getMinutes())}:00+03:00`;\n\nconst selected=meals.filter(m=>m.included!==false);\nif(!selected.length){\n  // No included items = user intentionally excluded the whole draft.\n  return [{json:{\n    chat_id:ctx.chat_id,\n    draft_id:ctx.draft_id,\n    skip_save:true,\n    dish:'',\n    grams:0,kcal:0,prot:0,fat:0,carb:0,\n    eaten_at\n  }}];\n}\n\nreturn selected.map(m => ({json:{\n  chat_id:ctx.chat_id,\n  draft_id:ctx.draft_id,\n  dish:m.dish,\n  grams:Number(m.grams),\n  kcal:Number(m.kcal),\n  prot:Number(m.prot),\n  fat:Number(m.fat),\n  carb:Number(m.carb),\n  eaten_at: m.eaten_at || eaten_at\n}}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78016,
+        12016
+      ],
+      "id": "7094ddf7-e468-4eff-b8dd-a8fea2dde303",
+      "name": "Explode meals"
+    },
+    {
+      "parameters": {
+        "tableId": "meals",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "dish",
+              "fieldValue": "={{$json.dish}}"
+            },
+            {
+              "fieldId": "grams",
+              "fieldValue": "={{$json.grams}}"
+            },
+            {
+              "fieldId": "eaten_at",
+              "fieldValue": "={{$json.eaten_at}}"
+            },
+            {
+              "fieldId": "kcal",
+              "fieldValue": "={{$json.kcal}}"
+            },
+            {
+              "fieldId": "fat",
+              "fieldValue": "={{$json.fat}}"
+            },
+            {
+              "fieldId": "carb",
+              "fieldValue": "={{$json.carb}}"
+            },
+            {
+              "fieldId": "prot",
+              "fieldValue": "={{$json.prot}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78256,
+        12016
+      ],
+      "id": "b75d0e37-6f52-4a2c-a127-36e5f94263ef",
+      "name": "CREATE meals multi",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items.map(i => i.json);\nconst ctx = $items('Parse multi confirm')[0].json;\nconst totals = rows.reduce((a,r)=>({\n  kcal:a.kcal+Number(r.kcal||0),\n  prot:a.prot+Number(r.prot||0),\n  fat:a.fat+Number(r.fat||0),\n  carb:a.carb+Number(r.carb||0)\n}),{kcal:0,prot:0,fat:0,carb:0});\n\nreturn [{json:{\n  chat_id:ctx.chat_id,\n  msg_id:ctx.del_msg_id,\n  count:rows.length,\n  kcal:Math.round(totals.kcal),\n  prot:Math.round(totals.prot*10)/10,\n  fat:Math.round(totals.fat*10)/10,\n  carb:Math.round(totals.carb*10)/10\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78480,
+        12016
+      ],
+      "id": "3a14779f-a23e-4a25-8c88-b495910e6fcd",
+      "name": "Aggregate saved meals"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{$json.chat_id}}",
+        "messageId": "={{$json.msg_id}}",
+        "text": "=*Сохранил {{ $json.count }} позиций* ✅\n\n*Итого:* {{ $json.kcal }} ккал\n*Б:* {{ $json.prot }}  *Ж:* {{ $json.fat }}  *У:* {{ $json.carb }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78688,
+        12016
+      ],
+      "id": "4b0c2c2a-ddaf-497f-bef4-5332c148b945",
+      "name": "SEND multi done",
+      "webhookId": "e771e5c1-3ce4-4643-b716-69b0d648e3eb",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const upd=$items(\"When Executed by Ingress\")[0].json.message;\nconst cap=$items(\"Parse photo caption\")[0].json;\nconst chatId=upd.chat.id;\nconst msgId=upd.message_id;\nconst photoId=upd.photo[upd.photo.length-1].file_id;\n\nlet raw=$json.content??$json.message?.content??$json;\nif(typeof raw!=='string')raw=JSON.stringify(raw);\n\nraw=raw\n  .replace(/```json/gi,'')\n  .replace(/```/g,'')\n  .replace(/[“”]/g,'\"')\n  .replace(/[‘’]/g,\"'\")\n  .replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]/g,'')\n  .trim();\n\nconst a=raw.indexOf('{'),b=raw.lastIndexOf('}');\nif(a>=0&&b>a)raw=raw.slice(a,b+1);\nraw=raw.replace(/,\\s*([}\\]])/g,'$1');\n\nlet parsed=null;\ntry{parsed=JSON.parse(raw)}catch(_){}\n\nconst arr=parsed&&Array.isArray(parsed.items)?parsed.items:[];\nconst containers=Number(parsed?.containers_detected||0);\n\nconst num=v=>{\n  if(v===null||v===undefined||v==='')return null;\n  const n=Number(String(v).replace(',','.').replace(/[^\\d.+-]/g,''));\n  return Number.isFinite(n)?n:null;\n};\nconst txt=v=>String(v??'').replace(/[\"“”]/g,'').replace(/\\s+/g,' ').trim();\n\nconst captionGrams=Number(cap.caption_grams||0)>0?Number(cap.caption_grams):null;\nconst captionHint=String(cap.caption_identity_hint||'').trim();\nconst captionHasIdentity=Boolean(cap.caption_has_identity&&captionHint);\n\nfunction textHasNumber(text,value,tolerance=0.06){\n  if(value===null||value===undefined)return false;\n  const nums=String(text||'').replace(/,/g,'.').match(/\\d+(?:\\.\\d+)?/g)||[];\n  const target=Number(value);\n  return nums.some(s=>{\n    const n=Number(s);\n    return Number.isFinite(n)&&Math.abs(n-target)<=Math.max(0.11,Math.abs(target)*tolerance);\n  });\n}\n\nconst clean=arr.map((x,i)=>{\n  let mode=String(x.source_mode||'visual').toLowerCase();\n  if(!['label','web','visual'].includes(mode))mode='visual';\n\n  const labelName=txt(x.label_name||x.package_name);\n  const packageContext=Boolean(x.package_context);\n  let dish=txt((packageContext&&labelName)||x.dish||x.name||x.label);\n  // Explicit user wording outranks model guesses such as SPAR -> Мираторг.\n  if(captionHasIdentity && arr.length===1) dish=captionHint;\n  const packageText=txt(x.package_text);\n  const labelText=txt(x.label_text);\n  const evidenceText=`${packageText} ${labelText}`;\n\n  const labelKcal=num(x.label_kcal);\n  const labelProt=num(x.label_prot);\n  const labelFat=num(x.label_fat);\n  const labelCarb=num(x.label_carb);\n\n  const completeLabel=[labelKcal,labelProt,labelFat,labelCarb].every(v=>v!==null);\n\n  // Evidence guard:\n  // for label mode, at least 3 of 4 extracted nutrition numbers must also be visible\n  // in the OCR transcript. This prevents \"confident\" hallucinated macros.\n  const evidenceHits=[\n    textHasNumber(evidenceText,labelKcal,0.04),\n    textHasNumber(evidenceText,labelProt,0.04),\n    textHasNumber(evidenceText,labelFat,0.04),\n    textHasNumber(evidenceText,labelCarb,0.04)\n  ].filter(Boolean).length;\n\n  const labelEvidenceOk=completeLabel && evidenceHits>=3;\n\n  // User-entered caption weight wins unconditionally.\n  let grams=captionGrams;\n  let weightSource=captionGrams?'caption':'missing';\n\n  if(!(grams>0)){\n    const candidates=[\n      num(x.grams),\n      num(x.serving_weight_g),\n      num(x.label_serving_g),\n      num(x.package_mass_g)\n    ];\n    const v=candidates.find(n=>Number.isFinite(n)&&n>0);\n    if(v){grams=Math.round(v);weightSource='vision_or_package';}\n  }\n\n  const y={\n    idx:i,\n    dish,\n    label_name:labelName,\n    label_name_confidence:Number(x.label_name_confidence??x.confidence??0),\n    label_name_locked:Boolean(packageContext&&labelName),\n    name_source:Boolean(packageContext&&labelName)?'label':'vision',\n    brand:txt(x.brand||x.store||x['brand/store']),\n    user_caption_hint:captionHint,\n    user_identity_locked:Boolean(captionHasIdentity&&arr.length===1),\n    source_mode:mode,\n    package_context:packageContext,\n    package_text:packageText,\n    grams:Number(grams||0),\n    weight_missing:!(Number(grams)>0),\n    weight_source:weightSource,\n    confidence:Number(x.confidence??0.5),\n    label_basis:\n      x.label_basis==='per_serving'||x.label_basis==='serving'?'per_serving':\n      x.label_basis==='per100g'?'per100g':null,\n    label_serving_g:num(x.label_serving_g),\n    label_kcal:labelKcal,\n    label_prot:labelProt,\n    label_fat:labelFat,\n    label_carb:labelCarb,\n    label_text:labelText,\n    label_evidence_hits:evidenceHits,\n    label_evidence_ok:labelEvidenceOk\n  };\n\n  if(captionHasIdentity&&arr.length===1){\n    // A named product/store in the caption should be searched exactly.\n    y.source_mode='web';\n    y.name_source='caption';\n    y.label_name_locked=false;\n  }else if(packageContext&&labelEvidenceOk){\n    y.source_mode='label';\n  }else if(packageContext){\n    // Do not trust uncertain OCR macros as authoritative label data.\n    y.source_mode='web';\n  }\n\n  return y;\n})\n.filter(x=>Boolean(x.dish))\n.slice(0,10)\n.map((x,i)=>({...x,idx:i}));\n\nreturn [{json:{\n  chat_id:chatId,\n  message_id:msgId,\n  photo_file_id:photoId,\n  containers_detected:containers,\n  caption_grams:captionGrams,\n  caption_identity_hint:captionHint,\n  caption_has_identity:captionHasIdentity,\n  recognition_started_at_ms:Number(cap.recognition_started_at_ms||Date.now()),\n  items:clean,\n  items_json:JSON.stringify(clean),\n  avg_confidence:clean.length\n    ?Math.round(clean.reduce((a,x)=>a+Math.max(0,Math.min(1,x.confidence||0)),0)/clean.length*100)/100\n    :0,\n  route:'single_pass',\n  primary_raw:raw.slice(0,5000)\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78512,
+        10304
+      ],
+      "id": "6616c686-3e81-4ce3-9204-22c02b1fe573",
+      "name": "Parse + validate",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Ты нутри-калькулятор.\n\nНа вход приходит массив ОБЫЧНЫХ визуально распознанных блюд с граммовкой.\nДля этих позиций нет надёжной этикетки и не требуется интернет-поиск.\n\nПосчитай КБЖУ каждой позиции.\n\nВерни ТОЛЬКО JSON:\n{\n  \"items\":[{\n    \"idx\":0,\n    \"dish\":\"название\",\n    \"grams\":160,\n    \"kcal\":200,\n    \"prot\":20,\n    \"fat\":8,\n    \"carb\":15,\n    \"nutrition_source\":\"estimate\",\n    \"source_url\":\"\",\n    \"source_title\":\"\"\n  }]\n}\n\nВерни каждую входную позицию.\ngrams не меняй.\nТолько JSON.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.unresolved_json }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        79872,
+        10336
+      ],
+      "id": "03c83532-f292-41db-ab57-b995bf78e41d",
+      "name": "NUTRION batch",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const source=$input.first().json;\nconst prep=$items('Prepare smart nutrition')[0].json;\n// V14_CAPTION_LOCK\nconst lockedCaptionGrams=Number(prep.caption_grams||0)>0?Number(prep.caption_grams):null;\n\n\nlet raw=source.message?.content??source.output??source;\nif(typeof raw==='string'){\n  const s=raw.replace(/```json|```/g,'').trim();\n  try{raw=JSON.parse(s)}\n  catch(_){return [{json:{...prep,recognition_failed:true,route_nutrition:'recognition_failed'}}]}\n}\n\nconst resolved=Array.isArray(raw.items)?raw.items:[];\nconst direct=Array.isArray(prep.direct_items)?prep.direct_items:[];\nconst unresolved=Array.isArray(prep.unresolved_items)?prep.unresolved_items:[];\n\nconst finite=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v));\nconst completeLabel=x=>\n  finite(x.label_kcal)&&finite(x.label_prot)&&finite(x.label_fat)&&finite(x.label_carb);\n\nfunction fromLabel(input,grams){\n  if(!completeLabel(input)||!(grams>0))return null;\n\n  let factor=null;\n  if(input.label_basis==='per100g'){\n    factor=grams/100;\n  }else if(input.label_basis==='per_serving'){\n    const serving=Number(input.label_serving_g||input.serving_weight_g||0);\n    factor=serving>0?grams/serving:1;\n  }\n  if(factor===null)return null;\n\n  const scale=v=>Math.round(Number(v)*factor*10)/10;\n  return {\n    kcal:scale(input.label_kcal),\n    prot:scale(input.label_prot),\n    fat:scale(input.label_fat),\n    carb:scale(input.label_carb)\n  };\n}\n\nconst aiRows=unresolved.map((input,i)=>{\n  const m=resolved.find(x=>Number(x.idx)===Number(input.idx))||resolved[i]||{};\n\n  // Critical fix: allow lookup to supply grams when Vision could not.\n  const inputGrams=Number(input.grams||0);\n  const lookupGrams=Number(m.grams||0);\n  const grams=lockedCaptionGrams || (inputGrams>0?inputGrams:lookupGrams);\n\n  // If label K/B/F/C were photographed, web may supply weight only.\n  const labelCalc=fromLabel(input,grams);\n  const personal=input.override_found&&input.personal_override?input.personal_override:null;\n\n  return {\n    ...input,\n    dish:String(input.label_name_locked&&input.label_name\n      ? input.label_name\n      : (m.dish||input.dish)),\n    grams,\n    weight_missing:!(grams>0),\n    kcal:personal?Number(personal.kcal||0):(labelCalc?labelCalc.kcal:Number(m.kcal||0)),\n    prot:personal?Number(personal.prot||0):(labelCalc?labelCalc.prot:Number(m.prot||0)),\n    fat:personal?Number(personal.fat||0):(labelCalc?labelCalc.fat:Number(m.fat||0)),\n    carb:personal?Number(personal.carb||0):(labelCalc?labelCalc.carb:Number(m.carb||0)),\n    nutrition_source:personal?'personal_override':(labelCalc?'label':String(m.nutrition_source||(input.source_mode==='web'?'web':'estimate'))),\n    source_url:String(m.source_url||''),\n    source_title:labelCalc?'Этикетка на фото':String(m.source_title||'')\n  };\n});\n\nconst combined=[...direct,...aiRows]\n  .sort((a,b)=>Number(a.idx)-Number(b.idx))\n  .map((x,i)=>({...x,idx:i}));\n\nfunction sanity(dish,grams,kcal){\n  if(!(grams>0)||!(kcal>0))return {per100:0,ok:false};\n  const per100=kcal/grams*100;\n  const s=String(dish||'').toLowerCase();\n  let min=5,max=900;\n  if(/суп|борщ|щи|солян|бульон/.test(s)){min=10;max=260}\n  else if(/салат|овощ/.test(s)){min=10;max=450}\n  else if(/пюре|рис|греч|макарон|картоф|круп/.test(s)){min=40;max=420}\n  else if(/кур|индей|рыб|мяс|филе|котлет|бургер/.test(s)){min=60;max=650}\n  else if(/булоч|хлеб|лаваш|лепеш|выпеч|батончик/.test(s)){min=120;max=700}\n  else if(/соус|майон|сметан|заправ/.test(s)){min=20;max=850}\n  return {per100:Math.round(per100),ok:Number.isFinite(per100)&&per100>=min&&per100<=max};\n}\n\nconst rows=combined.map((x,i)=>{\n  const confidence=Number(x.confidence??0.5);\n  const check=sanity(x.dish,Number(x.grams),Number(x.kcal));\n  const grounded=['label','web','personal_override'].includes(String(x.nutrition_source));\n  const missingWeight=!(Number(x.grams)>0);\n  const lowConfidence=!grounded&&confidence<0.45;\n  const uncertain=missingWeight||(!grounded&&confidence>=0.45&&confidence<0.75);\n  const insane=missingWeight||!check.ok||Number(x.kcal)<=0;\n\n  return {\n    ...x,\n    idx:i,\n    uncertain,\n    sanity_ok:check.ok,\n    kcal_per_100g:check.per100,\n    included:!lowConfidence&&!insane\n  };\n});\n\nif(!rows.length)throw new Error('После определения КБЖУ нет блюд');\n\nconst included=rows.filter(x=>x.included);\nconst totals=included.reduce((a,r)=>({\n  kcal:a.kcal+Number(r.kcal||0),\n  prot:a.prot+Number(r.prot||0),\n  fat:a.fat+Number(r.fat||0),\n  carb:a.carb+Number(r.carb||0)\n}),{kcal:0,prot:0,fat:0,carb:0});\n\nconst sourceMark=x=>x.nutrition_source==='label'?'🏷️':x.nutrition_source==='web'?'🌐':x.nutrition_source==='personal_override'?'🧠':'';\nconst lines=rows.map((r,i)=>{\n  let marker=sourceMark(r);\n  if(marker)marker+=' ';\n  let suffix='';\n  if(!(Number(r.grams)>0)){\n    marker='⚠️ '+marker;\n    suffix=' · не удалось определить массу';\n  }else if(!r.included){\n    marker='❓ '+marker;\n    suffix=' · не учитываю';\n  }else if(r.uncertain){\n    marker='⚠️ '+marker;\n    suffix=' · проверь';\n  }\n  return `${i+1}. ${marker}${r.dish} — ${Number(r.grams)>0?'~'+Math.round(r.grams)+' г':'масса ?'} · ${Math.round(r.kcal||0)} ккал${suffix}`;\n});\n\nconst labelCount=rows.filter(x=>x.nutrition_source==='label').length;\nconst webCount=rows.filter(x=>x.nutrition_source==='web').length;\nconst memoryCount=rows.filter(x=>x.nutrition_source==='personal_override').length;\nconst warningCount=rows.filter(x=>x.uncertain||!x.included).length;\nconst foodConfidence=rows.length?rows.reduce((a,x)=>a+Math.max(0,Math.min(1,Number(x.confidence||0))),0)/rows.length:0;\nconst portionConfidence=rows.length?rows.reduce((a,x)=>a+(Number(x.grams)>0?(x.weight_source==='caption'?1:0.72):0.15),0)/rows.length:0;\nconst nutritionConfidence=rows.length?rows.reduce((a,x)=>a+(['label','web'].includes(String(x.nutrition_source))?0.95:(x.sanity_ok?0.68:0.3)),0)/rows.length:0;\nconst recognitionScore=Math.max(0,Math.min(1,foodConfidence*.45+portionConfidence*.30+nutritionConfidence*.25+(prep.caption_has_identity?0.05:0)));\nconst needsConfirmation=recognitionScore<0.68||warningCount>0;\n\nreturn [{json:{\n  chat_id:prep.chat_id,\n  message_id:prep.message_id,\n  photo_file_id:prep.photo_file_id,\n  status:'await_multi_confirm',\n  vision_source:'single_pass',\n  items:rows,\n  items_json:JSON.stringify(rows),\n  total_kcal:Math.round(totals.kcal),\n  total_prot:Math.round(totals.prot*10)/10,\n  total_fat:Math.round(totals.fat*10)/10,\n  total_carb:Math.round(totals.carb*10)/10,\n  warning_count:warningCount,\n  confidence_food:Math.round(foodConfidence*100)/100,\n  confidence_portion:Math.round(portionConfidence*100)/100,\n  confidence_nutrition:Math.round(nutritionConfidence*100)/100,\n  recognition_score:Math.round(recognitionScore*100)/100,\n  needs_confirmation:needsConfirmation,\n  caption_used:Boolean(prep.caption_has_identity||prep.caption_grams),\n  recognition_latency_ms:Math.max(0,Date.now()-Number(prep.recognition_started_at_ms||Date.now())),\n  text:\n`*Нашёл ${rows.length} позиций:*\\n\\n${lines.join('\\n')}\\n\\n`+\n`*Итого учтено:* ~${Math.round(totals.kcal)} ккал\\n`+\n`*Б:* ${Math.round(totals.prot*10)/10}  *Ж:* ${Math.round(totals.fat*10)/10}  *У:* ${Math.round(totals.carb*10)/10}`+\n(labelCount?`\\n\\n🏷️ КБЖУ с этикетки`:'')+\n(webCount?`\\n🌐 Для части продуктов использованы данные из интернета`:'')+\n(memoryCount?`\\n🧠 Использованы ранее подтверждённые данные`:'')+\n(needsConfirmation?`\\n⚠️ Уверенность распознавания ${Math.round(recognitionScore*100)}%. Лучше быстро проверить перед сохранением.`:`\\n✅ Уверенность распознавания ${Math.round(recognitionScore*100)}%.`)\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80096,
+        10288
+      ],
+      "id": "7120c7b7-ec0a-4454-b374-82e0040747a1",
+      "name": "Build batch summary",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "bot_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{ $json.chat_id }}"
+            },
+            {
+              "fieldId": "event_type",
+              "fieldValue": "photo_analyzed"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "=Фото распознано: {{ $json.items.length }} позиций"
+            },
+            {
+              "fieldId": "body",
+              "fieldValue": "={{ $json.items.map((x,i)=>`${i+1}. ${x.dish} — ~${Math.round(x.grams)} г${x.included===false?' (не учтено)':x.uncertain?' (проверить)':''}`).join('\\n') }}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{ JSON.stringify({source:$json.vision_source,total_kcal:$json.total_kcal,warnings:$json.warning_count}) }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        79904,
+        10208
+      ],
+      "id": "2c2170fa-b708-4801-b9dd-53731f582ed3",
+      "name": "LOG photo analyzed",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "bot_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{ $json.chat_id }}"
+            },
+            {
+              "fieldId": "event_type",
+              "fieldValue": "meal_saved"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "=Сохранён приём пищи: {{ $json.count }} позиций"
+            },
+            {
+              "fieldId": "body",
+              "fieldValue": "=Итого: ~{{ $json.kcal }} ккал · Б {{ $json.prot }} · Ж {{ $json.fat }} · У {{ $json.carb }}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{ JSON.stringify({count:$json.count,kcal:$json.kcal,prot:$json.prot,fat:$json.fat,carb:$json.carb}) }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78656,
+        11936
+      ],
+      "id": "6b82ea35-0090-43fe-abca-1ab5295af360",
+      "name": "LOG meal saved",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data=$json.callback_query.data;\nconst draftId=Number(data.replace('multi_edit_',''));\nreturn [{json:{\n  action:'open',\n  draft_id:draftId,\n  idx:0,\n  chat_id:$json.callback_query.from.id,\n  edit_message_id:$json.callback_query.message.message_id\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77568,
+        12160
+      ],
+      "id": "53be145f-8b51-4cf8-9e68-15aa045d0313",
+      "name": "Parse edit start"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d=$json.callback_query.data.split('_');\n// med_<action>_<draft>_<idx>\nreturn [{json:{\n  action:d[1],\n  draft_id:Number(d[2]),\n  idx:Number(d[3]||0),\n  chat_id:$json.callback_query.from.id,\n  edit_message_id:$json.callback_query.message.message_id\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77568,
+        12288
+      ],
+      "id": "9fa41ec9-1a12-4e35-9ced-39d6949debe7",
+      "name": "Parse edit action"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{$json.candidates_json}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{$json.draft_status}}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78240,
+        12144
+      ],
+      "id": "37cbde7d-f735-4729-8411-e486d8f5785f",
+      "name": "UPDATE edit draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{$json.chat_id}}",
+        "messageId": "={{$json.edit_message_id}}",
+        "replyMarkup": "inlineKeyboard",
+        "text": "={{$json.text}}",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "◀️ Пред.",
+                    "additionalFields": {
+                      "callback_data": "=med_prev_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  },
+                  {
+                    "text": "След. ▶️",
+                    "additionalFields": {
+                      "callback_data": "=med_next_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "−10 г",
+                    "additionalFields": {
+                      "callback_data": "=med_minus10_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  },
+                  {
+                    "text": "+10 г",
+                    "additionalFields": {
+                      "callback_data": "=med_plus10_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  },
+                  {
+                    "text": "−25 г",
+                    "additionalFields": {
+                      "callback_data": "=med_minus25_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  },
+                  {
+                    "text": "+25 г",
+                    "additionalFields": {
+                      "callback_data": "=med_plus25_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "⌨️ Ввести вес",
+                    "additionalFields": {
+                      "callback_data": "=med_manual_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  },
+                  {
+                    "text": "🚫 Не учитывать / вернуть",
+                    "additionalFields": {
+                      "callback_data": "=med_toggle_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🗑 Удалить позицию",
+                    "additionalFields": {
+                      "callback_data": "=med_delete_{{ $json.draft_id }}_{{ $json.idx }}"
+                    }
+                  },
+                  {
+                    "text": "✅ Сохранить всё",
+                    "additionalFields": {
+                      "callback_data": "=multi_save_{{ $json.draft_id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78448,
+        12208
+      ],
+      "id": "6f417421-8564-4f47-a0cf-9a812be2b5fb",
+      "name": "SHOW editor",
+      "webhookId": "6fb98734-d88a-4cc1-89b9-79f6a124177c",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "bot_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "event_type",
+              "fieldValue": "meal_edited"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "Приём пищи скорректирован"
+            },
+            {
+              "fieldId": "body",
+              "fieldValue": "=Изменение: {{$json.action}}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{JSON.stringify({draft_id:$json.draft_id,action:$json.action})}}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78448,
+        12128
+      ],
+      "id": "c39647d6-0627-474e-a5f6-f2afd35b5f03",
+      "name": "LOG meal edited",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items=Array.isArray($json.items)?$json.items:[];\nif(!items.length){\n  return [{json:{\n    ...$json,\n    recognition_failed:true,\n    route_nutrition:'recognition_failed',\n    direct_items:[],\n    unresolved_items:[],\n    unresolved_json:'[]'\n  }}];\n}\n\nconst finite=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v));\n\nfunction completeTrustedLabel(x){\n  return x.label_evidence_ok===true &&\n    finite(x.label_kcal)&&finite(x.label_prot)&&finite(x.label_fat)&&finite(x.label_carb);\n}\n\nfunction directFromLabel(x){\n  if(!completeTrustedLabel(x))return null;\n\n  const grams=Number(x.grams||0);\n  if(!(grams>0))return null;\n\n  let factor=null;\n  if(x.label_basis==='per100g'){\n    factor=grams/100;\n  }else if(x.label_basis==='per_serving'){\n    const serving=Number(x.label_serving_g||0);\n    factor=serving>0?grams/serving:1;\n  }\n  if(factor===null)return null;\n\n  const scale=v=>Math.round(Number(v)*factor*10)/10;\n\n  return {\n    ...x,\n    source_mode:'label',\n    kcal:scale(x.label_kcal),\n    prot:scale(x.label_prot),\n    fat:scale(x.label_fat),\n    carb:scale(x.label_carb),\n    nutrition_source:'label',\n    source_url:'',\n    source_title:'Этикетка на фото'\n  };\n}\n\nconst direct=[];\nconst unresolved=[];\n\nfor(const raw of items){\n  const x={...raw};\n\n  if(x.package_context&&x.label_name_locked&&x.label_name){\n    x.dish=x.label_name;\n    x.name_source='label';\n  }\n\n  if(x.override_found&&x.personal_override){\n    direct.push({\n      ...x,\n      source_mode:'personal_override',\n      nutrition_source:'personal_override',\n      kcal:Number(x.personal_override.kcal||0),\n      prot:Number(x.personal_override.prot||0),\n      fat:Number(x.personal_override.fat||0),\n      carb:Number(x.personal_override.carb||0),\n      source_url:'',\n      source_title:'Подтверждено пользователем ранее',\n      confidence:Math.max(Number(x.confidence||0),Number(x.override_confidence||.95))\n    });\n    continue;\n  }\n\n  const directLabel=directFromLabel(x);\n  if(directLabel){\n    direct.push(directLabel);\n    continue;\n  }\n\n  unresolved.push(x);\n}\n\nconst hasWeb=unresolved.some(x=>x.source_mode==='web');\nreturn [{json:{\n  ...$json,\n  direct_items:direct,\n  unresolved_items:unresolved,\n  unresolved_json:JSON.stringify(unresolved),\n  route_nutrition:unresolved.length===0?'direct_only':hasWeb?'web_batch':'visual_batch',\n  has_web:hasWeb,\n  has_visual:unresolved.some(x=>x.source_mode!=='web')\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        79472,
+        10272
+      ],
+      "id": "a4d04198-41a8-4af6-8918-1f9af32bd49b",
+      "name": "Prepare smart nutrition",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5ef21844-da62-415d-90ae-218ae5d03626",
+                    "leftValue": "={{$json.route_nutrition}}",
+                    "rightValue": "direct_only",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "direct_only"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "796b87af-b958-4d0d-be2b-67708f7e5dd0",
+                    "leftValue": "={{$json.route_nutrition}}",
+                    "rightValue": "visual_batch",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "visual_batch"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "be683c28-bd82-4825-9254-99f5bd7c388b",
+                    "leftValue": "={{$json.route_nutrition}}",
+                    "rightValue": "web_batch",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "web_batch"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "174e6bfe-4b48-4b23-9d39-1b5f4c8a9aa0",
+                    "leftValue": "={{$json.route_nutrition}}",
+                    "rightValue": "recognition_failed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "recognition_failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        79648,
+        10272
+      ],
+      "id": "724cb262-12ec-4866-8ea4-b733489bb439",
+      "name": "Nutrition source?"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini:online",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI:ONLINE"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Ты делаешь ОДИН пакетный web lookup точных брендированных продуктов.\n\nКРИТИЧЕСКИЙ ПРИОРИТЕТ:\n- Если user_identity_locked=true и user_caption_hint заполнен, exact identity = user_caption_hint.\n- Это слова самого пользователя. НЕЛЬЗЯ заменять бренд/магазин/производителя похожим товаром.\n- \"SPAR\" нельзя превращать в \"Мираторг\".\n- Ищи сначала точную фразу пользователя, затем максимально близкое совпадение ТОГО ЖЕ бренда/магазина.\n- Если точный продукт указанного бренда не найден, НЕ подставляй чужой бренд. Верни estimate с исходным названием пользователя.\n- В поле dish сохрани исходную идентичность пользователя.\n\nДля каждой позиции:\n- exact identity = label_name, если он есть; иначе dish.\n- brand/store использовать дополнительно.\n- НЕ заменяй точный label_name похожим продуктом.\n- Если входной grams > 0, он ЗАБЛОКИРОВАН и не может изменяться. Это вес, указанный пользователем/системой.\n- Найди КБЖУ именно точного продукта.\n- Источники: официальный сайт/каталог > сайт сети/магазина > крупный ритейлер.\n- Если точный продукт не найден, nutrition_source=\"estimate\" и source_url=\"\".\n- Если нашёл данные на 100 г, пересчитай на входной grams.\n- Если grams отсутствует, только тогда найди стандартную массу порции.\n\nВерни ТОЛЬКО JSON:\n{\n \"items\":[{\n  \"idx\":0,\n  \"dish\":\"точное label_name\",\n  \"grams\":145,\n  \"kcal\":0,\n  \"prot\":0,\n  \"fat\":0,\n  \"carb\":0,\n  \"nutrition_source\":\"web\",\n  \"source_url\":\"https://...\",\n  \"source_title\":\"источник\"\n }]\n}\n\nТолько JSON.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.unresolved_json }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        79872,
+        10448
+      ],
+      "id": "4eecc247-2141-4243-be71-6965d4e3dd74",
+      "name": "NUTRION web lookup",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{items:$json.direct_items}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        79872,
+        10208
+      ],
+      "id": "ccc9105b-f20f-46d5-a263-d25f3975486f",
+      "name": "Label direct result",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77808,
+        12144
+      ],
+      "id": "624aa24c-743f-4991-95d2-454ad87d86c2",
+      "name": "GET edit draft start",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77808,
+        12320
+      ],
+      "id": "46efa836-36c1-42b7-b5ea-afebf562e8f9",
+      "name": "GET edit draft action",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$items('Parse edit start')[0].json;\nconst row=Array.isArray(items[0].json)?items[0].json[0]:items[0].json;\nlet arr=row.candidates;\nif(typeof arr==='string')arr=JSON.parse(arr);\nif(!Array.isArray(arr)||!arr.length)throw new Error('Нет позиций для редактора');\n\nlet items2=arr.map(x=>({...x}));\nlet idx=Number(ctx.idx);\nconst action=ctx.action;\n\nif(!Number.isInteger(idx)||idx<0)idx=0;\nif(idx>=items2.length)idx=Math.max(0,items2.length-1);\n\nif(action==='next')idx=(idx+1)%items2.length;\nif(action==='prev')idx=(idx-1+items2.length)%items2.length;\n\nfunction setWeight(x,next){\n  const old=Number(x.grams||0);\n  next=Math.max(1,Math.min(3000,Math.round(next)));\n\n  if(old>0){\n    const ratio=next/old;\n    for(const k of ['kcal','prot','fat','carb'])\n      x[k]=Math.round(Number(x[k]||0)*ratio*10)/10;\n  }else if(\n    x.nutrition_source==='label' &&\n    x.label_basis==='per100g' &&\n    Number.isFinite(Number(x.label_kcal))\n  ){\n    const f=next/100;\n    x.kcal=Math.round(Number(x.label_kcal||0)*f*10)/10;\n    x.prot=Math.round(Number(x.label_prot||0)*f*10)/10;\n    x.fat=Math.round(Number(x.label_fat||0)*f*10)/10;\n    x.carb=Math.round(Number(x.label_carb||0)*f*10)/10;\n  }\n\n  x.grams=next;\n  x.weight_missing=false;\n  x.included=true;\n}\n\nif(items2[idx]){\n  if(action==='plus10')setWeight(items2[idx],Number(items2[idx].grams||0)+10);\n  if(action==='minus10')setWeight(items2[idx],Math.max(1,Number(items2[idx].grams||0)-10));\n  if(action==='plus25')setWeight(items2[idx],Number(items2[idx].grams||0)+25);\n  if(action==='minus25')setWeight(items2[idx],Math.max(1,Number(items2[idx].grams||0)-25));\n  if(action==='toggle')items2[idx].included=items2[idx].included===false;\n  if(action==='delete'){\n    items2.splice(idx,1);\n    if(!items2.length)throw new Error('Нельзя удалить все позиции. Отмени весь приём отдельно.');\n    idx=Math.min(idx,items2.length-1);\n  }\n}\n\nconst selected=items2[idx];\nconst grams=Number(selected.grams||0);\nconst included=selected.included!==false;\nconst statusLine=included?'✅ Учитывается в рационе':'🚫 Не учитывается в рационе';\nconst mealContext=selected.meal_label?`\\nПриём: ${selected.meal_label}${selected.meal_time?' · '+selected.meal_time:''}`:'';\nconst source=selected.nutrition_source==='label'?'🏷️ этикетка':\n             selected.nutrition_source==='web'?'🌐 интернет':'≈ оценка';\n\nlet text;\nlet awaitManual=false;\n\nif(action==='manual'){\n  awaitManual=true;\n  text=`*${selected.dish}*\\n${grams>0?'~'+Math.round(grams)+' г':'вес не указан'} · ${Math.round(selected.kcal||0)} ккал\\nИсточник: ${source}\\n\\nОтправь новый вес одним сообщением, например: *145 г*`;\n}else{\n  text=`*Исправление приёма пищи*\\n\\nПозиция ${idx+1} из ${items2.length}\\n*${selected.dish}*\\n${grams>0?'~'+Math.round(grams)+' г':'⚠️ вес не указан'} · ${Math.round(selected.kcal||0)} ккал\\nБ ${Math.round(Number(selected.prot||0)*10)/10} · Ж ${Math.round(Number(selected.fat||0)*10)/10} · У ${Math.round(Number(selected.carb||0)*10)/10}\\nИсточник: ${source}${mealContext}\\n${statusLine}\\n\\nВыбери действие:`;\n}\n\nreturn [{json:{\n  chat_id:ctx.chat_id,\n  draft_id:ctx.draft_id,\n  edit_message_id:ctx.edit_message_id,\n  idx,\n  count:items2.length,\n  action,\n  items:items2,\n  candidates_json:JSON.stringify(items2),\n  text,\n  await_manual:awaitManual,\n  draft_status:awaitManual\n    ? `await_edit_weight_${idx}_${ctx.edit_message_id}`\n    : 'await_multi_confirm',\n  included:selected.included!==false\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78016,
+        12144
+      ],
+      "id": "e587d369-9cac-4e2d-b3af-d407b5adb7e0",
+      "name": "Render editor start"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$items('Parse edit action')[0].json;\nconst row=Array.isArray(items[0].json)?items[0].json[0]:items[0].json;\nlet arr=row.candidates;\nif(typeof arr==='string')arr=JSON.parse(arr);\nif(!Array.isArray(arr)||!arr.length)throw new Error('Нет позиций для редактора');\n\nlet items2=arr.map(x=>({...x}));\nlet idx=Number(ctx.idx);\nconst action=ctx.action;\n\nif(!Number.isInteger(idx)||idx<0)idx=0;\nif(idx>=items2.length)idx=Math.max(0,items2.length-1);\n\nif(action==='next')idx=(idx+1)%items2.length;\nif(action==='prev')idx=(idx-1+items2.length)%items2.length;\n\nfunction setWeight(x,next){\n  const old=Number(x.grams||0);\n  next=Math.max(1,Math.min(3000,Math.round(next)));\n\n  if(old>0){\n    const ratio=next/old;\n    for(const k of ['kcal','prot','fat','carb'])\n      x[k]=Math.round(Number(x[k]||0)*ratio*10)/10;\n  }else if(\n    x.nutrition_source==='label' &&\n    x.label_basis==='per100g' &&\n    Number.isFinite(Number(x.label_kcal))\n  ){\n    const f=next/100;\n    x.kcal=Math.round(Number(x.label_kcal||0)*f*10)/10;\n    x.prot=Math.round(Number(x.label_prot||0)*f*10)/10;\n    x.fat=Math.round(Number(x.label_fat||0)*f*10)/10;\n    x.carb=Math.round(Number(x.label_carb||0)*f*10)/10;\n  }\n\n  x.grams=next;\n  x.weight_missing=false;\n  x.included=true;\n}\n\nif(items2[idx]){\n  if(action==='plus10')setWeight(items2[idx],Number(items2[idx].grams||0)+10);\n  if(action==='minus10')setWeight(items2[idx],Math.max(1,Number(items2[idx].grams||0)-10));\n  if(action==='plus25')setWeight(items2[idx],Number(items2[idx].grams||0)+25);\n  if(action==='minus25')setWeight(items2[idx],Math.max(1,Number(items2[idx].grams||0)-25));\n  if(action==='toggle')items2[idx].included=items2[idx].included===false;\n  if(action==='delete'){\n    items2.splice(idx,1);\n    if(!items2.length){\n      return [{json:{\n        chat_id:ctx.chat_id,\n        draft_id:ctx.draft_id,\n        edit_message_id:ctx.edit_message_id,\n        idx:0,\n        count:0,\n        action:'delete_all',\n        items:[],\n        candidates_json:'[]',\n        text:'Позиция удалена. Приём пищи отменён.',\n        await_manual:false,\n        draft_status:'cancelled',\n        all_deleted:true\n      }}];\n    }\n    idx=Math.min(idx,items2.length-1);\n  }\n}\n\nconst selected=items2[idx];\nconst grams=Number(selected.grams||0);\nconst included=selected.included!==false;\nconst statusLine=included?'✅ Учитывается в рационе':'🚫 Не учитывается в рационе';\nconst mealContext=selected.meal_label?`\\nПриём: ${selected.meal_label}${selected.meal_time?' · '+selected.meal_time:''}`:'';\nconst source=selected.nutrition_source==='label'?'🏷️ этикетка':\n             selected.nutrition_source==='web'?'🌐 интернет':'≈ оценка';\n\nlet text;\nlet awaitManual=false;\n\nif(action==='manual'){\n  awaitManual=true;\n  text=`*${selected.dish}*\\n${grams>0?'~'+Math.round(grams)+' г':'вес не указан'} · ${Math.round(selected.kcal||0)} ккал\\nИсточник: ${source}\\n\\nОтправь новый вес одним сообщением, например: *145 г*`;\n}else{\n  text=`*Исправление приёма пищи*\\n\\nПозиция ${idx+1} из ${items2.length}\\n*${selected.dish}*\\n${grams>0?'~'+Math.round(grams)+' г':'⚠️ вес не указан'} · ${Math.round(selected.kcal||0)} ккал\\nБ ${Math.round(Number(selected.prot||0)*10)/10} · Ж ${Math.round(Number(selected.fat||0)*10)/10} · У ${Math.round(Number(selected.carb||0)*10)/10}\\nИсточник: ${source}${mealContext}\\n${statusLine}\\n\\nВыбери действие:`;\n}\n\nreturn [{json:{\n  chat_id:ctx.chat_id,\n  draft_id:ctx.draft_id,\n  edit_message_id:ctx.edit_message_id,\n  idx,\n  count:items2.length,\n  action,\n  items:items2,\n  candidates_json:JSON.stringify(items2),\n  text,\n  await_manual:awaitManual,\n  draft_status:awaitManual\n    ? `await_edit_weight_${idx}_${ctx.edit_message_id}`\n    : 'await_multi_confirm',\n  included:selected.included!==false\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78016,
+        12320
+      ],
+      "id": "2a9ef12c-da02-48ce-9468-ee010b22f3e6",
+      "name": "Render editor action"
+    },
+    {
+      "parameters": {
+        "jsCode": "const trigger = $items(\"When Executed by Ingress\")[0]?.json || {};\nconst msg = trigger.message || {};\nconst caption = String(msg.caption || msg.text || '').trim();\nconst normalized = caption.replace(',', '.');\n\nlet caption_grams = null;\nconst m = normalized.match(/(?:^|\\s)(\\d+(?:\\.\\d+)?)\\s*(кг|kg|г|гр|g)\\b/i);\nif (m) {\n  const value = Number(m[1]);\n  if (Number.isFinite(value) && value > 0) {\n    caption_grams = Math.round(/кг|kg/i.test(m[2]) ? value * 1000 : value);\n  }\n}\n\n// Remove service command and weight, but preserve the user's product/store wording.\nlet hint = caption\n  .replace(/^\\/v(?:@\\w+)?\\s*/i, '')\n  .replace(/(?:^|\\s)\\d+(?:[.,]\\d+)?\\s*(?:кг|kg|г|гр|g)\\b/ig, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\nconst aliases = [\n  [/\\bспар\\b/ig, 'SPAR'],\n  [/\\bмираторг\\b/ig, 'Мираторг'],\n  [/\\bвкусвилл\\b/ig, 'ВкусВилл'],\n  [/\\bперекр[её]сток\\b/ig, 'Перекрёсток'],\n  [/\\bпят[её]рочка\\b/ig, 'Пятёрочка'],\n  [/\\bмагнит\\b/ig, 'Магнит'],\n  [/\\bлента\\b/ig, 'Лента'],\n  [/\\bmetro\\b/ig, 'METRO']\n];\nfor (const [rx, val] of aliases) hint = hint.replace(rx, val);\n\nconst caption_has_identity = /[A-Za-zА-Яа-яЁё]{2,}/.test(hint);\n\nreturn [{\n  json: {\n    ...$json,\n    parsed_caption: caption,\n    caption_grams,\n    has_caption_weight: caption_grams !== null,\n    caption_identity_hint: caption_has_identity ? hint : '',\n    caption_has_identity,\n    recognition_started_at_ms: Date.now()\n  },\n  binary: $binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77344,
+        9664
+      ],
+      "id": "425e4e61-a51e-40bd-910d-9a058edcf48f",
+      "name": "Parse photo caption",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "meals_draft",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.message.chat.id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        77504,
+        12480
+      ],
+      "id": "cdd8f65d-1402-4038-b8c0-93c7145148b7",
+      "name": "GET drafts for text",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const trig=$items('When Executed by Ingress')[0].json;\nconst chatId=trig.message?.chat?.id;\nconst text=String(trig.message?.text||'').trim();\n\nconst rows=items.map(i=>i.json).filter(Boolean);\nconst waiting=rows\n  .filter(r=>String(r.status||'').startsWith('await_edit_weight_'))\n  .sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0))[0];\n\nif(!waiting){\n  return [{json:{...trig,is_manual_weight:false}}];\n}\n\nconst m=String(waiting.status).match(/^await_edit_weight_(\\d+)_(\\d+)$/);\nif(!m){\n  return [{json:{...trig,is_manual_weight:false}}];\n}\n\nreturn [{json:{\n  is_manual_weight:true,\n  chat_id:chatId,\n  raw_text:text,\n  draft_id:Number(waiting.message_id),\n  idx:Number(m[1]),\n  edit_message_id:Number(m[2]),\n  candidates:waiting.candidates\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77696,
+        12480
+      ],
+      "id": "f2d045cc-6e2d-4997-bbb1-4786c3707315",
+      "name": "Route text editor"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8ce522a8-70be-4665-9547-02f1a1251296",
+              "leftValue": "={{$json.is_manual_weight}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        77904,
+        12480
+      ],
+      "id": "19b33f9a-4388-4bfa-99c9-9f5eba183630",
+      "name": "Manual weight?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$json;\nlet arr=ctx.candidates;\nif(typeof arr==='string')arr=JSON.parse(arr);\nif(!Array.isArray(arr)||!arr.length)throw new Error('Нет позиций для изменения');\n\nconst normalized=String(ctx.raw_text||'').replace(',','.');\nconst m=normalized.match(/(\\d+(?:\\.\\d+)?)\\s*(кг|kg|г|гр|g)?/i);\n\nif(!m){\n  return [{json:{\n    ...ctx,\n    valid_weight:false,\n    reply_text:'Не понял вес. Напиши, например: 145 г'\n  }}];\n}\n\nlet grams=Number(m[1]);\nif(/кг|kg/i.test(m[2]||''))grams*=1000;\ngrams=Math.round(grams);\n\nif(!(grams>=1&&grams<=3000)){\n  return [{json:{\n    ...ctx,\n    valid_weight:false,\n    reply_text:'Укажи вес от 1 г до 3000 г.'\n  }}];\n}\n\nconst idx=Math.max(0,Math.min(Number(ctx.idx||0),arr.length-1));\nconst items2=arr.map(x=>({...x}));\nconst x=items2[idx];\nconst old=Number(x.grams||0);\n\nif(old>0){\n  const ratio=grams/old;\n  for(const k of ['kcal','prot','fat','carb'])\n    x[k]=Math.round(Number(x[k]||0)*ratio*10)/10;\n}else if(\n  x.nutrition_source==='label' &&\n  x.label_basis==='per100g' &&\n  Number.isFinite(Number(x.label_kcal))\n){\n  const f=grams/100;\n  x.kcal=Math.round(Number(x.label_kcal||0)*f*10)/10;\n  x.prot=Math.round(Number(x.label_prot||0)*f*10)/10;\n  x.fat=Math.round(Number(x.label_fat||0)*f*10)/10;\n  x.carb=Math.round(Number(x.label_carb||0)*f*10)/10;\n}\n\nx.grams=grams;\nx.weight_missing=false;\nx.included=true;\n\nconst source=x.nutrition_source==='label'?'🏷️ этикетка':\n             x.nutrition_source==='web'?'🌐 интернет':'≈ оценка';\n\nreturn [{json:{\n  valid_weight:true,\n  chat_id:ctx.chat_id,\n  draft_id:ctx.draft_id,\n  idx,\n  edit_message_id:ctx.edit_message_id,\n  items:items2,\n  candidates_json:JSON.stringify(items2),\n  draft_status:'await_multi_confirm',\n  included:x.included!==false,\n  text:`*Исправление приёма пищи*\\n\\nПозиция ${idx+1} из ${items2.length}\\n*${x.dish}*\\n~${grams} г · ${Math.round(x.kcal||0)} ккал\\nБ ${Math.round(Number(x.prot||0)*10)/10} · Ж ${Math.round(Number(x.fat||0)*10)/10} · У ${Math.round(Number(x.carb||0)*10)/10}\\nИсточник: ${source}\\n\\nВес обновлён.`\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78096,
+        12400
+      ],
+      "id": "b37ab926-dcd4-4eca-9d46-29d95552d66a",
+      "name": "Apply manual weight"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0b4c9dca-43fb-4ff6-91b8-2fa8b24c23d7",
+              "leftValue": "={{$json.valid_weight}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        78304,
+        12400
+      ],
+      "id": "d0981bee-b106-4c66-a2b8-aca67f8057e8",
+      "name": "Valid manual weight?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{$json.candidates_json}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{$json.draft_status}}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78496,
+        12352
+      ],
+      "id": "ffefbcc7-6358-469f-9824-b2c85f2e3b28",
+      "name": "UPDATE manual weight",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.reply_text}}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78496,
+        12480
+      ],
+      "id": "7d44561f-e52a-431f-a454-f52f2b546c66",
+      "name": "ASK manual weight again",
+      "webhookId": "a78a9678-1b78-4721-9de4-1296a7c28414",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"When Executed by Ingress\"].json.message.chat.id }}",
+        "text": "Не удалось распознать, загрузите еще раз",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80144,
+        10624
+      ],
+      "id": "cdad1586-5a15-45fd-869c-8e4da7b416f8",
+      "name": "SEND recognition failed",
+      "webhookId": "c20aade4-d406-42c1-a9f5-e90437b1e606",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dcaee9c9-ad35-4494-bdab-12a5e3bbc309",
+              "leftValue": "={{$json.all_deleted}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        79504,
+        11024
+      ],
+      "id": "e0dffed2-5109-4ddb-84dc-30048d4fafd2",
+      "name": "Editor item deleted all?"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{$json.chat_id}}",
+        "messageId": "={{$json.edit_message_id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        79904,
+        10912
+      ],
+      "id": "811ee908-19d2-4aa2-a21e-0489f633b5bc",
+      "name": "SHOW editor deleted",
+      "webhookId": "6fb98734-d88a-4cc1-89b9-79f6a124177c",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{$json.candidates_json}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{$json.draft_status}}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        79904,
+        10992
+      ],
+      "id": "bf85e93a-2e3e-40fd-a362-966aa8e5910b",
+      "name": "UPDATE deleted draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bce8f8ba-57d1-4a7e-9f6c-417498982c5a",
+              "leftValue": "={{$json.skip_save}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        79808,
+        10096
+      ],
+      "id": "5b7764bd-f315-4dd7-b18a-d4f29fd71567",
+      "name": "Skip excluded save?"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{$json.chat_id}}",
+        "messageId": "={{$items('Parse multi confirm')[0].json.del_msg_id}}",
+        "text": "Готово. Приём пищи не учитывается в рационе.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80144,
+        10016
+      ],
+      "id": "04cee63e-9013-4f7b-b523-7e2bf69bd54c",
+      "name": "SEND excluded done",
+      "webhookId": "e771e5c1-3ce4-4643-b716-69b0d648e3eb",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data=String($json.callback_query?.data||'');\nconst m=data.match(/^multi_delete_(\\d+)$/);\nif(!m)throw new Error('Некорректный callback удаления');\nreturn [{json:{\n  chat_id:$json.callback_query.from.id,\n  draft_id:Number(m[1]),\n  edit_message_id:$json.callback_query.message.message_id,\n  candidates_json:'[]',\n  draft_status:'cancelled',\n  text:'Сводка удалена. Ничего из неё не сохранено.'\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78000,
+        10624
+      ],
+      "id": "574029ef-c331-4940-be1d-a68641b25220",
+      "name": "Parse day draft delete"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals_draft",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{$json.draft_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{$json.candidates_json}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{$json.draft_status}}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78240,
+        10624
+      ],
+      "id": "e4a74c5d-7dc2-4d98-8f6e-c3773d7a1507",
+      "name": "CANCEL day draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{$json.chat_id}}",
+        "messageId": "={{$json.edit_message_id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        78480,
+        10624
+      ],
+      "id": "48e5b177-f55d-40d2-aea1-36c34ebbf522",
+      "name": "SHOW day draft deleted",
+      "webhookId": "6fb98734-d88a-4cc1-89b9-79f6a124177c",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "premiumPostMealV2",
+          "mode": "list",
+          "cachedResultName": "AI_Nutrition_Premium_PostMeal_v2_Outcome"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        79300,
+        11850
+      ],
+      "id": "044023f6-05db-4a9a-9a5c-6759fac51613",
+      "name": "Premium Post-Meal Insight"
+    },
+    {
+      "parameters": {
+        "tableId": "recognition_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "photo"
+            },
+            {
+              "fieldId": "recognized_name",
+              "fieldValue": "={{($json.items||[]).map(x=>x.dish).join(', ').slice(0,500)}}"
+            },
+            {
+              "fieldId": "grams",
+              "fieldValue": "={{($json.items||[]).length===1?Number($json.items[0].grams||0):null}}"
+            },
+            {
+              "fieldId": "kcal",
+              "fieldValue": "={{Number($json.total_kcal||0)}}"
+            },
+            {
+              "fieldId": "prot",
+              "fieldValue": "={{Number($json.total_prot||0)}}"
+            },
+            {
+              "fieldId": "fat",
+              "fieldValue": "={{Number($json.total_fat||0)}}"
+            },
+            {
+              "fieldId": "carb",
+              "fieldValue": "={{Number($json.total_carb||0)}}"
+            },
+            {
+              "fieldId": "confidence_food",
+              "fieldValue": "={{Number($json.confidence_food||0)}}"
+            },
+            {
+              "fieldId": "confidence_portion",
+              "fieldValue": "={{Number($json.confidence_portion||0)}}"
+            },
+            {
+              "fieldId": "confidence_nutrition",
+              "fieldValue": "={{Number($json.confidence_nutrition||0)}}"
+            },
+            {
+              "fieldId": "needs_confirmation",
+              "fieldValue": "={{Boolean($json.needs_confirmation)}}"
+            },
+            {
+              "fieldId": "caption_used",
+              "fieldValue": "={{Boolean($json.caption_used)}}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{JSON.stringify({score:$json.recognition_score,items:$json.items})}}"
+            },
+            {
+              "fieldId": "latency_ms",
+              "fieldValue": "={{Number($json.recognition_latency_ms||0)}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        80320,
+        10480
+      ],
+      "id": "61253cbb-12be-4dc0-b2b3-09737b5c7dd0",
+      "name": "LOG Recognition Confidence",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "client_food_overrides",
+        "returnAll": false,
+        "limit": 20,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        78700,
+        10340
+      ],
+      "id": "74a30d43-fb89-4036-9feb-e9b06ee593f3",
+      "name": "GET Personal Food Overrides",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Parse + validate')[0].json;const ovs=items.map(i=>i.json).filter(x=>x&&x.normalized_key);const norm=s=>String(s||'').toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9]+/g,' ').trim();const rows=(src.items||[]).map(x=>{const k=norm(x.dish);const o=ovs.find(v=>norm(v.display_name)===k||norm(v.normalized_key)===k);if(!o)return x;return{...x,dish:o.display_name||x.dish,grams:Number(o.grams||x.grams||0),override_found:true,override_confidence:Number(o.confidence||.95),source_mode:'personal_override',personal_override:{kcal:Number(o.kcal||0),prot:Number(o.prot||0),fat:Number(o.fat||0),carb:Number(o.carb||0)}}});return[{json:{...src,items:rows,items_json:JSON.stringify(rows)}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        78900,
+        10340
+      ],
+      "id": "ee14e426-187f-49a1-a74f-2688f5dda236",
+      "name": "Apply Personal Overrides"
+    },
+    {
+      "parameters": {
+        "jsCode": "const u=$json,cb=u.callback_query||{},map={menu_today:'/today',menu_add:'/add',menu_progress:'/progress',menu_recommend:'/recommend',menu_profile:'/profile',menu_support:'/support',menu_shop:'/shop'};const text=map[String(cb.data||'')]||'/help';return[{json:{update_id:u.update_id,message:{message_id:cb.message?.message_id||0,date:Math.floor(Date.now()/1000),chat:cb.message?.chat||{id:cb.from?.id},from:cb.from,text}}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        77400,
+        9500
+      ],
+      "id": "604fa7a7-c1b0-44bf-af52-7fa2f6f1c41a",
+      "name": "Build Menu Command"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get ready",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse dish_YES",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse dish_NO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse alt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split weight",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse multi confirm",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse edit start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse day draft delete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse edit action",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse cancel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET drafts for text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Menu Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse alt": {
+      "main": [
+        [
+          {
+            "node": "GET 3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEL await_alt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET 3": {
+      "main": [
+        [
+          {
+            "node": "WEIGHT 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET 2": {
+      "main": [
+        [
+          {
+            "node": "MORE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET 1": {
+      "main": [
+        [
+          {
+            "node": "WEIGHT 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split weight": {
+      "main": [
+        [
+          {
+            "node": "DEL await_weight",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET await_dish",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET await_weight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WEIGHT 3": {
+      "main": [
+        [
+          {
+            "node": "UPDATE 3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "await_weight 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WEIGHT 1": {
+      "main": [
+        [
+          {
+            "node": "await_weight 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "UPDATE 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MORE": {
+      "main": [
+        [
+          {
+            "node": "await_alt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "UPDATE 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse dish_YES": {
+      "main": [
+        [
+          {
+            "node": "GET 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEL dish_yes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse dish_NO": {
+      "main": [
+        [
+          {
+            "node": "GET 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEL dish_no",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Parse photo caption",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert": {
+      "main": [
+        [
+          {
+            "node": "VISION single pass",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get ready": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EDIT candidates": {
+      "main": [
+        [
+          {
+            "node": "CREATE candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract": {
+      "main": [
+        [
+          {
+            "node": "Convert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse cancel": {
+      "main": [
+        [
+          {
+            "node": "UPDATE meals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UPDATE meals": {
+      "main": [
+        [
+          {
+            "node": "GET meals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET meals": {
+      "main": [
+        [
+          {
+            "node": "build cancel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "build cancel": {
+      "main": [
+        [
+          {
+            "node": "EDITED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREATE meals": {
+      "main": [
+        [
+          {
+            "node": "DONE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Premium Post-Meal Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "NUTRION OR",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "NUTRION OR",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NUTRION OR": {
+      "main": [
+        [
+          {
+            "node": "Parse macros 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET await_dish": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GET await_weight": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse multi confirm": {
+      "main": [
+        [
+          {
+            "node": "GET multi draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET multi draft": {
+      "main": [
+        [
+          {
+            "node": "Explode meals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Explode meals": {
+      "main": [
+        [
+          {
+            "node": "Skip excluded save?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREATE meals multi": {
+      "main": [
+        [
+          {
+            "node": "Aggregate saved meals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate saved meals": {
+      "main": [
+        [
+          {
+            "node": "SEND multi done",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG meal saved",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Premium Post-Meal Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VISION single pass": {
+      "main": [
+        [
+          {
+            "node": "Parse + validate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse + validate": {
+      "main": [
+        [
+          {
+            "node": "GET Personal Food Overrides",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NUTRION batch": {
+      "main": [
+        [
+          {
+            "node": "Build batch summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build batch summary": {
+      "main": [
+        [
+          {
+            "node": "SAVE multi draft",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SEND multi confirm",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG photo analyzed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG Recognition Confidence",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse edit start": {
+      "main": [
+        [
+          {
+            "node": "GET edit draft start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse edit action": {
+      "main": [
+        [
+          {
+            "node": "GET edit draft action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare smart nutrition": {
+      "main": [
+        [
+          {
+            "node": "Nutrition source?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nutrition source?": {
+      "main": [
+        [
+          {
+            "node": "Label direct result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUTRION batch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUTRION web lookup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label direct result": {
+      "main": [
+        [
+          {
+            "node": "Build batch summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NUTRION web lookup": {
+      "main": [
+        [
+          {
+            "node": "Build batch summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET edit draft start": {
+      "main": [
+        [
+          {
+            "node": "Render editor start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET edit draft action": {
+      "main": [
+        [
+          {
+            "node": "Render editor action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render editor start": {
+      "main": [
+        [
+          {
+            "node": "UPDATE edit draft",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SHOW editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render editor action": {
+      "main": [
+        [
+          {
+            "node": "Editor item deleted all?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse photo caption": {
+      "main": [
+        [
+          {
+            "node": "Extract",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET drafts for text": {
+      "main": [
+        [
+          {
+            "node": "Route text editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route text editor": {
+      "main": [
+        [
+          {
+            "node": "Manual weight?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual weight?": {
+      "main": [
+        [
+          {
+            "node": "Apply manual weight",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "tg_text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply manual weight": {
+      "main": [
+        [
+          {
+            "node": "Valid manual weight?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid manual weight?": {
+      "main": [
+        [
+          {
+            "node": "UPDATE manual weight",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SHOW editor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ASK manual weight again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE multi draft": {
+      "main": [
+        [],
+        [
+          {
+            "node": "SEND recognition failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Editor item deleted all?": {
+      "main": [
+        [
+          {
+            "node": "UPDATE deleted draft",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SHOW editor deleted",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG meal edited",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "UPDATE edit draft",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SHOW editor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG meal edited",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip excluded save?": {
+      "main": [
+        [
+          {
+            "node": "SEND excluded done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CREATE meals multi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse day draft delete": {
+      "main": [
+        [
+          {
+            "node": "CANCEL day draft",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SHOW day draft deleted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Premium Post-Meal Insight": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Ingress": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Personal Food Overrides": {
+      "main": [
+        [
+          {
+            "node": "Apply Personal Overrides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Personal Overrides": {
+      "main": [
+        [
+          {
+            "node": "Prepare smart nutrition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Menu Command": {
+      "main": [
+        [
+          {
+            "node": "tg_text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "aa429a2f-9a02-4c7f-8eeb-6bfc9ba96ddb",
+  "meta": {
+    "instanceId": "169ae9c79d7aed5aceb64b989c1fc46ab74a2feb20b117eefd579dec340f104b"
+  },
+  "nodeGroups": [],
+  "id": "tgCallbacksV18",
+  "tags": []
+}

@@ -1,0 +1,110 @@
+{
+  "id": "nutritionContextV20",
+  "name": "AI_Nutrition_Context_Engine_v20",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "46779de3-1b92-4129-abf1-1e29a4421e50",
+      "name": "Input"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/get_nutrition_context_v20",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_chat_id",
+              "value": "={{Number($json.chat_id)}}"
+            },
+            {
+              "name": "_days",
+              "value": 14
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "2c5e30f4-3c4a-41f3-8ba1-1de897e1bc84",
+      "name": "Canonical Nutrition Context",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let c=$json;if(c?.body)c=c.body;if(c?.data)c=c.data;const input=$items('Input')[0].json;return[{json:{...input,context:c,context_json:JSON.stringify(c,null,2),confidence:c?.data_quality?.level||'low'}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "f7b9e79d-3bdf-4d46-bd32-bd60ca750584",
+      "name": "Normalize Context"
+    }
+  ],
+  "connections": {
+    "Input": {
+      "main": [
+        [
+          {
+            "node": "Canonical Nutrition Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Canonical Nutrition Context": {
+      "main": [
+        [
+          {
+            "node": "Normalize Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "63534b01-00f7-43a2-9638-8e386460b123",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

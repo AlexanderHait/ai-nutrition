@@ -32,6 +32,7 @@ export default async function Page(){
   const carbTarget=Number(d.settings?.carb_target||d.settings?.carb_target_g||0);
   const currentWeight=Number(d.settings?.current_weight_kg||d.weights?.[0]?.weight_kg||0);
   const targetWeight=Number(d.settings?.target_weight_kg||0);
+  const premium=d.subscription?.status==="active"&&d.subscription?.plan==="premium"&&(!d.subscription?.ends_at||new Date(d.subscription.ends_at)>new Date());
   const remaining=kcalTarget-sum.kcal;
   const lastDigest=d.digests?.[0];
   const latestMeal=d.meals?.[0];
@@ -148,17 +149,17 @@ export default async function Page(){
         {!d.meals.length&&<div className="clientEmptyNice"><Sparkles/><b>Начни с ближайшего приёма</b><span>Отправь фото еды боту — запись появится здесь автоматически.</span></div>}
       </section>
 
-      <section className="card clientInsightCard">
-        <div className="sectionTitleRow"><div><h2>AI‑сводка</h2><span className="muted">Последний дневной отчёт</span></div><Sparkles size={19}/></div>
+      {premium?<section className="card clientInsightCard">
+        <div className="sectionTitleRow"><div><h2>Premium AI‑сводка</h2><span className="muted">Последний персональный отчёт</span></div><Sparkles size={19}/></div>
         {lastDigest?<div className="clientDigestPreview">
           <div className="digestDate">{new Date(lastDigest.for_date+"T12:00:00").toLocaleDateString("ru-RU",{day:"numeric",month:"long"})} · {fmt(lastDigest.kcal)} ккал</div>
           <p>{cleanTelegramMarkdown(lastDigest.summary_md)}</p>
-          <Link className="textLink" href="/client/progress">Открыть прогресс →</Link>
-        </div>:<div className="clientEmptyNice compact"><Sparkles/><b>Отчёт ещё формируется</b><span>Он появится после накопления данных о питании.</span></div>}
-      </section>
+          <Link className="textLink" href="/client/coach">Открыть TeddY Coach →</Link>
+        </div>:<div className="clientEmptyNice compact"><Sparkles/><b>Premium изучает твои данные</b><span>Персональные выводы появятся после накопления рациона.</span></div>}
+      </section>:<Link className="card clientInsightCard premiumSoftLock" href="/client/plan"><div className="sectionTitleRow"><div><h2>TeddY Premium</h2><span className="muted">Не просто считай — получай следующий шаг</span></div><Sparkles size={19}/></div><div className="clientEmptyNice compact"><Sparkles/><b>Персональный нутрициолог</b><span>Планы дня, Food Memory, рекомендации и недельная стратегия.</span></div></Link>}
     </div>
 
-    <Link href="/client/plan" className={`planTeaser ${d.subscription?.status==="active"&&d.subscription?.plan==="premium"?"premiumActive":""}`}><i><Crown size={20}/></i><span><small>{d.subscription?.status==="active"?"Твой тариф":"Подписка"}</small><b>{d.subscription?.status==="active"?String(d.subscription.plan).toUpperCase():"Открой больше аналитики"}</b><em>{d.subscription?.status==="active"&&d.subscription?.plan==="premium"?"Premium‑функции активны":"Сравнить Basic и Premium"}</em></span><ChevronRight size={18}/></Link>
+    <Link href="/client/plan" className={`planTeaser ${d.subscription?.status==="active"&&d.subscription?.plan==="premium"&&(!d.subscription?.ends_at||new Date(d.subscription.ends_at)>new Date())?"premiumActive":""}`}><i><Crown size={20}/></i><span><small>{d.subscription?.status==="active"?"Твой тариф":"Подписка"}</small><b>{d.subscription?.status==="active"?String(d.subscription.plan).toUpperCase():"Открой больше аналитики"}</b><em>{d.subscription?.status==="active"&&d.subscription?.plan==="premium"&&(!d.subscription?.ends_at||new Date(d.subscription.ends_at)>new Date())?"Premium‑функции активны":"Сравнить Basic и Premium"}</em></span><ChevronRight size={18}/></Link>
 
     <section className="card top clientWeekStrip">
       <div className="sectionTitleRow"><div><h2>Неделя</h2><span className="muted">Нажми на день, чтобы открыть питание</span></div></div>

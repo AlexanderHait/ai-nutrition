@@ -1,0 +1,1110 @@
+{
+  "id": "premiumCoachV5",
+  "name": "AI_Nutrition_Premium_Coach_v5_Smooth",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "46779de3-1b92-4129-abf1-1e29a4421e50",
+      "name": "Input"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nutritionContextV20",
+          "mode": "list",
+          "cachedResultName": "AI_Nutrition_Context_Engine_v20"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "aeb616b2-baca-435d-8b78-2687240a55d1",
+      "name": "Get Unified Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst j=$json,c=j.context||{},cmd=String(j.command||'recommend'),raw=String(j.message?.text||j.raw||'');\nconst sub=c.subscription||{},life=c.subscription_lifecycle||{};\nconst legacyPremium=sub.plan==='premium'&&sub.status==='active'&&(!sub.ends_at||new Date(sub.ends_at)>new Date());\nconst lifecyclePremium=life.plan==='premium'&&['trial','active','grace'].includes(String(life.state||''))&&(!life.current_period_end||new Date(life.current_period_end)>new Date()||life.state==='grace');\nconst premium=legacyPremium||lifecyclePremium;\nconst medical_query=/\\b(давлен|беремен|анорекс|булим|рпп|лекар|препарат|таблет|диабет|инсулин|болит|головокруж|обморок|сердц|почек|почки|печен|анеми|ферритин|гемоглобин)\\w*/i.test(raw);if(!premium)return[{json:{...j,blocked:true,scenario:'',user_request:raw,prompt:''}}];\nconst scenarios={recommend:'Определи лучший следующий шаг по питанию прямо сейчас.',plan:'Составь план оставшегося дня.',shop:'Пользователь в магазине: собери конкретную корзину.',restaurant:'Пользователь в ресторане: предложи 3 типа заказа.',quick:'Нет времени готовить: 3 быстрых решения.',sweet:'Пользователь хочет сладкое: встрои десерт в день.',training:'Сегодня тренировка: предложи питание без выдумывания типа тренировки.',overate:'Пользователь переел: скорректируй остаток дня без наказаний.',bedtime:'Подбери уместный вариант перед сном.',can:'Оцени продукт из сообщения пользователя.',why:'Объясни последнюю рекомендацию простыми словами, опираясь на факты контекста.'};\nreturn[{json:{...j,medical_query,started_at_ms:Date.now(),scenario:scenarios[cmd]||scenarios.recommend,user_request:raw,prompt:JSON.stringify({scenario:scenarios[cmd]||scenarios.recommend,user_request:raw,context:c},null,2)}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "f088fd34-8ed3-4c19-ba93-ace6ff06618e",
+      "name": "Build Decision"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты — TeddY Premium, персональный нутрициолог. Все числовые факты уже рассчитаны системой — НЕ пересчитывай и не исправляй их.\n\nКлючевые правила:\n1) Используй data_quality. При low не делай жёстких выводов и не предлагай менять нормы.\n2) Используй weight_trend как сглаженный тренд, а не отдельные скачки веса.\n3) Учитывай client_memory и прошлые рекомендации. Не повторяй совет механически, если его уже игнорировали/отклоняли.\n4) Если день идёт нормально — допустимый лучший ответ: ничего специально менять не нужно.\n5) Учитывай время суток и остаток дня. Не оставляй огромный объём еды на поздний вечер.\n6) Не назначай лекарства/БАДы и не диагностируй.\n7) Для набора, снижения и поддержания используй goal из контекста.\n8) Не морализируй и не наказывай голодовкой.\n\nОтвет верни строго в двух блоках:\nANSWER:\n<готовый ответ пользователю до 1100 символов>\nREASON:\n<2-4 предложения: почему именно такая рекомендация; только факты из контекста>\n\nANSWER должен быть конкретным, с 2–3 вариантами/действиями, если это уместно.\n9) В context.coach_knowledge находятся только одобренные тезисы из базы квалифицированного тренера. Используй их как дополнительный практический слой, но не выдавай их за медицинские рекомендации и не противоречь фактическим данным клиента.\n10) Если coach_knowledge не содержит релевантного тезиса, не выдумывай, что говорил тренер.\n11) Всегда читай context.guardrails. При severity=caution не усиливай дефицит/профицит и не предлагай автоматическое изменение цели. При severity=restricted не давай агрессивных рекомендаций по изменению массы тела; ограничься безопасными образовательными рекомендациями.\n12) Если вход содержит medical_query=true или вопрос касается симптомов, лекарств, беременности, РПП, диабета, анемии/ферритина или другого медицинского состояния: не диагностируй, не меняй лечение и не назначай препараты. Можно дать только общую пищевую информацию; для персонального медицинского решения явно обозначь необходимость профильного специалиста.\n13) Учитывай context.adaptive_coach.preferred_message_length: short = максимально кратко, medium = стандартный ответ, detailed = немного больше объяснения. Не превышай разумный объём Telegram."
+            },
+            {
+              "role": "user",
+              "content": "={{$json.prompt}}"
+            }
+          ]
+        },
+        "jsonOutput": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1280,
+        -220
+      ],
+      "id": "c84a16a2-4899-476a-91f3-9830d7f034d0",
+      "name": "Premium Decision",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 500,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Build Decision')[0].json,j=$json||{};let t=j.output_text||j.output||j.text||j.content||j.message?.content||j.choices?.[0]?.message?.content||'';if(Array.isArray(t))t=t.map(x=>x?.text||x?.content||x).join('\\n');t=String(t);const am=t.match(/ANSWER:\\s*([\\s\\S]*?)(?:\\nREASON:|$)/i),rm=t.match(/REASON:\\s*([\\s\\S]*)$/i);const answer=(am?.[1]||t||'Не удалось сформировать рекомендацию. Попробуй ещё раз.').trim(),reason=(rm?.[1]||'Рекомендация основана на текущем профиле, рационе и доступной динамике.').trim();return[{json:{chat_id:Number(src.chat_id),command:src.command||'recommend',text:answer,reason,context:src.context,confidence:src.confidence,owner_key:src.owner_key||'',latency_ms:Math.max(0,Date.now()-Number(src.started_at_ms||Date.now()))}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "695876c8-c60d-4fd7-9a60-601c7d9b2e8e",
+      "name": "Parse Answer + Why"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        -80
+      ],
+      "id": "d710588b-ec02-42e5-bf09-4672bfd7deba",
+      "name": "SEND",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "premium_recommendations",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "feature",
+              "fieldValue": "={{$json.command}}"
+            },
+            {
+              "fieldId": "recommendation_text",
+              "fieldValue": "={{$json.text}}"
+            },
+            {
+              "fieldId": "reason_text",
+              "fieldValue": "={{$json.reason}}"
+            },
+            {
+              "fieldId": "context_snapshot",
+              "fieldValue": "={{JSON.stringify($json.context)}}"
+            },
+            {
+              "fieldId": "outcome",
+              "fieldValue": "unknown"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        80
+      ],
+      "id": "7f1dd864-a12f-42f4-8fd7-934891ecf4cd",
+      "name": "SAVE Recommendation",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "535fe810-98f9-416a-92a5-f252a6453799",
+              "leftValue": "={{$json.blocked===true}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        550,
+        0
+      ],
+      "id": "c832ac3f-276b-4682-8e58-6fd7e5ebea01",
+      "name": "Premium blocked?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "=🔒 Эта функция доступна в TeddY Premium. Подписку можно открыть на платформе.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        770,
+        -150
+      ],
+      "id": "a6b906e0-5df8-42ae-81dc-7159ba7d87da",
+      "name": "SEND Premium Required",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/premium_ai_budget_ok",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_chat_id",
+              "value": "={{$json.chat_id}}"
+            },
+            {
+              "name": "_daily_limit",
+              "value": 30
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        650,
+        -140
+      ],
+      "id": "2c0d8834-8723-4f5e-8b69-cebbd9eff755",
+      "name": "AI Budget Guard",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Build Decision')[0].json;let r=$json;if(r?.body!==undefined)r=r.body;if(r?.data!==undefined)r=r.data;const ok=(r===true||r==='true'||r===1||r==='1');return[{json:{...src,ai_budget_ok:ok}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        850,
+        -140
+      ],
+      "id": "76c6b1b6-47e9-463c-b44d-1d5d75c29b15",
+      "name": "Budget Result"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fd69eb49-1cac-4efe-ac99-dec3c3df79fa",
+              "leftValue": "={{$json.ai_budget_ok}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1050,
+        -140
+      ],
+      "id": "a7254156-2fed-4ebf-8a2d-5943782c84b2",
+      "name": "Budget available?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const c=$json.context||{},r=c.today?.remaining||{},q=c.data_quality||{};let text='Сейчас лучше ориентироваться на обычный сбалансированный приём: источник белка + гарнир + овощи.';if(Number(r.protein||0)>35)text=`На сегодня осталось около ${Math.round(Number(r.protein))} г белка. Следующий приём лучше сделать белковым: мясо/птица/рыба/творог + привычный гарнир.`;if(q.level==='low')text+=' Данных пока мало, поэтому TeddY не будет делать жёстких корректировок.';return[{json:{chat_id:$json.chat_id,command:$json.command||'recommend',text,reason:'Использован безопасный fallback без AI на основе уже рассчитанного остатка дня.',context:c,confidence:q.level||'low'}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        80
+      ],
+      "id": "a3f8aaa9-ac3e-431b-8bcc-73bb97f177e8",
+      "name": "Deterministic Fallback"
+    },
+    {
+      "parameters": {
+        "tableId": "ai_usage_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "feature",
+              "fieldValue": "={{$json.command}}"
+            },
+            {
+              "fieldId": "model",
+              "fieldValue": "openai/gpt-4.1-mini"
+            },
+            {
+              "fieldId": "success",
+              "fieldValue": "true"
+            },
+            {
+              "fieldId": "latency_ms",
+              "fieldValue": "={{Number($json.latency_ms||0)}}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        220
+      ],
+      "id": "082bb206-465b-4961-b08d-3f051d36d181",
+      "name": "LOG AI Usage",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/circuit_allows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_service",
+              "value": "openrouter"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        -260
+      ],
+      "id": "dc70a1a3-ddb1-4e4a-8c0b-b02ca4fc7e4f",
+      "name": "AI Circuit Check",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Budget Result')[0].json;let r=$json;if(r?.body!==undefined)r=r.body;if(r?.data!==undefined)r=r.data;const ok=(r===true||r==='true'||r===1||r==='1');return[{json:{...src,circuit_ok:ok}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        -260
+      ],
+      "id": "5d077fc8-b178-4dfe-a0c9-d875c75ed767",
+      "name": "Circuit Result"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7601125e-7c24-425b-8513-84e1220ad025",
+              "leftValue": "={{$json.circuit_ok}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1480,
+        -260
+      ],
+      "id": "26a37394-2b32-4d8c-ad0c-6fc068064b08",
+      "name": "Circuit available?"
+    },
+    {
+      "parameters": {
+        "jsCode": "return[{json:{...$json,owner_key:`premium:${$json.chat_id}:${Date.now()}`}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        -300
+      ],
+      "id": "f096e4dd-64e0-4741-8621-3f016ac55fa3",
+      "name": "Prepare AI Lease"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/claim_ai_slot",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_service",
+              "value": "openrouter"
+            },
+            {
+              "name": "_owner_key",
+              "value": "={{$json.owner_key}}"
+            },
+            {
+              "name": "_max_slots",
+              "value": 4
+            },
+            {
+              "name": "_ttl_seconds",
+              "value": 60
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1880,
+        -300
+      ],
+      "id": "6d4994f4-2382-42c5-88ae-ebcf98fe8f2b",
+      "name": "Claim AI Slot",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Prepare AI Lease')[0].json;let r=$json;if(r?.body!==undefined)r=r.body;if(r?.data!==undefined)r=r.data;const ok=(r===true||r==='true'||r===1||r==='1');return[{json:{...src,slot_ok:ok}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        -300
+      ],
+      "id": "5d59f3db-18d2-4b9a-bf54-e4a9870aac6f",
+      "name": "AI Slot Result"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "580ef786-9dd9-4653-a77c-5d7962923d86",
+              "leftValue": "={{$json.slot_ok}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2280,
+        -300
+      ],
+      "id": "2ec27356-092b-4294-ba56-84186acae2e5",
+      "name": "AI slot available?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/release_ai_slot",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_owner_key",
+              "value": "={{$json.owner_key}}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2900,
+        -40
+      ],
+      "id": "72358df1-c9ea-4123-a985-5fc93e66f1cf",
+      "name": "Release AI Slot",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/circuit_report",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_service",
+              "value": "openrouter"
+            },
+            {
+              "name": "_success",
+              "value": true
+            },
+            {
+              "name": "_error",
+              "value": ""
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2900,
+        60
+      ],
+      "id": "a2face6e-5f3c-49ec-b61e-fdc6493a191f",
+      "name": "Circuit Success",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Prepare AI Lease')[0].json;const err=String($json.error?.message||$json.message||$json.description||'AI request failed');return[{json:{...src,ai_error:err}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2500,
+        160
+      ],
+      "id": "e05cc636-bd9a-4448-8250-46ec1c348959",
+      "name": "Prepare AI Failure"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/circuit_report",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_service",
+              "value": "openrouter"
+            },
+            {
+              "name": "_success",
+              "value": false
+            },
+            {
+              "name": "_error",
+              "value": "={{$json.ai_error}}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2700,
+        160
+      ],
+      "id": "68b0c648-aebb-4e37-bb9d-f2b5c4484626",
+      "name": "Circuit Failure",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/release_ai_slot",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_owner_key",
+              "value": "={{$json.owner_key}}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2900,
+        160
+      ],
+      "id": "e714ec4b-357e-45bc-b013-0c9bbc9543ee",
+      "name": "Release Failed Slot",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Input": {
+      "main": [
+        [
+          {
+            "node": "Get Unified Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Unified Context": {
+      "main": [
+        [
+          {
+            "node": "Build Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Decision": {
+      "main": [
+        [
+          {
+            "node": "Premium blocked?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Premium Decision": {
+      "main": [
+        [
+          {
+            "node": "Parse Answer + Why",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare AI Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Answer + Why": {
+      "main": [
+        [
+          {
+            "node": "SEND",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SAVE Recommendation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG AI Usage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Release AI Slot",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Circuit Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Premium blocked?": {
+      "main": [
+        [
+          {
+            "node": "SEND Premium Required",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Budget Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Budget Guard": {
+      "main": [
+        [
+          {
+            "node": "Budget Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Budget Result": {
+      "main": [
+        [
+          {
+            "node": "Budget available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Budget available?": {
+      "main": [
+        [
+          {
+            "node": "AI Circuit Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Deterministic Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deterministic Fallback": {
+      "main": [
+        [
+          {
+            "node": "SEND",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SAVE Recommendation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Circuit Check": {
+      "main": [
+        [
+          {
+            "node": "Circuit Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Circuit Result": {
+      "main": [
+        [
+          {
+            "node": "Circuit available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Circuit available?": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI Lease",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Deterministic Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI Lease": {
+      "main": [
+        [
+          {
+            "node": "Claim AI Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim AI Slot": {
+      "main": [
+        [
+          {
+            "node": "AI Slot Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Slot Result": {
+      "main": [
+        [
+          {
+            "node": "AI slot available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI slot available?": {
+      "main": [
+        [
+          {
+            "node": "Premium Decision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Deterministic Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI Failure": {
+      "main": [
+        [
+          {
+            "node": "Circuit Failure",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Release Failed Slot",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Deterministic Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8fdb28d2-a1e6-419a-ae1f-6a4338c9d335",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

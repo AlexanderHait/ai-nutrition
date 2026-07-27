@@ -1,0 +1,2766 @@
+{
+  "name": "tx_text_v29_v20",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0a73cab2-d78a-4354-a626-2fa054d2426a",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bb4375e7-83ed-46fc-97d8-ae53fbfd1226",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/day",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "day"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "297ea0c0-2bde-4954-b144-74bb67a37913",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/день",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "day_ru"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/v",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "c83a3bbf-a07a-4547-aa5f-24d1641dc2fe"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "main"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fa47404d-c110-4d4a-8310-126eb004bd75",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notStartsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "chat"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3104,
+        3984
+      ],
+      "id": "d60f76c9-1f0f-4b89-8ab3-fa401a6f47c2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3408,
+        3984
+      ],
+      "id": "27cfb794-b704-43e0-8789-46e24dcfb258",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "content": "# /v РУЧНОЙ ВВОД\n\n\n\n\n",
+        "height": 432,
+        "width": 1858,
+        "color": 4
+      },
+      "id": "5ff3e76e-c326-4bd5-903a-d38265e80055",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2848,
+        3360
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# ОБЩЕНИЕ С НУТРИЦИОЛОГОМ\n\n\n\n",
+        "height": 472,
+        "width": 1858,
+        "color": 6
+      },
+      "id": "cd42254a-5485-446a-b096-b4a1db55a222",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2848,
+        3824
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# /start  И СОЗДАНИЕ ПРОФИЛЯ\n\n\n\n",
+        "height": 312,
+        "width": 858,
+        "color": 7
+      },
+      "id": "a7844fc7-25de-4f3f-82d1-8d548ddac9bb",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2848,
+        3024
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "52493568-0b68-46b8-b18a-894cf77bcac1",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "manual_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "manual"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5eeb9b3f-d4ce-45f6-bb62-32244fd9a99a",
+                    "leftValue": "={{ $json.message.photo[0] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f1495ad-2eb2-4729-af5a-23c949adce8c",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "dish_yes_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "dish_yes"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "dish_no_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "c9ead52e-1b81-453a-bd9b-1d18dcbd82bb"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "dish_no"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "646db5d3-3518-4edf-9374-cef371fa7ba9",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "alt_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "alt"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1bcf1e75-3e73-465b-8bbb-2665b845e7e9",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "weight_",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "weight"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6166763a-38e9-494a-aea0-20bdc9626314",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text_cmd"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3456,
+        4976
+      ],
+      "id": "c26e842b-b1cf-4934-8789-3d4f0c866649",
+      "name": "Switch1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "tableId": "profiles",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "telegram_id",
+              "fieldValue": "={{ $('Switch').item.json.message.from.id }}"
+            },
+            {
+              "fieldId": "first_name",
+              "fieldValue": "={{ $('Switch').item.json.message.from.first_name }}"
+            },
+            {
+              "fieldId": "username",
+              "fieldValue": "={{ $('Switch').item.json.message.from.username }}"
+            },
+            {
+              "fieldId": "locale",
+              "fieldValue": "={{ $('Switch').item.json.message.from.language_code }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2384,
+        3104
+      ],
+      "id": "cf7f5545-f895-4f89-b6f4-02cf8198e639",
+      "name": "CREATE profile",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch').item.json.message.from.id }}",
+        "text": "=*Привет, {{ $('Switch').item.json.message.from.first_name }}!*\n\nЯ помогу тебе отслеживать рацион, считать КБЖУ и подсказывать, как питаться лучше.\n\n🧾 *Как начать:*\n📸 Просто *отправь фото еды* — я распознаю блюдо и рассчитаю КБЖУ.  \n🧠 Каждое блюдо *сохраняется в твоём дневнике* — можно вернуться, пересмотреть и задать вопросы.  \n📬 *Каждый вечер* я присылаю краткий отчёт и даю рекомендации на завтра.\n\n📝 *Можно вводить вручную:*  \nПример: _/v омлет 2 яйца 09:00_\n\n⚖️ Если не знаешь вес — опиши на глаз, я прикину сам.\n\nГотов? Тогда начинаем — *просто пришли фото!*",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2176,
+        3136
+      ],
+      "id": "c83c27d0-b914-45de-99f0-d751f6abb57b",
+      "name": "start",
+      "webhookId": "da4a8d3c-0d67-480c-a25d-4844309807d2",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## [включать только для настройки]\n\n",
+        "height": 432,
+        "width": 598,
+        "color": 5
+      },
+      "id": "eab79f90-8d7e-4dd6-bfaf-5ec5da89a165",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3760,
+        4896
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "profiles",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.message.from.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2768,
+        3120
+      ],
+      "id": "bd58a8e4-db9e-4a90-83bc-e4842f71c836",
+      "name": "GET profile",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dbd664b4-20b3-4d51-8000-20892b93782d",
+              "leftValue": "={{ Object.keys($items(\"GET profile\")[0].json || {}).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2576,
+        3120
+      ],
+      "id": "817d3df6-bba5-48c0-947c-a1eae978aa15",
+      "name": "IF NO"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-5.5",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-5.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2000,
+        4064
+      ],
+      "id": "8dd89fa0-fea0-45f8-9808-2406674e53e1",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.content }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        3920
+      ],
+      "id": "124ad1d6-c52c-4c47-9d40-9353ff31a521",
+      "name": "Telegram",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "336d64ed-3993-434e-9bbd-abb9f3c777f3",
+              "leftValue": "={{ $json.summary_md }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2448,
+        4096
+      ],
+      "id": "0f5a7c3c-eec8-4ced-92d0-ea8b5eb0a991",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/get_current_summary",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_chat_id",
+              "value": "={{ $json.chat_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2624,
+        4304
+      ],
+      "id": "b1dada5a-7df4-49c5-9377-a44a4d87bce3",
+      "name": "SUPA digest",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64fb8515-cda5-462c-afcf-2c9865a3631d",
+              "name": "hasDigest",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2208,
+        4080
+      ],
+      "id": "533060b9-6105-4bd4-b2eb-a80ebcc79cc8",
+      "name": "NO DIGEST"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "08b17997-5514-4157-9518-365744b2a556",
+              "name": "hasDigest",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2208,
+        3920
+      ],
+      "id": "1ebb5d2c-9964-4c21-b316-b9bb947cf155",
+      "name": "YES DIGEST"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "meals",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Switch').item.json.message.from.id }}"
+            },
+            {
+              "keyName": "eaten_at",
+              "condition": "gte",
+              "keyValue": "={{ (() => {\n     // «сейчас» в Москве\n     const now = new Date(new Date()\n                 .toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));\n\n     // минус 7 суток\n     now.setDate(now.getDate() - 7);\n\n     // ставим начало дня и возвращаем ISO +03:00\n     now.setHours(0,0,0,0);\n     return now.toISOString().replace('Z','+03:00');\n})() }}\n"
+            },
+            {
+              "keyName": "eaten_at",
+              "condition": "lte",
+              "keyValue": "={{ (() => {\n     const now = new Date(new Date()\n                 .toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));\n     return now.toISOString().replace('Z','+03:00');\n})() }}\n"
+            },
+            {
+              "keyName": "deleted",
+              "condition": "is",
+              "keyValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -1840,
+        4064
+      ],
+      "id": "20ccfb10-edc1-49e0-9fa1-32350ab9ad46",
+      "name": "get_week_meals",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## [основной триггер]\n\n",
+        "height": 272,
+        "width": 298
+      },
+      "id": "acb2ed27-af28-443e-9033-a52bfcfaec4c",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3504,
+        3920
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const escapeMdV2 = (s) =>\n  String(s).replace(/([_*$begin:math:display$$end:math:display$()~`>#+\\-=|{}.!\\\\])/g, '\\\\$1');\n\nif (item.json.output) {\n  item.json.output = escapeMdV2(item.json.output);\n}\n\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1680,
+        3920
+      ],
+      "id": "f88bc689-9237-438e-9fcd-ca627581be34",
+      "name": "Escape",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "442870a4-1075-4f7c-bdce-f6011d4c93da",
+              "name": "chat_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "d38f3a89-b513-46c0-b960-ba64a754bd58",
+              "name": "session_id",
+              "value": "={{ 'user_' + $json.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8d169f91-297e-494d-8260-224ef6f88cba",
+              "name": "role",
+              "value": "user",
+              "type": "string"
+            },
+            {
+              "id": "011e9af4-a978-4985-bf28-dbafcb4fa2e9",
+              "name": "content",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "3ad625a1-0bdd-48cf-901b-d1306d890628",
+              "name": "username",
+              "value": "={{ $json.message.from.username }}",
+              "type": "string"
+            },
+            {
+              "id": "c4c0ac19-2cdd-451b-b0f0-7829e06bd7b6",
+              "name": "first_name",
+              "value": "={{ $json.message.from.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "c270f762-1398-45d2-a58c-883b5f512bd3",
+              "name": "metadata",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2800,
+        4000
+      ],
+      "id": "1856c848-bb9d-46d1-89bb-259740819d0c",
+      "name": "User Log"
+    },
+    {
+      "parameters": {
+        "tableId": "chat_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{ $json.chat_id }}"
+            },
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $json.session_id }}"
+            },
+            {
+              "fieldId": "role",
+              "fieldValue": "={{ $json.role }}"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.content }}"
+            },
+            {
+              "fieldId": "username",
+              "fieldValue": "={{ $json.username }}"
+            },
+            {
+              "fieldId": "first_name",
+              "fieldValue": "={{ $json.first_name }}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ $json.metadata }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2624,
+        3920
+      ],
+      "id": "b13a0f7b-576b-40c5-929b-b6ff560e380c",
+      "name": "Save User Msg",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "chat_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{ $('Bot Log').item.json.chat_id }}"
+            },
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Bot Log').item.json.session_id }}"
+            },
+            {
+              "fieldId": "role",
+              "fieldValue": "={{ $('Bot Log').item.json.role }}"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('Bot Log').item.json.content }}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ $('Bot Log').item.json.metadata }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        3920
+      ],
+      "id": "a5d7b913-8405-4d43-be20-fd8370c6200c",
+      "name": "Save Bot Msg",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03bc3c9d-7d1b-4f70-999d-115edccd98dd",
+              "name": "chat_id",
+              "value": "={{ $('User Log').item.json.chat_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9093739a-9c1b-4b54-8487-9a79272b6892",
+              "name": "session_id",
+              "value": "={{ $('User Log').item.json.session_id }}",
+              "type": "string"
+            },
+            {
+              "id": "4bc4cf2d-63c7-49f3-bae8-7d08160305ca",
+              "name": "role",
+              "value": "assistant",
+              "type": "string"
+            },
+            {
+              "id": "494392e4-828d-4fd6-a70b-af2c9e050558",
+              "name": "content",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "581ad272-fd98-4fa1-8bb1-b985f816079d",
+              "name": "metadata",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1504,
+        3920
+      ],
+      "id": "632edbbe-b796-468a-aee0-8c6329e5887c",
+      "name": "Bot Log"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Switch').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=Ты дипломированный AI-нутрициолог. Отвечай профессионально, но естественно — это диалог в Telegram.\n\nПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ С САЙТА AI-NUTRITION:\n{{ JSON.stringify($('GET client settings').item.json || {}, null, 2) }}\n\nПОСЛЕДНЕЕ ИЗМЕРЕНИЕ ВЕСА:\n{{ JSON.stringify($('GET latest weight').item.json || {}, null, 2) }}\n\nПОСЛЕДНИЙ ДНЕВНОЙ ОТЧЁТ:\nsummary_md: {{ $json.summary_md }}\nkcal: {{ $json.kcal }}\nfat: {{ $json.fat }}\ncarb: {{ $json.carb }}\nprot: {{ $json.prot }}\nhasDigest: {{ $json.hasDigest }}\n\nПравила персонализации:\n• goal — цель пользователя.\n• sex, birth_date, height_cm — персональные параметры.\n• current_weight_kg и target_weight_kg — текущий и целевой вес.\n• kcal_target, protein_target, fat_target, carb_target — персональные цели по КБЖУ.\n• Если поле пустое — не выдумывай.\n• Сравнивай рацион именно с персональными целями пользователя.\n• Если hasDigest=true, используй дневной отчёт как дополнительный источник.\n• У тебя есть инструмент get_week_meals с рационом за последние дни — используй его при необходимости.\n• Если пользователь спрашивает, сколько ему осталось или как он питается, ориентируйся на его цели и уже съеденное.\n• Не ставь медицинские диагнозы и не назначай лечение.\n\nФормат Telegram:\n• Markdown Legacy.\n• Жирный: *текст*, курсив: _текст_.\n• Не перегружай форматированием.\n• Давай конкретные рекомендации.\n\n\nВАЖНО ПРО УДАЛЕНИЕ ПИТАНИЯ:\n• В системе ЕСТЬ функция удаления приёмов пищи, она обрабатывается автоматически до этого AI-диалога.\n• Никогда не говори пользователю, что \"инструмента удаления нет\", \"я не могу удалить\" или что удалять нужно вручную.\n• Если запрос вида \"удали/убери/сотри приём пищи\" по ошибке дошёл до тебя, ответь только:\n  \"Похоже, команда удаления не обработалась. Повтори, например: «удали последний приём пищи».\"\n• Не делай предположений, что записи являются дублями, если пользователь сам этого не сказал.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -2000,
+        3920
+      ],
+      "id": "e84df836-a80b-45ab-bf02-ccd6f8e3c621",
+      "name": "nutrion 2"
+    },
+    {
+      "parameters": {
+        "content": "ютуб канал ИИздец передает тебе привет и желает успехов :3",
+        "height": 80,
+        "width": 478,
+        "color": 7
+      },
+      "id": "9430725c-122a-4d2d-867f-bd4a58e8989e",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2000,
+        2976
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "client_settings",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $('User Log').item.json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2608,
+        4064
+      ],
+      "id": "11be78e2-b40b-467a-9fa7-bc65dfce9851",
+      "name": "GET client settings",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "weight_logs",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{ $('User Log').item.json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2416,
+        4064
+      ],
+      "id": "0feababa-2f32-4dd7-ae14-d7f0c689c19a",
+      "name": "GET latest weight",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const original = String($json.content || '').trim();\nconst t = original\n  .toLowerCase()\n  .replace(/ё/g, 'е')\n  .replace(/[«»\"'`]/g, '')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\n// IMPORTANT: no \\b around Cyrillic words.\n// JavaScript word-boundary semantics are unreliable for Cyrillic.\nconst deleteVerb =\n  /(?:^|\\s)(?:удал(?:и|ить|яй|яйте|ите)?|убер(?:и|ите|ать)?|сотр(?:и|ите|еть)?|стер(?:еть|и|ите)?|очист(?:и|ить|ите)?)(?:\\s|$)/i.test(t)\n  || /(?:^|\\s)удал\\w*/i.test(t)\n  || /(?:^|\\s)убер\\w*/i.test(t)\n  || /(?:^|\\s)сотр\\w*/i.test(t);\n\nconst foodContext =\n  /(прием|приема|приемов|пищ|питан|рацион|еда|еду|еды|завтрак|обед|ужин|перекус|блюд|запис)/i.test(t);\n\nconst relativeContext =\n  /(последн|предыдущ|сегодня|вчера|за день|весь день|всю еду|все питание|всё питание)/i.test(t);\n\nconst isDelete = deleteVerb && (foodContext || relativeContext);\n\nif (!isDelete) {\n  return [{json:{...$json,is_delete:false,delete_debug:{original,t,deleteVerb,foodContext,relativeContext}}}];\n}\n\nconst numberWords = {\n  'один':1,'одну':1,'первый':1,'первую':1,\n  'два':2,'две':2,'второй':2,'вторую':2,\n  'три':3,'третий':3,'третью':3,\n  'четыре':4,'четвертый':4,'четвертую':4,\n  'пять':5,'пятый':5,'пятую':5,\n  'шесть':6,'шестой':6,'шестую':6,\n  'семь':7,'седьмой':7,'седьмую':7,\n  'восемь':8,'восьмой':8,'восьмую':8,\n  'девять':9,'девятый':9,'девятую':9,\n  'десять':10,'десятый':10,'десятую':10\n};\n\nfunction readCount(text) {\n  const digit = text.match(/(?:^|\\s)(\\d{1,2})\\s+(?:последн\\w*\\s+)?(?:прием|приема|приемов|запис)/i);\n  if (digit) return Math.max(1, Math.min(20, Number(digit[1])));\n\n  for (const [word,num] of Object.entries(numberWords)) {\n    const rx = new RegExp(`(?:^|\\\\s)${word}(?:\\\\s+последн\\\\w*)?\\\\s+(?:прием|приема|приемов|запис)`, 'i');\n    if (rx.test(text)) return num;\n  }\n  return 1;\n}\n\nlet scope='last';\nlet delete_count=readCount(t);\n\n// Whole day.\nif (/(весь|всю|все|всё).*(день|питан|рацион|еда|еду)|(?:питан|рацион|еда|еду)\\s+за\\s+(сегодня|вчера)|за\\s+(сегодня|вчера|день)/i.test(t)) {\n  scope='day';\n  delete_count=999;\n}\n\n// Explicit ordinal meal: \"удали второй прием\".\nlet ordinal=null;\nfor (const [word,num] of Object.entries(numberWords)) {\n  if (['один','одну','два','две','три','четыре','пять','шесть','семь','восемь','девять','десять'].includes(word)) continue;\n  if (new RegExp(`(?:^|\\\\s)${word}\\\\s+(?:прием|приема)`, 'i').test(t)) {\n    ordinal=num;\n    scope='ordinal';\n    delete_count=1;\n    break;\n  }\n}\n\nconst ordinalDigit=t.match(/(?:^|\\s)(\\d{1,2})(?:-?й|-?ый|-?ой)?\\s+(?:прием|приема)/i);\nif (ordinalDigit && !/последн/i.test(t)) {\n  ordinal=Math.max(1,Number(ordinalDigit[1]));\n  scope='ordinal';\n  delete_count=1;\n}\n\n// Time-specific.\nconst tm=t.match(/(?:^|\\s)([01]?\\d|2[0-3])[:.](\\d{2})(?:\\s|$)/);\nconst time=tm ? `${String(tm[1]).padStart(2,'0')}:${tm[2]}` : null;\nif (time) {\n  scope='time';\n  delete_count=1;\n}\n\nlet day='today';\nif (/(?:^|\\s)вчера(?:\\s|$)/i.test(t)) day='yesterday';\n\nconst dm=t.match(/(?:^|\\s)(\\d{1,2})[./-](\\d{1,2})(?:[./-](\\d{2,4}))?(?:\\s|$)/);\nlet explicit_date=null;\nif (dm) {\n  let y=dm[3] ? Number(dm[3]) : new Date().getFullYear();\n  if (y<100) y+=2000;\n  explicit_date=`${y}-${String(dm[2]).padStart(2,'0')}-${String(dm[1]).padStart(2,'0')}`;\n  day='explicit';\n}\n\nif (/последн/i.test(t) && scope!=='day' && scope!=='ordinal' && scope!=='time') {\n  scope='last_n';\n}\n\nreturn [{json:{\n  ...$json,\n  is_delete:true,\n  delete_scope:scope,\n  delete_count,\n  delete_day:day,\n  delete_date:explicit_date,\n  delete_ordinal:ordinal,\n  delete_time:time,\n  delete_original:original,\n  delete_debug:{original,t,deleteVerb,foodContext,relativeContext}\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2800,
+        3872
+      ],
+      "id": "87ee14d3-4aa1-487b-b75e-be2c80ec2960",
+      "name": "Detect delete request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "edec048f-8fad-4efb-b2cf-1d2141650a37",
+              "leftValue": "={{$json.is_delete}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2608,
+        3872
+      ],
+      "id": "9701ac98-cb0b-4e12-bdac-f0ef8ed73f69",
+      "name": "Delete request?"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "meals",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "deleted",
+              "condition": "eq",
+              "keyValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2384,
+        3728
+      ],
+      "id": "0b42cc96-95a5-4ccf-a6da-ad2c549184eb",
+      "name": "GET meals for delete",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const intent=$items('Detect delete request')[0].json;\nconst rows=items.map(i=>i.json).filter(x=>x&&x.id&&x.deleted!==true);\n\nconst p=n=>String(n).padStart(2,'0');\n\nfunction moscowParts(value){\n  const d=new Date(value);\n  if(Number.isNaN(d.getTime())) return null;\n  const parts=new Intl.DateTimeFormat('en-CA',{\n    timeZone:'Europe/Moscow',\n    year:'numeric',month:'2-digit',day:'2-digit',\n    hour:'2-digit',minute:'2-digit',hour12:false\n  }).formatToParts(d);\n  const get=t=>parts.find(x=>x.type===t)?.value;\n  return {\n    date:`${get('year')}-${get('month')}-${get('day')}`,\n    hour:Number(get('hour')),\n    minute:Number(get('minute'))\n  };\n}\n\nconst nowParts=moscowParts(new Date());\nconst today=nowParts.date;\nconst noonUtc=new Date(`${today}T12:00:00Z`);\nnoonUtc.setUTCDate(noonUtc.getUTCDate()-1);\nconst yesterday=moscowParts(noonUtc).date;\n\nlet targetDay=today;\nif(intent.delete_day==='yesterday') targetDay=yesterday;\nif(intent.delete_day==='explicit'&&intent.delete_date) targetDay=intent.delete_date;\n\nfunction rowDay(m){\n  if(m.eaten_day) return String(m.eaten_day).slice(0,10);\n  return moscowParts(m.eaten_at)?.date || '';\n}\n\nfunction sessions(list,gap=12){\n  const sorted=[...list].sort((a,b)=>new Date(a.eaten_at)-new Date(b.eaten_at));\n  const out=[];\n  for(const m of sorted){\n    const ts=new Date(m.eaten_at).getTime();\n    const day=rowDay(m);\n    const prev=out[out.length-1];\n    const prevTs=prev?new Date(prev.at).getTime():0;\n    const sameDay=prev && prev.day===day;\n    if(prev && sameDay && (ts-prevTs)<=gap*60*1000){\n      prev.rows.push(m);\n      prev.at=m.eaten_at;\n    }else{\n      out.push({at:m.eaten_at,day,rows:[m]});\n    }\n  }\n  return out;\n}\n\nconst dayRows=rows\n  .filter(x=>rowDay(x)===targetDay)\n  .sort((a,b)=>new Date(a.eaten_at)-new Date(b.eaten_at));\n\nconst daySessions=sessions(dayRows);\nconst allSessions=sessions(rows);\n\nlet selectedSessions=[];\nlet description='';\n\nif(intent.delete_scope==='day'){\n  selectedSessions=daySessions;\n  description=intent.delete_day==='today'\n    ? 'всё питание за сегодня'\n    : intent.delete_day==='yesterday'\n      ? 'всё питание за вчера'\n      : `всё питание за ${targetDay}`;\n}else if(intent.delete_scope==='ordinal'){\n  const idx=Number(intent.delete_ordinal||0)-1;\n  if(daySessions[idx]) selectedSessions=[daySessions[idx]];\n  description=`${intent.delete_ordinal}-й приём пищи за ${targetDay}`;\n}else if(intent.delete_scope==='time'){\n  const [hh,mm]=String(intent.delete_time||'').split(':').map(Number);\n  const target=hh*60+mm;\n  let best=null;\n  for(const s of daySessions){\n    const mp=moscowParts(s.at);\n    if(!mp) continue;\n    const diff=Math.abs((mp.hour*60+mp.minute)-target);\n    if(!best||diff<best.diff) best={s,diff};\n  }\n  if(best&&best.diff<=90) selectedSessions=[best.s];\n  description=`приём пищи около ${intent.delete_time} за ${targetDay}`;\n}else{\n  const count=Math.max(1,Math.min(20,Number(intent.delete_count||1)));\n  selectedSessions=allSessions.slice(-count);\n  const actual=selectedSessions.length;\n  description=actual===1?'последний приём пищи':`${actual} последних приёма пищи`;\n}\n\nconst selected=selectedSessions.flatMap((s,sessionIndex)=>\n  s.rows.map(m=>({...m,_session_index:sessionIndex,_session_at:s.at}))\n);\n\nif(!selected.length){\n  return [{json:{\n    found:false,\n    chat_id:intent.chat_id,\n    session_id:intent.session_id,\n    description,\n    target_day:targetDay,\n    count:0,\n    session_count:0\n  }}];\n}\n\nreturn selected.map((m,i)=>({json:{\n  found:true,\n  chat_id:intent.chat_id,\n  session_id:intent.session_id,\n  delete_id:m.id,\n  dish:m.dish,\n  eaten_at:m.eaten_at,\n  target_day:targetDay,\n  description,\n  count:selected.length,\n  session_count:selectedSessions.length,\n  idx:i\n}}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2176,
+        3728
+      ],
+      "id": "f7011488-4986-4f49-8f1f-92e01f52da46",
+      "name": "Select meals to delete",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ec8bdeb9-d19b-4281-8a89-3fb62141be41",
+              "leftValue": "={{$json.found}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1984,
+        3728
+      ],
+      "id": "11646d22-1dc7-4112-9ec0-7b5f3fdede44",
+      "name": "Meals found?",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "meals",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{$json.delete_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "deleted",
+              "fieldValue": "={{true}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1776,
+        3664
+      ],
+      "id": "4bc1fd04-5d6c-40f4-9924-a98e2f5efa76",
+      "name": "SOFT DELETE meals",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const selected=$items('Select meals to delete').map(x=>x.json).filter(x=>x.found);\nconst first=selected[0];\nconst dishes=[...new Set(selected.map(x=>x.dish).filter(Boolean))];\n\nconst sessionCount=Number(first.session_count||1);\nconst positionCount=selected.length;\n\nlet what;\nif(sessionCount===1){\n  what='Удалил приём пищи ✅';\n}else{\n  what=`Удалил ${sessionCount} последних приёма пищи ✅`;\n}\n\nconst preview=dishes.slice(0,5).join(', ');\nconst extra=dishes.length>5?` и ещё ${dishes.length-5}`:'';\n\nreturn [{json:{\n  chat_id:first.chat_id,\n  session_id:first.session_id,\n  count:positionCount,\n  session_count:sessionCount,\n  description:first.description,\n  dishes,\n  content:`${what}\\n${preview}${extra}${preview?'\\n':''}Больше не учитывается в рационе.`\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1568,
+        3664
+      ],
+      "id": "f261b4f8-8556-40fa-9c06-9c171c643f16",
+      "name": "Build delete reply",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const x=$json;\nreturn [{json:{\n  chat_id:x.chat_id,\n  session_id:x.session_id,\n  content:`Не нашёл подходящий приём для удаления.\\n\\nМожно написать обычным текстом:\\n• «удали последний приём пищи»\\n• «удали два последних приёма пищи»\\n• «удали питание за сегодня»\\n• «удали второй приём сегодня»\\n• «удали приём в 14:30»`\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1776,
+        3824
+      ],
+      "id": "975abfe3-5b35-46e9-adc0-3d5c2bb341a4",
+      "name": "Delete not found reply"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.content }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        3728
+      ],
+      "id": "577d3cfc-3c5a-469d-be1e-c6c4b6881096",
+      "name": "Telegram delete reply",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "bot_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "event_type",
+              "fieldValue": "meal_deleted"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "Приём пищи удалён"
+            },
+            {
+              "fieldId": "body",
+              "fieldValue": "={{$json.description}}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{JSON.stringify({count:$json.count,dishes:$json.dishes})}}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        3616
+      ],
+      "id": "194b1e58-6139-4584-af8a-df4b8dafcc57",
+      "name": "LOG meal deleted",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $json.message || {};\nconst chat_id = msg.chat?.id;\nconst message_id = msg.message_id;\nlet text = String(msg.text || '').replace(/^\\/v(?:@\\w+)?\\s*/i, '').trim();\n\nif (!chat_id || !text) {\n  throw new Error('Пустая команда /v');\n}\n\n// One time anywhere in the message applies to the entire meal.\nconst tm = text.match(/\\b([01]?\\d|2[0-3])[:.](\\d{2})\\b/);\nconst time = tm ? `${String(tm[1]).padStart(2,'0')}:${tm[2]}` : null;\nif (tm) text = text.replace(tm[0], ' ');\n\n// Preferred syntax: one food per line.\n// Also accept semicolon and \" + \" as separators.\n// Commas are only treated as separators when there are no line breaks.\nlet chunks;\nif (/\\n/.test(text)) {\n  chunks = text.split(/\\n+/);\n} else if (/\\s*;\\s*|\\s+\\+\\s+/.test(text)) {\n  chunks = text.split(/\\s*;\\s*|\\s+\\+\\s+/);\n} else {\n  // Compatibility with \"/v food 100 g, food 2 150 g\"\n  chunks = text.split(/\\s*,\\s*(?=[A-Za-zА-Яа-яЁё])/);\n}\n\nconst clean = chunks\n  .map(x => x.replace(/^[\\s•\\-–—\\d.)]+/, '').replace(/\\s+/g, ' ').trim())\n  .filter(Boolean)\n  .slice(0, 12);\n\nif (!clean.length) throw new Error('Нет позиций в /v');\n\nconst positions = clean.map((raw, idx) => {\n  const gm = raw.match(/(?:^|\\s)(\\d+(?:[.,]\\d+)?)\\s*(кг|kg|г|гр|g|gram|grams)\\b/i);\n  let explicit_grams = null;\n  if (gm) {\n    const v = Number(gm[1].replace(',', '.'));\n    explicit_grams = /кг|kg/i.test(gm[2]) ? Math.round(v * 1000) : Math.round(v);\n  }\n\n  return {\n    idx,\n    raw,\n    explicit_grams\n  };\n});\n\nreturn [{json:{\n  chat_id,\n  message_id,\n  raw:text.trim(),\n  time,\n  positions,\n  positions_json:JSON.stringify(positions),\n  position_count:positions.length\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        2784
+      ],
+      "id": "449754ef-f4f1-4af6-bda9-c649cf217478",
+      "name": "Parse /v command",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini:online",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI:ONLINE"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Ты обрабатываешь ручное добавление еды /v.\n\nВАЖНО: вход уже детерминированно разбит на отдельные позиции.\nСделай ВСЁ ЗА ОДИН запрос для ВСЕХ позиций. Не объединяй строки между собой.\n\nВход:\n- positions[]: каждая строка пользователя = отдельная пищевая позиция;\n- positions[].raw — исходные слова пользователя;\n- positions[].explicit_grams — точный вес, если пользователь написал граммы;\n- time — общее время всего приёма пищи.\n\nПРАВИЛА:\n\n1. ОДНА СТРОКА = ОДНА ПОЗИЦИЯ.\nНапример:\n\"тефтеля из риса и курицы\"\n\"Два кусочка куриных бедер, немного овощей\"\n\"Персика два\"\nдолжны вернуть ТРИ items, а не один.\n\n2. Сохраняй смысл пользователя.\nНе выбрасывай компоненты строки:\n\"Два кусочка куриных бедер, немного овощей\" — это одна позиция с куриными бёдрами и овощами.\n\n3. Количество словами имеет значение.\n\"два персика\", \"2 яйца\", \"два кусочка\" — используй количество для оценки массы.\nЕсли точный вес не указан, оцени разумную массу съеденной порции.\n\n4. explicit_grams имеет АБСОЛЮТНЫЙ приоритет.\nЕсли он не null:\n- grams = именно explicit_grams;\n- weight_source=\"user\";\n- не заменяй массу найденной упаковкой или типовой порцией.\n\n5. Бренд/магазин пользователя имеет приоритет.\nЕсли написано SPAR, ВкусВилл, Мираторг, \"Вкусно — и точка\" и т.п.:\n- ищи именно этот продукт;\n- не подменяй другим брендом;\n- если точный товар не найден, сохрани исходное название и используй estimate.\n\n6. Интернет используй только там, где он реально нужен:\n- точный брендированный/сетевой продукт → web;\n- обычная домашняя еда → стандартная оценка без лишнего поиска.\n\n7. КБЖУ должны быть рассчитаны НА ИТОГОВУЮ grams каждой позиции.\n\n8. Возвращай items в том же порядке и с тем же idx, что во входе.\nНельзя потерять строку. Если оценка приблизительная — всё равно верни позицию с nutrition_source=\"estimate\".\n\nВерни ТОЛЬКО JSON:\n{\n  \"items\":[\n    {\n      \"idx\":0,\n      \"dish\":\"нормализованное название\",\n      \"grams\":200,\n      \"kcal\":264,\n      \"prot\":18,\n      \"fat\":10,\n      \"carb\":21,\n      \"nutrition_source\":\"estimate\",\n      \"weight_source\":\"estimate\",\n      \"source_url\":\"\",\n      \"source_title\":\"\"\n    }\n  ]\n}\n\nnutrition_source: \"web\" или \"estimate\".\nweight_source: \"user\", \"web\" или \"estimate\".\nТолько JSON.",
+              "role": "system"
+            },
+            {
+              "content": "={{ JSON.stringify({positions:$json.unresolved_positions,time:$json.time}) }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        800,
+        2700
+      ],
+      "id": "a93545cf-1513-475a-b855-dd5f58f57710",
+      "name": "SMART /v lookup",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 800,
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst src=$items('Parse /v command')[0].json;\nconst cache=$items('Resolve /v cache')[0]?.json||{};\nconst cached=Array.isArray(cache.cached_items)?cache.cached_items:[];\n\nlet payload=$json.message?.content ?? $json.output ?? $json;\nif(typeof payload==='string'){\n  let s=payload.replace(/```json|```/gi,'').trim();\n  const a=s.indexOf('{'),b=s.lastIndexOf('}');\n  if(a>=0&&b>a)s=s.slice(a,b+1);\n  try{payload=JSON.parse(s)}catch(_){payload={items:[]}}\n}\nconst aiItems=Array.isArray(payload?.items)?payload.items:[];\nconst combined=[...cached,...aiItems];\nconst byIdx=new Map(combined.map(x=>[Number(x.idx),x]));\nconst hints=Array.isArray(src.positions)?src.positions:[];\nif(!hints.length)throw new Error('Нет позиций /v');\n\nconst now=new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Moscow'}));\nconst pad=n=>String(n).padStart(2,'0');\nconst time=src.time||`${pad(now.getHours())}:${pad(now.getMinutes())}`;\nconst eaten_at=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${time}:00+03:00`;\n\nconst result=[];\nfor(const hint of hints){\n  const x=byIdx.get(Number(hint.idx))||{};\n  const dish=String(x.dish||hint.raw||'').trim();\n  let grams=hint.explicit_grams!=null?Number(hint.explicit_grams):Number(x.grams||0);\n  if(!dish)continue;\n  if(!(grams>0))grams=100;\n\n  // If AI ignored the user-entered grams, rescale its macros to that exact mass\n  // only when its returned grams are known.\n  let kcal=Number(x.kcal||0),prot=Number(x.prot||0),fat=Number(x.fat||0),carb=Number(x.carb||0);\n  const returnedGrams=Number(x.grams||0);\n  if(hint.explicit_grams!=null&&returnedGrams>0&&returnedGrams!==grams&&x.nutrition_source!=='cache'){\n    const factor=grams/returnedGrams;\n    kcal*=factor;prot*=factor;fat*=factor;carb*=factor;\n  }\n\n  result.push({json:{\n    chat_id:src.chat_id,message_id:src.message_id,idx:Number(hint.idx),\n    dish,grams:Math.round(grams),\n    kcal:Math.max(0,Math.round(kcal*10)/10),\n    prot:Math.max(0,Math.round(prot*10)/10),\n    fat:Math.max(0,Math.round(fat*10)/10),\n    carb:Math.max(0,Math.round(carb*10)/10),\n    eaten_at,\n    nutrition_source:String(x.nutrition_source||'estimate'),\n    weight_source:hint.explicit_grams!=null?'user':String(x.weight_source||'estimate'),\n    source_url:String(x.source_url||''),source_title:String(x.source_title||''),\n    cache_hit:String(x.nutrition_source||'')==='cache',\n    expected_count:hints.length\n  }});\n}\nif(!result.length)throw new Error('Не удалось разобрать позиции /v');\n\nfunction quality(x){\n  const g=Number(x.json.grams||0),k=Number(x.json.kcal||0);\n  const p=Number(x.json.prot||0),f=Number(x.json.fat||0),c=Number(x.json.carb||0);\n  const macroKcal=p*4+f*9+c*4;\n  const delta=k>0&&macroKcal>0?Math.abs(k-macroKcal)/k:0;\n  const per100=g>0?k/g*100:0;\n  const bad=!(g>0)||!(k>0)||per100>1200;\n  const check=!bad&&(delta>.28||per100<5);\n  return {...x,json:{...x.json,included:!bad,quality:bad?'bad':check?'check':'ok'}};\n}\nreturn result.map(quality);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        2784
+      ],
+      "id": "c3ed12eb-65c4-4d7f-bd5e-f24fd874e3b0",
+      "name": "Build /v meal",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "meals",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "dish",
+              "fieldValue": "={{$json.dish}}"
+            },
+            {
+              "fieldId": "grams",
+              "fieldValue": "={{$json.grams}}"
+            },
+            {
+              "fieldId": "kcal",
+              "fieldValue": "={{$json.kcal}}"
+            },
+            {
+              "fieldId": "prot",
+              "fieldValue": "={{$json.prot}}"
+            },
+            {
+              "fieldId": "fat",
+              "fieldValue": "={{$json.fat}}"
+            },
+            {
+              "fieldId": "carb",
+              "fieldValue": "={{$json.carb}}"
+            },
+            {
+              "fieldId": "eaten_at",
+              "fieldValue": "={{$json.eaten_at}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        672,
+        2784
+      ],
+      "id": "ef266787-428a-4079-b31e-c2ab5b055999",
+      "name": "CREATE /v meal",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.content}}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        2784
+      ],
+      "id": "be4f10d2-1c0e-4d8f-9b22-746c218009bb",
+      "name": "OK /v",
+      "webhookId": "f18169c5-1020-42a5-8e71-f4b478fe0e8e",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const built = $items('Build /v meal').map(i=>i.json).sort((a,b)=>Number(a.idx)-Number(b.idx));\nconst rows = built;\nif(!rows.length) throw new Error('Нет сохранённых позиций');\n\nconst totals = rows.reduce((a,r)=>({\n  kcal:a.kcal+Number(r.kcal||0),\n  prot:a.prot+Number(r.prot||0),\n  fat:a.fat+Number(r.fat||0),\n  carb:a.carb+Number(r.carb||0)\n}),{kcal:0,prot:0,fat:0,carb:0});\n\nconst r1=n=>Math.round(Number(n||0)*10)/10;\nconst lines=rows.map((r,i)=>{\n  const source=r.nutrition_source==='web'?' 🌐':'';\n  return `${i+1}. ${r.dish} — ~${Math.round(Number(r.grams||0))} г · ${Math.round(Number(r.kcal||0))} ккал${source}`;\n});\n\nconst content =\n`Сохранил ${rows.length} ${rows.length===1?'позицию':rows.length>=2&&rows.length<=4?'позиции':'позиций'}:\\n\\n`+\nlines.join('\\n')+\n`\\n\\nИтого: ~${Math.round(totals.kcal)} ккал\\nБ ${r1(totals.prot)} · Ж ${r1(totals.fat)} · У ${r1(totals.carb)}`;\n\nreturn [{json:{\n  chat_id:rows[0].chat_id,\n  count:rows.length,\n  content,\n  kcal:Math.round(totals.kcal),\n  prot:r1(totals.prot),\n  fat:r1(totals.fat),\n  carb:r1(totals.carb)\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        2784
+      ],
+      "id": "f055eed0-934d-49e4-b5c2-f538aa07cdb7",
+      "name": "Aggregate /v meals",
+      "onError": "continueErrorOutput",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{$items('Parse /v command')[0].json.chat_id}}",
+        "text": "Не удалось разобрать запись. Попробуй ещё раз: одна позиция — одна строка.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        2960
+      ],
+      "id": "90b16870-c037-4d89-bb1c-01a9d1c01516",
+      "name": "FAIL /v",
+      "webhookId": "f18169c5-1020-42a5-8e71-f4b478fe0e8e",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $json.message || {};\nconst chat_id = msg.chat?.id;\nconst message_id = msg.message_id;\nlet text = String(msg.text || '')\n  .replace(/^\\/(?:day|день)(?:@\\w+)?\\s*/i,'')\n  .trim();\n\nif(!chat_id || !text) throw new Error('Пустая сводка за день');\n\nconst sectionAliases = [\n  {rx:/^(?:утро|завтрак)(?:\\s*[:—-]?\\s*(\\d{1,2}[:.]\\d{2}))?\\s*:?\\s*(.*)$/i, key:'morning', label:'Утро', defaultTime:'09:00'},\n  {rx:/^(?:день|обед)(?:\\s*[:—-]?\\s*(\\d{1,2}[:.]\\d{2}))?\\s*:?\\s*(.*)$/i, key:'day', label:'День', defaultTime:'14:00'},\n  {rx:/^(?:вечер|ужин)(?:\\s*[:—-]?\\s*(\\d{1,2}[:.]\\d{2}))?\\s*:?\\s*(.*)$/i, key:'evening', label:'Вечер', defaultTime:'19:00'},\n  {rx:/^(?:перекус)(?:\\s*[:—-]?\\s*(\\d{1,2}[:.]\\d{2}))?\\s*:?\\s*(.*)$/i, key:'snack', label:'Перекус', defaultTime:'16:30'}\n];\n\nconst lines=text.split(/\\n+/).map(x=>x.trim()).filter(Boolean);\nlet current=null;\nconst positions=[];\n\nfunction addFood(raw, section){\n  const cleaned=String(raw||'').replace(/^[•\\-–—\\d.)]+\\s*/,'').trim();\n  if(!cleaned) return;\n  const gm=cleaned.match(/(?:^|\\s)(\\d+(?:[.,]\\d+)?)\\s*(кг|kg|г|гр|g)\\b/i);\n  let explicit_grams=null;\n  if(gm){\n    const v=Number(gm[1].replace(',','.'));\n    if(Number.isFinite(v)&&v>0) explicit_grams=/кг|kg/i.test(gm[2])?Math.round(v*1000):Math.round(v);\n  }\n  positions.push({\n    idx:positions.length,\n    raw:cleaned,\n    explicit_grams,\n    meal_key:section.key,\n    meal_label:section.label,\n    meal_time:section.time\n  });\n}\n\nfor(const line of lines){\n  let header=null;\n  for(const def of sectionAliases){\n    const m=line.match(def.rx);\n    if(m){\n      const rawTime=m[1]?m[1].replace('.',':'):def.defaultTime;\n      const [hh,mm]=rawTime.split(':').map(Number);\n      const valid=hh>=0&&hh<=23&&mm>=0&&mm<=59;\n      header={key:def.key,label:def.label,time:valid?`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`:def.defaultTime};\n      current=header;\n      if(m[2]) addFood(m[2],current);\n      break;\n    }\n  }\n  if(header) continue;\n\n  // If user omitted headings entirely, keep it as one evening meal.\n  if(!current) current={key:'evening',label:'Вечер',time:'19:00'};\n\n  // Within a section semicolon and \" + \" may separate foods; commas remain part of a food description.\n  const parts=line.split(/\\s*;\\s*|\\s+\\+\\s+/).filter(Boolean);\n  for(const part of parts) addFood(part,current);\n}\n\nif(!positions.length) throw new Error('В сводке нет еды');\nif(positions.length>30) positions.length=30;\n\nconst meals=[...new Map(positions.map(p=>[p.meal_key, {key:p.meal_key,label:p.meal_label,time:p.meal_time}])).values()];\n\nreturn [{json:{\n  chat_id,\n  message_id,\n  raw:text,\n  positions,\n  positions_json:JSON.stringify(positions),\n  position_count:positions.length,\n  meals,\n  meal_count:meals.length\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        3024
+      ],
+      "id": "6190f233-0820-4191-bd88-cef9d99874bb",
+      "name": "Parse day summary",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini:online",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI:ONLINE"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Ты обрабатываешь ОДНУ вечернюю сводку питания за целый день.\n\nВход уже разбит кодом на positions[].\nКаждая positions[].raw = отдельная позиция еды.\nmeal_key / meal_label / meal_time определяют, к какому приёму она относится.\n\nСделай ВСЕ позиции ОДНИМ запросом. Не объединяй разные строки и не теряй позиции.\n\nПравила:\n1. Сохраняй idx и порядок.\n2. explicit_grams, если указан, имеет абсолютный приоритет.\n3. Количество словами (\"два яйца\", \"два персика\", \"кусочек хлеба\") учитывай при оценке массы.\n4. Бренд/магазин, явно написанный пользователем, нельзя заменять другим брендом.\n5. Обычная домашняя еда: разумная оценка порции и КБЖУ.\n6. Брендированные/сетевые продукты: найди данные в интернете, но только для того же бренда/сети.\n7. КБЖУ должны соответствовать итоговой массе.\n8. Если точного ответа нет, НЕ выбрасывай позицию — верни estimate.\n9. Никаких дополнительных запросов на отдельные позиции: это batch-обработка.\n\nТолько JSON:\n{\n  \"items\":[\n    {\n      \"idx\":0,\n      \"dish\":\"название\",\n      \"grams\":200,\n      \"kcal\":250,\n      \"prot\":20,\n      \"fat\":10,\n      \"carb\":20,\n      \"nutrition_source\":\"estimate\",\n      \"weight_source\":\"estimate\",\n      \"source_url\":\"\",\n      \"source_title\":\"\"\n    }\n  ]\n}",
+              "role": "system"
+            },
+            {
+              "content": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        224,
+        3024
+      ],
+      "id": "51bfe512-db7a-4a00-8667-415c6b8e357f",
+      "name": "SMART day lookup",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 800,
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Parse day summary')[0].json;\nlet payload=$json.message?.content ?? $json.output ?? $json;\nif(typeof payload==='string'){\n  let s=payload.replace(/```json|```/gi,'').trim();\n  const a=s.indexOf('{'),b=s.lastIndexOf('}');\n  if(a>=0&&b>a)s=s.slice(a,b+1);\n  try{payload=JSON.parse(s)}catch(_){throw new Error('Невалидный JSON дневной сводки')}\n}\n\nconst returned=Array.isArray(payload?.items)?payload.items:[];\nconst byIdx=new Map(returned.map(x=>[Number(x.idx),x]));\nconst hints=Array.isArray(src.positions)?src.positions:[];\nif(!hints.length)throw new Error('Нет позиций');\n\nconst now=new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Moscow'}));\nconst pad=n=>String(n).padStart(2,'0');\nconst date=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;\n\nconst rows=[];\nfor(const h of hints){\n  const x=byIdx.get(Number(h.idx))||{};\n  const dish=String(x.dish||h.raw||'').trim();\n  if(!dish)continue;\n  let grams=h.explicit_grams!=null?Number(h.explicit_grams):Number(x.grams||0);\n  if(!(grams>0))grams=100;\n  rows.push({json:{\n    chat_id:src.chat_id,\n    message_id:src.message_id,\n    idx:Number(h.idx),\n    dish,\n    grams:Math.round(grams),\n    kcal:Math.max(0,Number(x.kcal||0)),\n    prot:Math.max(0,Number(x.prot||0)),\n    fat:Math.max(0,Number(x.fat||0)),\n    carb:Math.max(0,Number(x.carb||0)),\n    eaten_at:`${date}T${h.meal_time}:00+03:00`,\n    meal_key:h.meal_key,\n    meal_label:h.meal_label,\n    meal_time:h.meal_time,\n    nutrition_source:String(x.nutrition_source||'estimate'),\n    weight_source:h.explicit_grams!=null?'user':String(x.weight_source||'estimate'),\n    source_url:String(x.source_url||''),\n    source_title:String(x.source_title||''),\n    expected_count:hints.length\n  }});\n}\nif(!rows.length)throw new Error('Не удалось разобрать дневную сводку');\nreturn rows;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        3024
+      ],
+      "id": "5d5314e9-f5de-4b52-a616-cfd82103cf3f",
+      "name": "Build day meals",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows=$items('Build day meals').map(i=>i.json).sort((a,b)=>a.meal_time.localeCompare(b.meal_time)||a.idx-b.idx);\nif(!rows.length)throw new Error('Нет распознанных позиций');\n\nconst groups=new Map();\nfor(const r of rows){\n  r.included = r.included !== false;\n  if(!groups.has(r.meal_key))groups.set(r.meal_key,{label:r.meal_label,time:r.meal_time,rows:[]});\n  groups.get(r.meal_key).rows.push(r);\n}\n\nconst sum=arr=>arr.reduce((a,r)=>({\n  kcal:a.kcal+Number(r.kcal||0),\n  prot:a.prot+Number(r.prot||0),\n  fat:a.fat+Number(r.fat||0),\n  carb:a.carb+Number(r.carb||0)\n}),{kcal:0,prot:0,fat:0,carb:0});\nconst r1=n=>Math.round(Number(n||0)*10)/10;\n\nconst blocks=[];\nfor(const g of groups.values()){\n  const t=sum(g.rows);\n  blocks.push(\n    `🍽 *${g.label}* · ${g.time}\\n`+\n    g.rows.map((r,i)=>`${i+1}. ${r.dish} — ~${Math.round(r.grams)} г · ${Math.round(r.kcal)} ккал`).join('\\n')+\n    `\\nИтого: ${Math.round(t.kcal)} ккал`\n  );\n}\nconst total=sum(rows);\n\nreturn [{json:{\n  chat_id:rows[0].chat_id,\n  message_id:rows[0].message_id,\n  count:rows.length,\n  meal_count:groups.size,\n  items:rows,\n  items_json:JSON.stringify(rows),\n  content:\n    `*Сводка за день готова*\\n\\n`+\n    blocks.join('\\n\\n')+\n    `\\n\\n*За день:* ~${Math.round(total.kcal)} ккал\\n`+\n    `Б ${r1(total.prot)} · Ж ${r1(total.fat)} · У ${r1(total.carb)}\\n\\n`+\n    `Проверь данные перед сохранением.`\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        3024
+      ],
+      "id": "44a6ca4e-70cf-42fc-88e0-608d3bd348d7",
+      "name": "Build day draft",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$items('Parse day summary')[0]?.json?.chat_id || $json.message?.chat?.id}}",
+        "text": "Не удалось разобрать сводку. Напиши её блоками: Утро, День, Вечер — по одной позиции с новой строки.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        3184
+      ],
+      "id": "a8115d65-d186-4d3a-8e79-ef0f76787ede",
+      "name": "FAIL day summary",
+      "webhookId": "f18169c5-1020-42a5-8e71-f4b478fe0e8e",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "meals_draft",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{$json.message_id}}"
+            },
+            {
+              "fieldId": "photo_file_id"
+            },
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{$json.items_json}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "await_multi_confirm"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        704,
+        3024
+      ],
+      "id": "fa418c2d-9b3c-48c0-a6ce-fd1c99eceb4d",
+      "name": "SAVE day draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.content}}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Сохранить",
+                    "additionalFields": {
+                      "callback_data": "=multi_save_{{ $json.message_id }}"
+                    }
+                  },
+                  {
+                    "text": "✏️ Поправить",
+                    "additionalFields": {
+                      "callback_data": "=multi_edit_{{ $json.message_id }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🗑 Удалить",
+                    "additionalFields": {
+                      "callback_data": "=multi_delete_{{ $json.message_id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        3024
+      ],
+      "id": "3b6074f4-d8e3-4923-a797-01bb53047c6b",
+      "name": "SEND day draft",
+      "webhookId": "f18169c5-1020-42a5-8e71-f4b478fe0e8e",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $items('Detect delete request')[0].json.chat_id }}",
+        "text": "Не удалось удалить приём пищи из-за технической ошибки. Попробуй ещё раз через несколько секунд.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1552,
+        3904
+      ],
+      "id": "fcf6ca73-0cf8-427d-be61-6c3dcbeeab14",
+      "name": "Telegram delete technical fail",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst rows=$items('Build /v meal').map(i=>i.json).sort((a,b)=>Number(a.idx)-Number(b.idx));\nif(!rows.length)throw new Error('Нет распознанных позиций');\n\nconst totals=rows.filter(r=>r.included!==false).reduce((a,r)=>({\n  kcal:a.kcal+Number(r.kcal||0),prot:a.prot+Number(r.prot||0),\n  fat:a.fat+Number(r.fat||0),carb:a.carb+Number(r.carb||0)\n}),{kcal:0,prot:0,fat:0,carb:0});\nconst r1=n=>Math.round(Number(n||0)*10)/10;\n\nconst lines=rows.map((r,i)=>{\n  const q=r.quality==='bad'?'⚠️ ':r.quality==='check'?'△ ':r.cache_hit?'⚡ ':'';\n  const suffix=r.included===false?' · не учитываю':r.quality==='check'?' · проверь':'';\n  return `${i+1}. ${q}${r.dish} — ~${Math.round(r.grams)} г · ${Math.round(r.kcal)} ккал${suffix}`;\n});\n\nreturn [{json:{\n  chat_id:rows[0].chat_id,\n  message_id:rows[0].message_id,\n  count:rows.length,\n  items:rows,\n  items_json:JSON.stringify(rows),\n  content:\n    `*Проверь приём пищи*\\\\n\\\\n${lines.join('\\\\n')}\\\\n\\\\n`+\n    `*Итого учтено:* ~${Math.round(totals.kcal)} ккал\\\\n`+\n    `Б ${r1(totals.prot)} · Ж ${r1(totals.fat)} · У ${r1(totals.carb)}`+\n    (rows.some(r=>r.cache_hit)?`\\\\n\\\\n⚡ Часть позиций взята из Food Cache без AI-поиска.`:'')\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1210,
+        2784
+      ],
+      "id": "cbd918f1-0178-4171-892f-f798124cafe2",
+      "name": "Build /v draft",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "meals_draft",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{$json.chat_id}}"
+            },
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{$json.message_id}}"
+            },
+            {
+              "fieldId": "photo_file_id"
+            },
+            {
+              "fieldId": "candidates",
+              "fieldValue": "={{$json.items_json}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "await_multi_confirm"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        2784
+      ],
+      "id": "ce85ed76-12c8-4466-994b-0e8975527e2c",
+      "name": "SAVE /v draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.content}}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Сохранить",
+                    "additionalFields": {
+                      "callback_data": "=multi_save_{{ $json.message_id }}"
+                    }
+                  },
+                  {
+                    "text": "✏️ Поправить",
+                    "additionalFields": {
+                      "callback_data": "=multi_edit_{{ $json.message_id }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🗑 Удалить",
+                    "additionalFields": {
+                      "callback_data": "=multi_delete_{{ $json.message_id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1640,
+        2784
+      ],
+      "id": "4cebfe96-cc34-42e0-ab2a-9f6d6e81d39f",
+      "name": "SEND /v draft",
+      "webhookId": "f18169c5-1020-42a5-8e71-f4b478fe0e8e",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/lookup_food_catalog",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_queries",
+              "value": "={{ $json.positions }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        2784
+      ],
+      "id": "5543aac3-8c2c-45fe-915c-277910d7204b",
+      "name": "LOOKUP food cache",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst src=$items('Parse /v command')[0].json;\nlet rows=$json;\nif(!Array.isArray(rows)){\n  if(Array.isArray(rows?.body))rows=rows.body;\n  else if(Array.isArray(rows?.data))rows=rows.data;\n  else rows=[];\n}\n\nconst byIdx=new Map(rows.map(x=>[Number(x.idx),x]));\nconst cached=[];\nconst unresolved=[];\n\nfor(const p of src.positions||[]){\n  const hit=byIdx.get(Number(p.idx));\n  if(!hit){\n    unresolved.push(p);\n    continue;\n  }\n\n  const grams=p.explicit_grams!=null\n    ? Number(p.explicit_grams)\n    : Number(hit.typical_grams||0);\n\n  if(!(grams>0)){\n    unresolved.push(p);\n    continue;\n  }\n\n  const factor=grams/100;\n  const scale=v=>Math.round(Number(v||0)*factor*10)/10;\n\n  cached.push({\n    idx:Number(p.idx),\n    dish:String(hit.display_name||p.raw),\n    grams:Math.round(grams),\n    kcal:scale(hit.kcal_per_100),\n    prot:scale(hit.prot_per_100),\n    fat:scale(hit.fat_per_100),\n    carb:scale(hit.carb_per_100),\n    nutrition_source:'cache',\n    weight_source:p.explicit_grams!=null?'user':'cache',\n    source_url:'',\n    source_title:`Food Cache · ${Number(hit.use_count||0)} использ.`,\n    cache_confidence:Number(hit.confidence||0)\n  });\n}\n\nreturn [{json:{\n  ...src,\n  cached_items:cached,\n  cache_hits:cached.length,\n  unresolved_positions:unresolved,\n  positions:unresolved,\n  positions_json:JSON.stringify(unresolved),\n  needs_ai:unresolved.length>0\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        2784
+      ],
+      "id": "2169a2ec-cd6b-4b84-8891-2a7138f9715f",
+      "name": "Resolve /v cache"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "472689ac-4898-4be7-8ad4-c8bc43e8133e",
+              "leftValue": "={{$json.needs_ai}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        600,
+        2784
+      ],
+      "id": "79c757ad-cec6-4a7d-817d-e9373bd65161",
+      "name": "Need AI for /v?"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst msg=$json.message||{};\nconst text=String(msg.text||'').trim();\nconst chat_id=msg.chat?.id;\nconst first_name=msg.from?.first_name||'';\nconst m=text.match(/^\\/([a-zA-Z_]+)(?:@\\w+)?(?:\\s|$)/);\nconst cmd=m?m[1].toLowerCase():'';\n\nconst known=new Set([\n  'start','help','today','add','delete','progress','profile','weight','summary','history',\n  'subscription','settings','support','cancel','day','recommend','plan','shop','restaurant',\n  'quick','sweet','training','overate','bedtime','can','why','checkin'\n]);\n\nreturn [{json:{\n  ...$json,\n  command:known.has(cmd)?cmd:'',\n  is_command:known.has(cmd),\n  chat_id,\n  first_name\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3240,
+        3984
+      ],
+      "id": "a02516b1-808d-4be0-976b-f7aac2263ba3",
+      "name": "Command Router"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4234f045-5a00-46ee-9201-862879561f74",
+              "leftValue": "={{$json.is_command}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3040,
+        3820
+      ],
+      "id": "baddd802-0c0f-4979-820e-3e19e1bfd51c",
+      "name": "Known command?"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "cmdNutriV14",
+          "mode": "list",
+          "cachedResultName": "AI_Nutrition_Commands_v14_v20"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -2900,
+        3800
+      ],
+      "id": "325d7c68-8fb9-4ea8-8bcf-6fbcdc4fe173",
+      "name": "Run Commands"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "GET profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse day summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse day summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse /v command",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "User Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Command Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREATE profile": {
+      "main": [
+        [
+          {
+            "node": "start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET profile": {
+      "main": [
+        [
+          {
+            "node": "IF NO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF NO": {
+      "main": [
+        [
+          {
+            "node": "CREATE profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "nutrion 2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUPA digest": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "YES DIGEST",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NO DIGEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YES DIGEST": {
+      "main": [
+        [
+          {
+            "node": "nutrion 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NO DIGEST": {
+      "main": [
+        [
+          {
+            "node": "nutrion 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_week_meals": {
+      "ai_tool": [
+        [
+          {
+            "node": "nutrion 2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escape": {
+      "main": [
+        [
+          {
+            "node": "Bot Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Save Bot Msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Log": {
+      "main": [
+        [
+          {
+            "node": "Save User Msg",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Detect delete request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bot Log": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nutrion 2": {
+      "main": [
+        [
+          {
+            "node": "Escape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET client settings": {
+      "main": [
+        [
+          {
+            "node": "GET latest weight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET latest weight": {
+      "main": [
+        [
+          {
+            "node": "SUPA digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect delete request": {
+      "main": [
+        [
+          {
+            "node": "Delete request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete request?": {
+      "main": [
+        [
+          {
+            "node": "GET meals for delete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET client settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET meals for delete": {
+      "main": [
+        [
+          {
+            "node": "Select meals to delete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram delete technical fail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select meals to delete": {
+      "main": [
+        [
+          {
+            "node": "Meals found?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram delete technical fail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meals found?": {
+      "main": [
+        [
+          {
+            "node": "SOFT DELETE meals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram delete technical fail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOFT DELETE meals": {
+      "main": [
+        [
+          {
+            "node": "Build delete reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram delete technical fail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build delete reply": {
+      "main": [
+        [
+          {
+            "node": "Telegram delete reply",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG meal deleted",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram delete technical fail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete not found reply": {
+      "main": [
+        [
+          {
+            "node": "Telegram delete reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse /v command": {
+      "main": [
+        [
+          {
+            "node": "LOOKUP food cache",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL /v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMART /v lookup": {
+      "main": [
+        [
+          {
+            "node": "Build /v meal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL /v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build /v meal": {
+      "main": [
+        [
+          {
+            "node": "Build /v draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL /v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREATE /v meal": {
+      "main": [
+        [
+          {
+            "node": "Aggregate /v meals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL /v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate /v meals": {
+      "main": [
+        [
+          {
+            "node": "OK /v",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL /v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse day summary": {
+      "main": [
+        [
+          {
+            "node": "SMART day lookup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL day summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMART day lookup": {
+      "main": [
+        [
+          {
+            "node": "Build day meals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL day summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build day meals": {
+      "main": [
+        [
+          {
+            "node": "Build day draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL day summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build day draft": {
+      "main": [
+        [
+          {
+            "node": "SAVE day draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL day summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE day draft": {
+      "main": [
+        [
+          {
+            "node": "SEND day draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL day summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build /v draft": {
+      "main": [
+        [
+          {
+            "node": "SAVE /v draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL /v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE /v draft": {
+      "main": [
+        [
+          {
+            "node": "SEND /v draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL /v",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LOOKUP food cache": {
+      "main": [
+        [
+          {
+            "node": "Resolve /v cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve /v cache": {
+      "main": [
+        [
+          {
+            "node": "Need AI for /v?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Need AI for /v?": {
+      "main": [
+        [
+          {
+            "node": "SMART /v lookup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build /v meal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Command Router": {
+      "main": [
+        [
+          {
+            "node": "Known command?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Known command?": {
+      "main": [
+        [
+          {
+            "node": "Run Commands",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Commands": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ed09baae-0e42-4e0b-9359-d835f848e52c",
+  "meta": {
+    "instanceId": "169ae9c79d7aed5aceb64b989c1fc46ab74a2feb20b117eefd579dec340f104b"
+  },
+  "nodeGroups": [],
+  "id": "txTextV29",
+  "tags": []
+}

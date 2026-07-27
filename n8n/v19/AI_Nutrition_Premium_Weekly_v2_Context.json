@@ -1,0 +1,403 @@
+{
+  "id": "premiumWeeklyV1",
+  "name": "AI_Nutrition_Premium_Weekly_v2_Context",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 19
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "71f8eb37-b745-4d99-af9c-f8ad7c4f58bd",
+      "name": "Weekly check 19:00"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/premium_contexts_v20",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_days",
+              "value": 14
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "5f580cbe-a4ef-4acc-98b2-d8ab473f5536",
+      "name": "GET Premium Contexts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now=new Date();const wd=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Moscow',weekday:'short'}).format(now);if(wd!=='Sun')return [];let a=$json;if(a?.body)a=a.body;if(a?.data)a=a.data;if(!Array.isArray(a))a=items.map(i=>i.json).flatMap(x=>Array.isArray(x)?x:[]);const week_end=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(now);return a.filter(x=>x?.chat_id&&x.context?.preferences?.weekly_review!==false).map(x=>({json:{chat_id:Number(x.chat_id),week_end,context:JSON.stringify(x.context)}}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "16808d46-a2c0-4698-a34b-046515e3630c",
+      "name": "Prepare Weekly Context"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты — TeddY Premium. Сделай профессиональный недельный разбор питания.\nИспользуй цель, нормы, питание, Food Memory и динамику веса. Если активных дней мало — прямо скажи, что вывод ограничен.\nНужны: что получилось, что мешает, один главный фокус следующей недели. Не морализируй.\nЕсли по данным очевидно, что при стабильном соблюдении цели вес не движется в нужную сторону, аккуратно предложи обсудить небольшую коррекцию калорий, но не меняй цель сам.\nДо 1500 символов. Формат:\n📈 Неделя\nкороткий итог\n✅ Что работает\n• ...\n⚠️ Что мешает\n• ...\n🎯 Фокус следующей недели\n• ...\nОбязательно учитывай last_checkin: высокий голод, низкая энергия или сложное соблюдение важнее идеального попадания в цифры.\nУчитывай data_quality: при low не делай уверенных стратегических выводов и прямо скажи, что данных пока мало."
+            },
+            {
+              "role": "user",
+              "content": "={{$json.context}}"
+            }
+          ]
+        },
+        "jsonOutput": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        0
+      ],
+      "id": "eb791c9a-0788-4f03-b234-dca582e08834",
+      "name": "Weekly Nutritionist",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 600,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Prepare Weekly Context'),out=items;return out.map((o,i)=>{const j=o.json||{};let t=j.output_text||j.output||j.text||j.content||j.message?.content||j.choices?.[0]?.message?.content||'';if(Array.isArray(t))t=t.map(x=>x?.text||x?.content||x).join('\\n');const c=JSON.parse(src[i]?.json.context||'{}'),s=c.settings||{},q=c.data_quality||{},wt=c.weight_trend||{},n=v=>Number(v||0);let proposal=null;if(q.level==='high'&&n(s.kcal_target)>0&&wt.delta!=null){const dw=n(wt.delta),g=String(s.goal||'').toLowerCase();if((g.includes('gain')||g.includes('набор'))&&dw<=0.1)proposal={current_kcal:n(s.kcal_target),proposed_kcal:n(s.kcal_target)+150,reason:'При хорошем качестве данных сглаженный тренд веса почти не растёт. Можно протестировать +150 ккал.'};else if((g.includes('loss')||g.includes('сниж')||g.includes('похуд'))&&dw>=-0.1)proposal={current_kcal:n(s.kcal_target),proposed_kcal:Math.max(1200,n(s.kcal_target)-150),reason:'При хорошем качестве данных сглаженный тренд веса почти не снижается. Можно протестировать -150 ккал.'}}return{json:{chat_id:src[i]?.json.chat_id,week_end:src[i]?.json.week_end,text:String(t||'').trim(),proposal}}});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "25de2dcd-e973-4efd-b9b5-89b3c66ac73f",
+      "name": "Format Weekly Reports"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        -100
+      ],
+      "id": "f686d61e-9bcd-47f8-b648-6995c50a0055",
+      "name": "SEND Weekly Report",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/premium_weekly_reports?on_conflict=chat_id,week_end",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{$json.chat_id}}"
+            },
+            {
+              "name": "week_end",
+              "value": "={{$json.week_end}}"
+            },
+            {
+              "name": "content_md",
+              "value": "={{$json.text}}"
+            },
+            {
+              "name": "payload",
+              "value": "={{JSON.stringify({source:'weekly_automation'})}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "c71bbd5f-add1-455b-a1c9-37268ad9766f",
+      "name": "SAVE Weekly Report",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d433eaeb-0263-448b-a7de-09f8532a7321",
+              "leftValue": "={{!!$json.proposal}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        100
+      ],
+      "id": "f1f658a6-eb09-4e85-b663-91d60469c87e",
+      "name": "Has strategy proposal?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/premium_target_proposals",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{$json.chat_id}}"
+            },
+            {
+              "name": "current_kcal",
+              "value": "={{$json.proposal.current_kcal}}"
+            },
+            {
+              "name": "proposed_kcal",
+              "value": "={{$json.proposal.proposed_kcal}}"
+            },
+            {
+              "name": "reason",
+              "value": "={{$json.proposal.reason}}"
+            },
+            {
+              "name": "status",
+              "value": "pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        100
+      ],
+      "id": "f8f279d6-4e44-4980-8f00-f7ec3cc05fcf",
+      "name": "SAVE Target Proposal",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Weekly check 19:00": {
+      "main": [
+        [
+          {
+            "node": "GET Premium Contexts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Premium Contexts": {
+      "main": [
+        [
+          {
+            "node": "Prepare Weekly Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Weekly Context": {
+      "main": [
+        [
+          {
+            "node": "Weekly Nutritionist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Nutritionist": {
+      "main": [
+        [
+          {
+            "node": "Format Weekly Reports",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Weekly Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Weekly Reports": {
+      "main": [
+        [
+          {
+            "node": "SEND Weekly Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SAVE Weekly Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Has strategy proposal?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has strategy proposal?": {
+      "main": [
+        [
+          {
+            "node": "SAVE Target Proposal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2fac7469-a8e9-45b8-9eec-14e242be45b0",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

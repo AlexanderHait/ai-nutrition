@@ -1,0 +1,181 @@
+{
+  "id": "premiumContextRefreshV19",
+  "name": "AI_Nutrition_Premium_Context_Refresh_v19",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d934e147-cc49-4de0-9c10-b3855a9d691c",
+      "name": "Daily 06:00"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/premium_contexts_v20",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_days",
+              "value": 14
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "8a608204-558a-4b61-abdb-d0e2766c2268",
+      "name": "GET Premium Contexts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let a=$json;if(a?.body)a=a.body;if(a?.data)a=a.data;if(!Array.isArray(a))a=items.map(i=>i.json).flatMap(x=>Array.isArray(x)?x:[]);return a.map(x=>({json:{chat_id:Number(x.chat_id),context:x.context,confidence_level:x.context?.data_quality?.level||'low',refreshed_at:new Date().toISOString()}}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "be571aed-fcbe-4faa-bf1f-4ded8cb9871a",
+      "name": "Prepare Snapshots"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/premium_context_snapshots?on_conflict=chat_id",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{$json.chat_id}}"
+            },
+            {
+              "name": "context",
+              "value": "={{JSON.stringify($json.context)}}"
+            },
+            {
+              "name": "confidence_level",
+              "value": "={{$json.confidence_level}}"
+            },
+            {
+              "name": "refreshed_at",
+              "value": "={{$json.refreshed_at}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "1c90281f-8e19-4395-bc3b-f3f3c81060af",
+      "name": "UPSERT Snapshots",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Daily 06:00": {
+      "main": [
+        [
+          {
+            "node": "GET Premium Contexts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Premium Contexts": {
+      "main": [
+        [
+          {
+            "node": "Prepare Snapshots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Snapshots": {
+      "main": [
+        [
+          {
+            "node": "UPSERT Snapshots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "75b01779-1bb9-4df6-bdf4-55ec700aa943",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

@@ -1,0 +1,382 @@
+{
+  "id": "telegramIngressV20",
+  "name": "AI_Nutrition_Telegram_Ingress_v20",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7a19ccec-7486-48f2-8244-abae43cfe29d",
+      "name": "Telegram Ingress",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const u=$json||{};const update_id=Number(u.update_id||0)||null;const msg=u.message||u.edited_message||u.channel_post||{};const cb=u.callback_query||{};const chat_id=Number(msg.chat?.id||cb.message?.chat?.id||cb.from?.id||0)||null;const kind=cb.id?'callback':(msg.photo?.length?'photo':(msg.text?'text':'other'));return[{json:{...u,_ingress:{update_id,chat_id,kind,received_at:new Date().toISOString()}}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "55520164-3448-41f6-92dd-eb267e2c02af",
+      "name": "Normalize Update"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/claim_telegram_update",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_update_id",
+              "value": "={{$json._ingress.update_id}}"
+            },
+            {
+              "name": "_chat_id",
+              "value": "={{$json._ingress.chat_id}}"
+            },
+            {
+              "name": "_kind",
+              "value": "={{$json._ingress.kind}}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "2791f4f5-1224-4d86-b851-901f71eed61d",
+      "name": "Claim update_id",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 250,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const original=$items('Normalize Update')[0].json;let r=$json;if(r?.body!==undefined)r=r.body;if(r?.data!==undefined)r=r.data;const claimed=(r===true||r==='true'||r===1||r==='1');return[{json:{...original,_claimed:claimed}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "dcf1c17b-1cc5-4152-a41f-cfa437ccd146",
+      "name": "Read Claim"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6ab9666b-11e8-498f-aecc-bc9d3b885d40",
+              "leftValue": "={{$json._claimed}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "c13d4379-c9c4-4d1a-8bf7-9cb42940776e",
+      "name": "New update?"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8733d134-b15b-46c5-a219-99e3ee2656f4",
+                    "leftValue": "={{$json._ingress.kind}}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1a60b096-da87-40fc-91d5-8934071f9e9d",
+                    "leftValue": "={{$json._ingress.kind}}",
+                    "rightValue": "photo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "photo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c9f3da60-1529-4ac0-aafa-d5a0e0067b92",
+                    "leftValue": "={{$json._ingress.kind}}",
+                    "rightValue": "callback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "callback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "b15c08ab-e4e8-4a9d-a916-dbb4782dc840",
+      "name": "Route Update"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "txTextV29",
+          "mode": "list",
+          "cachedResultName": "tx_text_v29_v20"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1340,
+        -120
+      ],
+      "id": "1aa3d2de-bd11-42f9-9d12-8087b240059d",
+      "name": "Run Text"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tgCallbacksV18",
+          "mode": "list",
+          "cachedResultName": "tg_callbacks_v18_confidence_learning"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1340,
+        100
+      ],
+      "id": "78278a39-6dd3-4ebc-a432-f57c43113c9b",
+      "name": "Run Media + Callbacks"
+    }
+  ],
+  "connections": {
+    "Telegram Ingress": {
+      "main": [
+        [
+          {
+            "node": "Normalize Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Update": {
+      "main": [
+        [
+          {
+            "node": "Claim update_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim update_id": {
+      "main": [
+        [
+          {
+            "node": "Read Claim",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Read Claim": {
+      "main": [
+        [
+          {
+            "node": "New update?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New update?": {
+      "main": [
+        [
+          {
+            "node": "Route Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Route Update": {
+      "main": [
+        [
+          {
+            "node": "Run Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Media + Callbacks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Media + Callbacks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "065e69b2-9c3b-41f9-836d-68faffaf1542",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

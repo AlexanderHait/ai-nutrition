@@ -1,0 +1,637 @@
+{
+  "id": "jobWorkerV20",
+  "name": "AI_Nutrition_AI_Queue_Worker_v20",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c002a6da-aca5-4fde-bb2d-ba37bfc83c6c",
+      "name": "Every minute"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/claim_jobs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_worker",
+              "value": "v20-ai-worker"
+            },
+            {
+              "name": "_job_type",
+              "value": ""
+            },
+            {
+              "name": "_limit",
+              "value": 5
+            }
+          ]
+        },
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "88a35dbd-8790-44de-b35b-3568daa540dd",
+      "name": "Claim queued jobs",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let a=$json;if(a?.body)a=a.body;if(a?.data)a=a.data;if(!Array.isArray(a))a=[];return a.map(x=>({json:{...x,payload:typeof x.payload==='string'?JSON.parse(x.payload):x.payload}}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "2efcd5b9-793a-4df4-ae7b-a52998cf79f6",
+      "name": "Normalize Jobs"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "66cf1d9b-0e61-4829-8d88-1e4b429c726b",
+                    "leftValue": "={{$json.job_type}}",
+                    "rightValue": "replay",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "replay"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3696882b-c0e4-4e62-9526-fce449e5b95e",
+                    "leftValue": "={{$json.job_type}}",
+                    "rightValue": "knowledge_extract",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "knowledge_extract"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "68659f28-9a7c-4190-aa6c-5bb9e32379f0",
+      "name": "Job type"
+    },
+    {
+      "parameters": {
+        "jsCode": "const p=$json.payload||{},input=p.input||{};const kind=input?._ingress?.kind||(input.callback_query?'callback':input.message?.photo?.length?'photo':'text');return[{json:{job_id:$json.id,kind,input}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -140
+      ],
+      "id": "bbb3294f-95c4-4a96-9c97-dd9f76ea7201",
+      "name": "Prepare Replay"
+    },
+    {
+      "parameters": {
+        "jsCode": "const p=$json.payload||{};return[{json:{job_id:$json.id,source_id:Number(p.source_id||0),text:String(p.text||'').slice(0,30000)}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        160
+      ],
+      "id": "4901fb27-40db-4c35-b317-aeba7dfceb63",
+      "name": "Prepare Knowledge"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Извлеки из транскрипта тренера только явно сформулированные полезные тезисы. Не додумывай отсутствующее. Верни JSON:\n{\"items\":[{\"topic\":\"...\",\"claim\":\"...\",\"practical_rule\":\"...\",\"audience\":\"...\",\"caveat\":\"...\",\"tags\":[\"...\"]}]}\nДо 15 тезисов. Медицинские/спорные утверждения обязательно помечай caveat. Никакого Markdown."
+            },
+            {
+              "role": "user",
+              "content": "={{$json.text}}"
+            }
+          ]
+        },
+        "jsonOutput": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1100,
+        160
+      ],
+      "id": "cdd1795e-577a-4e99-886e-ca673b3d6616",
+      "name": "Extract Knowledge",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 700,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Prepare Knowledge')[0].json;let raw=$json.output_text||$json.output||$json.text||$json.content||$json.message?.content||$json.choices?.[0]?.message?.content||'';if(Array.isArray(raw))raw=raw.map(x=>x?.text||x?.content||x).join('\\n');raw=String(raw).replace(/```json|```/g,'').trim();let j={};try{j=JSON.parse(raw)}catch{};return (Array.isArray(j.items)?j.items:[]).slice(0,15).map(x=>({json:{job_id:src.job_id,source_id:src.source_id,topic:String(x.topic||'other'),claim:String(x.claim||''),practical_rule:String(x.practical_rule||''),audience:String(x.audience||''),caveat:String(x.caveat||''),tags:Array.isArray(x.tags)?x.tags:[]}})).filter(i=>i.json.claim);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        160
+      ],
+      "id": "0447464e-997e-4714-8f17-ea0da67de744",
+      "name": "Parse Knowledge"
+    },
+    {
+      "parameters": {
+        "tableId": "coach_knowledge",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "source_id",
+              "fieldValue": "={{$json.source_id}}"
+            },
+            {
+              "fieldId": "topic",
+              "fieldValue": "={{$json.topic}}"
+            },
+            {
+              "fieldId": "claim",
+              "fieldValue": "={{$json.claim}}"
+            },
+            {
+              "fieldId": "practical_rule",
+              "fieldValue": "={{$json.practical_rule}}"
+            },
+            {
+              "fieldId": "audience",
+              "fieldValue": "={{$json.audience}}"
+            },
+            {
+              "fieldId": "caveat",
+              "fieldValue": "={{$json.caveat}}"
+            },
+            {
+              "fieldId": "tags",
+              "fieldValue": "={{$json.tags}}"
+            },
+            {
+              "fieldId": "evidence_level",
+              "fieldValue": "source_claim"
+            },
+            {
+              "fieldId": "approved_for_ai",
+              "fieldValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        160
+      ],
+      "id": "27813e99-fbd9-4e05-9f9b-2b478da56384",
+      "name": "SAVE Knowledge Draft",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/mark_job_result",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_id",
+              "value": "={{Number($json.job_id||$items('Replay Diagnostic')[0]?.json.job_id||$items('Prepare Knowledge')[0]?.json.job_id)}}"
+            },
+            {
+              "name": "_success",
+              "value": true
+            },
+            {
+              "name": "_error",
+              "value": ""
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        0
+      ],
+      "id": "acb8dfca-0a54-4f33-aec8-a2237a1fdfb5",
+      "name": "Mark Job Done",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const p=$json.payload||{},input=p.input||{};const kind=input?._ingress?.kind||(input.callback_query?'callback':input.message?.photo?.length?'photo':'text');const text=String(input.message?.text||'');const command=text.startsWith('/')?text.split(/\\s+/)[0].toLowerCase():null;const cb=String(input.callback_query?.data||'');return[{json:{job_id:$json.id,replay_event_id:Number(p.replay_event_id||0),diagnostic:{kind,command,callback_data:cb||null,has_photo:Boolean(input.message?.photo?.length),has_caption:Boolean(input.message?.caption),chat_id:input._ingress?.chat_id||input.message?.chat?.id||input.callback_query?.message?.chat?.id||null,route:kind==='text'?'tx_text':(kind==='photo'||kind==='callback'?'callbacks':'unsupported')}}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        -120
+      ],
+      "id": "c7934328-3cea-4b0f-beae-2667eea52f9d",
+      "name": "Replay Diagnostic"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "replay_events",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{$json.replay_event_id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "replayed"
+            },
+            {
+              "fieldId": "diagnostic_result",
+              "fieldValue": "={{JSON.stringify($json.diagnostic)}}"
+            },
+            {
+              "fieldId": "replayed_at",
+              "fieldValue": "={{new Date().toISOString()}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        -120
+      ],
+      "id": "91e3c31b-11a5-49df-8d1d-9690a28ac34e",
+      "name": "SAVE Replay Diagnostic",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const job=$items('Prepare Knowledge')[0]?.json||{};const err=String($json.error?.message||$json.message||$json.description||'queued job failed');return[{json:{job_id:Number(job.job_id||0),error:err}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        300
+      ],
+      "id": "9a5b5530-ca60-4909-893d-f3415b5c2661",
+      "name": "Prepare Job Failure"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/mark_job_result",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_id",
+              "value": "={{$json.job_id}}"
+            },
+            {
+              "name": "_success",
+              "value": false
+            },
+            {
+              "name": "_error",
+              "value": "={{$json.error}}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 4000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1740,
+        300
+      ],
+      "id": "d810146a-6a7e-40e5-8f7b-648c3bf6e942",
+      "name": "Mark Job Failed",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every minute": {
+      "main": [
+        [
+          {
+            "node": "Claim queued jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim queued jobs": {
+      "main": [
+        [
+          {
+            "node": "Normalize Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Jobs": {
+      "main": [
+        [
+          {
+            "node": "Job type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job type": {
+      "main": [
+        [
+          {
+            "node": "Prepare Replay",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Knowledge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Replay": {
+      "main": [
+        [
+          {
+            "node": "Replay Diagnostic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Knowledge": {
+      "main": [
+        [
+          {
+            "node": "Extract Knowledge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Knowledge": {
+      "main": [
+        [
+          {
+            "node": "Parse Knowledge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Job Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Knowledge": {
+      "main": [
+        [
+          {
+            "node": "SAVE Knowledge Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE Knowledge Draft": {
+      "main": [
+        [
+          {
+            "node": "Mark Job Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Job Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replay Diagnostic": {
+      "main": [
+        [
+          {
+            "node": "SAVE Replay Diagnostic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE Replay Diagnostic": {
+      "main": [
+        [
+          {
+            "node": "Mark Job Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Prepare Job Failure": {
+      "main": [
+        [
+          {
+            "node": "Mark Job Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7e7ab6ee-66f7-46ff-9a4d-01dc1a2d7f8d",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

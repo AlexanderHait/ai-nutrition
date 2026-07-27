@@ -1,0 +1,294 @@
+{
+  "id": "premiumMorningV1",
+  "name": "AI_Nutrition_Premium_Morning_v2_Context",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6b19ba96-3809-46f9-a868-613a81145bdc",
+      "name": "Morning 08:00"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/premium_contexts_v20",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_days",
+              "value": 14
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "54398535-7b02-4f07-8632-722a5eb4b45d",
+      "name": "GET Premium Contexts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let a=$json;if(a?.body)a=a.body;if(a?.data)a=a.data;if(!Array.isArray(a))a=items.map(i=>i.json).flatMap(x=>Array.isArray(x)?x:[]);\nconst today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(new Date());\nreturn a.filter(x=>x?.chat_id&&x.context?.preferences?.morning_plan!==false).map(x=>({json:{chat_id:Number(x.chat_id),for_date:today,context:JSON.stringify(x.context)}}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "323c736f-6cc5-4c82-a3ae-3b5cf89fb829",
+      "name": "Prepare Morning Context"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты — TeddY Premium. Составь утренний план питания на сегодня под конкретного человека.\nИспользуй цель, вес и его динамику, КБЖУ, последние 14 дней и Food Memory.\nПлан должен быть реалистичным, 3–5 приёмов максимум, с примерными диапазонами калорий/белка по приёмам. Используй привычные продукты, но добавь варианты.\nНе выдавай медицинских советов. Не требуй идеальности.\nФормат Telegram до 1300 символов:\n☀️ План на сегодня\nкороткий персональный вывод\n🎯 Фокус дня\n• ...\n🍽 Как распределить\n1. ...\n2. ...\n...\nВ конце один простой ориентир.\nУчитывай data_quality: при low не делай уверенных стратегических выводов и прямо скажи, что данных пока мало."
+            },
+            {
+              "role": "user",
+              "content": "={{$json.context}}"
+            }
+          ]
+        },
+        "jsonOutput": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        0
+      ],
+      "id": "3f07c51f-5deb-4ddf-a1ed-b402ca58f862",
+      "name": "Morning Nutritionist",
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 600,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src=$items('Prepare Morning Context'),out=items;return out.map((o,i)=>{const j=o.json||{};let t=j.output_text||j.output||j.text||j.content||j.message?.content||j.choices?.[0]?.message?.content||'';if(Array.isArray(t))t=t.map(x=>x?.text||x?.content||x).join('\\n');return{json:{chat_id:src[i]?.json.chat_id,for_date:src[i]?.json.for_date,text:String(t||'').trim()}}});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "14ef88cc-6409-451f-b737-c4783d037a86",
+      "name": "Format Morning Plans"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        -80
+      ],
+      "id": "9f633c2f-14f1-4fb7-9ba4-cb9dd9c21222",
+      "name": "SEND Morning Plan",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/premium_daily_plans?on_conflict=chat_id,for_date",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{$json.chat_id}}"
+            },
+            {
+              "name": "for_date",
+              "value": "={{$json.for_date}}"
+            },
+            {
+              "name": "content_md",
+              "value": "={{$json.text}}"
+            },
+            {
+              "name": "payload",
+              "value": "={{JSON.stringify({source:'morning_automation'})}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        80
+      ],
+      "id": "b6a9b74a-1a97-4a92-8400-6dbbb4cba0e9",
+      "name": "SAVE Morning Plan",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Morning 08:00": {
+      "main": [
+        [
+          {
+            "node": "GET Premium Contexts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Premium Contexts": {
+      "main": [
+        [
+          {
+            "node": "Prepare Morning Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Morning Context": {
+      "main": [
+        [
+          {
+            "node": "Morning Nutritionist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Morning Nutritionist": {
+      "main": [
+        [
+          {
+            "node": "Format Morning Plans",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Morning Plans",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Morning Plans": {
+      "main": [
+        [
+          {
+            "node": "SEND Morning Plan",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SAVE Morning Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0b613db2-0faa-4f12-9f8d-532c0605c141",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

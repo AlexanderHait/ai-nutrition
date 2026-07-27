@@ -1,0 +1,248 @@
+{
+  "id": "premiumPostMealV2",
+  "name": "AI_Nutrition_Premium_PostMeal_v2_Outcome",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "88224d31-ced7-4fce-bd56-0a64697afb1e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nutritionContextV20",
+          "mode": "list",
+          "cachedResultName": "AI_Nutrition_Context_Engine_v20"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "postmeal-context-v19",
+      "name": "Get Unified Context"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input=$items('When Executed by Another Workflow')[0].json,c=$json.context||{},pr=c.preferences||{};if(pr.post_meal_insights===false)return[];const s=c.settings||{},T=c.today?.eaten||{},n=v=>Number(v||0),kt=n(s.kcal_target),pt=n(s.protein_target),ft=n(s.fat_target);let text='';if(kt&&n(T.kcal)>kt*1.05)text='💡 *Контекст дня*\\nКалорийная цель уже закрыта. Дальше ориентируйся прежде всего на голод; если нужен ещё приём — лучше сделать его лёгким.';else if(ft&&n(T.fat)>ft*1.05)text='💡 *Контекст дня*\\nЖиры на сегодня уже практически закрыты. В следующем приёме лучше выбрать более постный белок.';else if(pt&&n(T.prot)>=pt*.85)text='💡 *Хороший темп*\\nБелок уже почти закрыт. Следующий приём можно выбирать свободнее по оставшимся калориям и углеводам.';else if(n(input.prot)>=30)text=`💡 *Хороший основной приём*\\nВ этом приёме около ${Math.round(n(input.prot))} г белка — хороший вклад в дневную цель.`;if(!text)return[];return[{json:{chat_id:Number(input.chat_id),text}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        -80
+      ],
+      "id": "a4714124-2dbb-4ed5-8769-42129de4c5ad",
+      "name": "Build Useful Insight"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "ee3d1623-8508-4860-bf1b-ad562fc631fd",
+      "name": "SEND Insight",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "premium_recommendations",
+        "returnAll": false,
+        "limit": 5,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$items('When Executed by Another Workflow')[0].json.chat_id}}"
+            },
+            {
+              "keyName": "outcome",
+              "condition": "eq",
+              "keyValue": "unknown"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        440,
+        100
+      ],
+      "id": "e98d0455-d288-4e52-b4cb-9870b2a78991",
+      "name": "GET Recent Recommendations",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows=items.map(i=>i.json).filter(x=>x&&x.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));const r=rows[0];if(!r)return[];const age=Date.now()-new Date(r.created_at).getTime();if(age>6*3600000)return[];const input=$items('When Executed by Another Workflow')[0].json,txt=String(r.recommendation_text||'').toLowerCase(),dish=String(input.dish||'').toLowerCase(),prot=Number(input.prot||0),kcal=Number(input.kcal||0);let matched=false;if(r.feature==='plan'||r.feature==='recommend'||r.feature==='quick'||r.feature==='training'||r.feature==='bedtime'){if(prot>=20&&(/белок|белков|кур|твор|мяс|рыб|яйц/.test(txt)))matched=true;if(kcal>0&&(/приём|поесть|еда|ужин|обед|завтрак/.test(txt)))matched=true;if(dish&&txt.includes(dish))matched=true}if(!matched)return[];return[{json:{id:r.id,outcome:'followed',outcome_at:new Date().toISOString()}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        160
+      ],
+      "id": "8495fbb9-b3b7-40d0-9346-cd4b585f2226",
+      "name": "Match Outcome"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "premium_recommendations",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{$json.id}}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "outcome",
+              "fieldValue": "={{$json.outcome}}"
+            },
+            {
+              "fieldId": "outcome_at",
+              "fieldValue": "={{$json.outcome_at}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        160
+      ],
+      "id": "8eea1610-5f78-4f12-9066-c6ea920f386d",
+      "name": "MARK Followed",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Unified Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Unified Context": {
+      "main": [
+        [
+          {
+            "node": "Build Useful Insight",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET Recent Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Useful Insight": {
+      "main": [
+        [
+          {
+            "node": "SEND Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Recent Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Match Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Outcome": {
+      "main": [
+        [
+          {
+            "node": "MARK Followed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ae651dba-42f3-4f74-93cc-7d187e07f03c",
+  "meta": {},
+  "pinData": {},
+  "tags": []
+}

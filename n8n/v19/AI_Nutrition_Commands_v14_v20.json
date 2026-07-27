@@ -1,0 +1,2134 @@
+{
+  "id": "cmdNutriV14",
+  "name": "AI_Nutrition_Commands_v14_v20",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9c239272-0f7d-4805-86a1-aec1fb3c0482",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3ef2a15d-0291-45d0-a62f-82db6d11480d",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "help"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0fe8918a-0deb-4e6a-b043-edaba92eb7d2",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "today",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "today"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "639c807c-7279-4eb9-a93a-343f00a6388b",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "day",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "day"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "48ae3286-222b-476a-a5d9-cf06ee8dc82f",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "add"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8838207c-e0f4-49f7-87dc-6e4ad2b5c68a",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "delete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "55e8c1b1-d759-407e-a70f-e75adfdfb356",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "progress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "progress"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "89d2140b-e891-47fb-bf8d-fa7b1ea2a954",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "profile",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "profile"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "10b1af80-aba1-41f1-ade2-9cfb61bb44a5",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "weight",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "weight"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "75d8f28f-dc6d-4141-8b9c-cf0873259baf",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "summary",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "summary"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b2c1178b-65c2-40fd-af04-2649182fe3ed",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "history",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "history"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1d0ca32a-ca5a-41f2-a778-f1a9f7e78d92",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "subscription",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "subscription"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "040947eb-aebc-42d9-bd8e-fc1e21ca6ae0",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "settings",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "settings"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0228ae39-dd0e-460c-84e2-fc7b7a8c92ed",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "support"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3fd0d403-9fbb-4cc5-88e3-6fed0a9ccd08",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "cancel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "15711901-7aa9-4415-848d-2dd214fcaa01",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "recommend",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "recommend"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c53e21d-b78a-4bd6-8971-c3a5c0f72638",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "plan",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "plan"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "50194560-6607-48de-b6c0-f605175e09c7",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "shop",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "shop"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f7288868-178d-42e3-95d9-4292d3056e4d",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "restaurant",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "restaurant"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "904dbb68-1929-44f7-b608-9b210f9d16f9",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "quick",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "quick"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7ab44bdf-0dbc-450f-b4fa-7aae050ee4ec",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "sweet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "sweet"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9a3493c8-d7a4-46ef-964f-feeb9985ef1e",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "training",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "training"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3aa061dc-6f15-4080-a1c7-f456573d5456",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "overate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "overate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7fcf960f-23be-4477-bafc-be7d105d4fc5",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "bedtime",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "bedtime"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d64abd53-b377-4766-86d0-83c21f8b6b1e",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "can",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "can"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cddce172-24bf-463c-b9fb-e8a3c9207dcc",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "why",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "why"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ab5d2452-197d-4220-9dd9-339ddfc230a9",
+                    "leftValue": "={{$json.command}}",
+                    "rightValue": "checkin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "checkin"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2840,
+        3660
+      ],
+      "id": "5aeaf456-e262-4bee-a27e-a77d3a9a8c9c",
+      "name": "Command Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*TeddY — помощь*\n\n📸 Пришли фото еды или используй `/v`.\n📋 `/day` — внести весь день.\n\n*Основное*\n/today — текущий день\n/summary — итог дня\n/progress — прогресс\n/history — история\n/profile — профиль\n/support — поддержка\n\n*Premium Coach*\n/recommend — что съесть дальше\n/plan — собрать сегодняшний рацион\n/shop — что купить в магазине\n/restaurant — что выбрать в ресторане\n/quick — нет времени готовить\n/sweet — хочу сладкое\n/training — сегодня тренировка\n/overate — сегодня переел\n/bedtime — что съесть перед сном\n/can продукт — можно ли это сегодня\n/why — почему TeddY дал последний совет\n/checkin — недельное самочувствие\n\nPremium использует твой профиль, сегодняшний рацион, динамику веса и Food Memory.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        },
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📊 Сегодня",
+                    "additionalFields": {
+                      "callback_data": "menu_today"
+                    }
+                  },
+                  {
+                    "text": "➕ Добавить",
+                    "additionalFields": {
+                      "callback_data": "menu_add"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📈 Прогресс",
+                    "additionalFields": {
+                      "callback_data": "menu_progress"
+                    }
+                  },
+                  {
+                    "text": "✨ Что съесть",
+                    "additionalFields": {
+                      "callback_data": "menu_recommend"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "👤 Профиль",
+                    "additionalFields": {
+                      "callback_data": "menu_profile"
+                    }
+                  },
+                  {
+                    "text": "💬 Поддержка",
+                    "additionalFields": {
+                      "callback_data": "menu_support"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2600,
+        3300
+      ],
+      "id": "8401b0a8-968d-420b-9c5b-29d7c0a62ba0",
+      "name": "CMD help",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*Добавить питание*\n\n📸 Просто пришли фотографию еды.\nЕсли знаешь название, бренд, ресторан или вес — напиши это в подписи: бот использует подпись как важную подсказку.\n\n✍️ Вручную:\n`/v Чикенбургер SPAR 145 г`\n\nНесколько продуктов:\n`/v`\n`творог 200 г`\n`банан`\n`кофе`\n\n📋 Весь день одним сообщением — `/day`.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2600,
+        3380
+      ],
+      "id": "d4532823-56fd-426b-9dc6-273f9df50a9e",
+      "name": "CMD add",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*Удаление питания*\n\nНапиши обычным сообщением:\n\n`удали последний приём`\n`удали 2 последних приёма`\n`удали второй приём`\n`удали приём в 14:30`\n`удали питание за сегодня`\n`удали питание за вчера`\n\nПосле удаления данные должны сразу исчезнуть и из бота, и с платформы.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2600,
+        3460
+      ],
+      "id": "be48b4eb-185c-4104-b3da-9cc169840ca2",
+      "name": "CMD delete",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*Вес*\n\nОсновной способ вести вес — через раздел «Прогресс» на платформе: там видны история и динамика.\n\nБыстрый ввод через Telegram пока сохранён:\n`вес 69.4`\n\nКоманда /weight скрыта из основного меню, чтобы не перегружать интерфейс.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2600,
+        3540
+      ],
+      "id": "4d6a454c-9886-482d-8e05-ef733846f2a4",
+      "name": "CMD weight",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*Настройки*\n\nЦель, нормы КБЖУ, параметры профиля и другие основные настройки лучше менять на платформе — это единый источник данных для сайта и бота.\n\nИспользуй раздел «Профиль / Настройки» в личном кабинете.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2600,
+        3620
+      ],
+      "id": "2115bcab-aa82-4cd2-bcb8-694f381e5eaa",
+      "name": "CMD settings",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*Поддержка*\n\nОпиши проблему одним следующим сообщением.\n\nЕсли режим поддержки подключён в основном workflow, сообщение появится у администратора в разделе «Диалоги».\n\nДля выхода — /cancel.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2600,
+        3700
+      ],
+      "id": "c822c451-6d1d-41a4-ba76-ab5a903ff5da",
+      "name": "CMD support",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "Действие отменено. Можно продолжать пользоваться ботом.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2600,
+        3780
+      ],
+      "id": "a60043a5-805c-41de-aa52-657062433ae4",
+      "name": "CMD cancel",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2140,
+        3940
+      ],
+      "id": "fa7df40d-5424-4bbf-8316-ce0841b80a71",
+      "name": "CMD data reply",
+      "webhookId": "ce8565f7-fca8-4e4e-b9ba-109e833298a3",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3050,
+        3900
+      ],
+      "id": "5ac07159-e4bb-4cbd-bd85-848887b8a398",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "meals",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "deleted",
+              "condition": "eq",
+              "keyValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2500,
+        3480
+      ],
+      "id": "8e66c579-daa1-4682-8549-af9a0a6c269f",
+      "name": "CMD TODAY exact DB",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx=$items('When Executed by Another Workflow')[0].json;\nconst tz='Europe/Moscow';\nconst today=new Intl.DateTimeFormat('sv-SE',{timeZone:tz}).format(new Date());\n\n// IMPORTANT: this formatter receives router data. Read meal rows from the DB node explicitly.\nconst all=$items('CMD TODAY exact DB')\n  .map(i=>i.json)\n  .filter(r=>r&&r.id&&r.deleted!==true);\nconst rows=all.filter(r=>String(r.eaten_day||'').slice(0,10)===today);\n\nconst n=v=>Number(v||0), r0=v=>Math.round(n(v)), r1=v=>Math.round(n(v)*10)/10;\nconst tm=v=>new Intl.DateTimeFormat('ru-RU',{timeZone:tz,hour:'2-digit',minute:'2-digit'}).format(new Date(v));\nconst clean=s=>String(s||'Еда').replace(/[*_`[\\]]/g,'').trim();\nconst sum=a=>a.reduce((s,x)=>(s.k+=n(x.kcal),s.p+=n(x.prot),s.f+=n(x.fat),s.c+=n(x.carb),s),{k:0,p:0,f:0,c:0});\n\nfunction sessions(a){\n const s=[...a].sort((x,y)=>new Date(x.eaten_at)-new Date(y.eaten_at)),out=[];\n for(const x of s){\n   const p=out.at(-1),t=+new Date(x.eaten_at);\n   if(p&&t-(+new Date(p.at))<=12*60*1000){p.rows.push(x);p.at=x.eaten_at}\n   else out.push({at:x.eaten_at,rows:[x]});\n }\n return out;\n}\nfunction names(a){\n const u=[...new Set(a.map(x=>clean(x.dish)).filter(Boolean))];\n return u.length>2?`${u.slice(0,2).join(', ')} +${u.length-2}`:u.join(', ');\n}\n\nconst T=sum(rows),S=sessions(rows);\nlet text=`📊 *Сегодня — текущий статус*\\n\\n🔥 *${r0(T.k)} ккал*\\n🥩 Б ${r1(T.p)} · 🥑 Ж ${r1(T.f)} · 🍚 У ${r1(T.c)}`;\ntext+=`\\n\\n🍽 *${S.length} ${S.length===1?'приём':S.length>=2&&S.length<=4?'приёма':'приёмов'}*`;\nif(S.length) text+='\\n'+S.slice(-6).map(s=>`${tm(s.at)} · ${names(s.rows)} · ${r0(sum(s.rows).k)} ккал`).join('\\n');\nelse text+='\\nПитание пока не добавлено.';\nreturn [{json:{chat_id:Number(ctx.chat_id),text}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2260,
+        3480
+      ],
+      "id": "ff013c63-f949-4732-b257-a7d094b4539f",
+      "name": "CMD TODAY hard date formatter"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "client_settings",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2520,
+        3740
+      ],
+      "id": "c37bc8f8-5fab-4ee1-a95b-af62814fae78",
+      "name": "CMD DB settings",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "profiles",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2520,
+        3820
+      ],
+      "id": "808f584f-be50-471a-9820-735d3a5d6288",
+      "name": "CMD DB profile",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "meals",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            },
+            {
+              "keyName": "deleted",
+              "condition": "eq",
+              "keyValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2520,
+        3900
+      ],
+      "id": "55b47c8d-a30a-4b85-abbd-72cf0dbc6ace",
+      "name": "CMD DB week meals",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "subscriptions",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "condition": "eq",
+              "keyValue": "={{$json.chat_id}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2520,
+        3980
+      ],
+      "id": "03f8b304-acf4-43d0-80e6-6c5a0cc0d2d3",
+      "name": "CMD DB subscription",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "pdSlU2y767Xdowom",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx=$items('When Executed by Another Workflow')[0].json;\nconst n=v=>Number(v||0), r0=v=>Math.round(n(v)), r1=v=>Math.round(n(v)*10)/10;\nconst clean=s=>String(s??'').replace(/[*_`[\\]]/g,'').trim();\nconst p=$items('CMD DB profile')[0]?.json||{};\nconst s=$items('CMD DB settings')[0]?.json||{};\nconst pt=n(s.protein_target_g||s.protein_target||s.prot_target);\nconst ft=n(s.fat_target_g||s.fat_target);\nconst ct=n(s.carb_target_g||s.carb_target);\nconst kt=n(s.kcal_target||s.target_kcal||s.calories_target);\nconst cw=n(s.current_weight_kg||p.current_weight_kg), tw=n(s.target_weight_kg||p.target_weight_kg);\n\nlet text=`👤 *${clean(p.first_name||'Профиль')}*`;\nif(p.username) text+=`\\n@${clean(p.username)}`;\ntext+=`\\n\\n🎯 ${clean(s.goal||'Цель не указана')}`;\nif(cw||tw){\n  text+='\\n';\n  if(cw) text+=`\\n⚖️ ${r1(cw)} кг`;\n  if(tw) text+=` → ${r1(tw)} кг`;\n}\nif(s.height_cm) text+=`\\n📏 ${r1(s.height_cm)} см`;\n\nif(kt||pt||ft||ct){\n  text+='\\n\\n*Дневная цель*';\n  if(kt) text+=`\\n🔥 ${r0(kt)} ккал`;\n  const macros=[];\n  if(pt) macros.push(`Б ${r1(pt)} г`);\n  if(ft) macros.push(`Ж ${r1(ft)} г`);\n  if(ct) macros.push(`У ${r1(ct)} г`);\n  if(macros.length) text+=`\\n🥩 ${macros.join(' · ')}`;\n}\ntext+='\\n\\nПрофиль и цели редактируются на платформе.';\nreturn [{json:{chat_id:Number(ctx.chat_id),text}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1880,
+        3780
+      ],
+      "id": "dca98024-94e2-44d6-87ab-e8206cea5b4f",
+      "name": "CMD DB profile reply"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx=$items('When Executed by Another Workflow')[0].json;\nconst n=v=>Number(v||0), r0=v=>Math.round(n(v)), r1=v=>Math.round(n(v)*10)/10;\nconst tz='Europe/Moscow';\nconst sum=a=>a.reduce((s,x)=>(s.k+=n(x.kcal),s.p+=n(x.prot),s.f+=n(x.fat),s.c+=n(x.carb),s),{k:0,p:0,f:0,c:0});\nconst all=$items('CMD DB week meals').map(i=>i.json).filter(r=>r&&r.id&&r.deleted!==true);\nconst days=[];\nfor(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);days.push(new Intl.DateTimeFormat('sv-SE',{timeZone:tz}).format(d));}\nconst rows=all.filter(r=>days.includes(String(r.eaten_day||'').slice(0,10)));\nconst by={}; for(const r of rows)(by[String(r.eaten_day).slice(0,10)]??=[]).push(r);\nfunction sessions(a){const s=[...a].sort((x,y)=>new Date(x.eaten_at)-new Date(y.eaten_at)),o=[];for(const x of s){const p=o.at(-1),t=+new Date(x.eaten_at);if(p&&t-(+new Date(p.at))<=720000){p.rows.push(x);p.at=x.eaten_at}else o.push({at:x.eaten_at,rows:[x]})}return o}\nconst active=Object.keys(by).length, T=sum(rows), meals=Object.values(by).reduce((a,rs)=>a+sessions(rs).length,0);\nlet text='';\nif(ctx.command==='progress'){\n  text=`📈 *Последние 7 дней*\\n\\nЗаполнено: *${active} из 7 дней*\\nСреднее: *${active?r0(T.k/active):0} ккал/день*\\n🥩 Белок: *${active?r1(T.p/active):0} г/день*\\n🍽 Приёмов: *${meals}*`;\n  if(active<4) text+='\\n\\nДля более точной динамики стоит заполнить ещё несколько дней.';\n}else{\n  const listed=days.filter(d=>by[d]).slice(0,3);\n  text='📅 *История*\\n\\n'+(listed.length?listed.map(d=>{\n    const dt=new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long'}).format(new Date(d+'T12:00:00'));\n    return `${dt}\\n${r0(sum(by[d]).k)} ккал · ${sessions(by[d]).length} приём.`;\n  }).join('\\n\\n'):'Записей пока нет.');\n  if(Object.keys(by).length>3) text+='\\n\\nПолная история доступна на платформе.';\n}\nreturn [{json:{chat_id:Number(ctx.chat_id),text}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1880,
+        3900
+      ],
+      "id": "e268971a-c2b7-4e35-a6e1-30993d139795",
+      "name": "CMD DB week reply"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx=$items('When Executed by Another Workflow')[0].json;\nconst clean=s=>String(s??'').replace(/[*_`[\\]]/g,'').trim();\nconst rows=$items('CMD DB subscription').map(i=>i.json).filter(Boolean);\nconst x=rows.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0]||{};\nconst plan=String(x.plan||'').toLowerCase(), status=String(x.status||'').toLowerCase();\nlet text='💎 *Подписка*\\n\\n';\nif(!x.plan&&!x.status){\n  text+='Тариф: *без подписки*\\n\\n*Basic*\\n✓ распознавание еды\\n✓ КБЖУ и дневник\\n✓ базовый прогресс\\n\\n*Premium*\\n✦ персональные рекомендации\\n✦ расширенная аналитика\\n✦ умные сводки и подсказки';\n}else{\n  const pn=plan==='premium'?'Premium':plan==='basic'?'Basic':clean(x.plan||'Не выбран');\n  text+=`Тариф: *${pn}*\\nСтатус: *${status==='active'?'активен':clean(x.status||'—')}*`;\n  const until=x.current_period_end||x.ends_at||x.expires_at;\n  if(until) text+=`\\nДо: ${new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'long',year:'numeric'}).format(new Date(until))}`;\n  text+= plan==='premium'\n    ? '\\n\\n✓ трекер питания\\n✓ расширенный прогресс\\n✓ персональные рекомендации\\n✓ AI-сводки'\n    : '\\n\\n✓ трекер питания\\n✓ КБЖУ\\n✓ базовый прогресс\\n\\nPremium добавляет персональные рекомендации и расширенную аналитику.';\n}\nreturn [{json:{chat_id:Number(ctx.chat_id),text}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1880,
+        3980
+      ],
+      "id": "63e1b1d3-ec36-40ba-b7c8-ccc594f3567b",
+      "name": "CMD DB subscription reply"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx=$items('When Executed by Another Workflow')[0].json;\nconst n=v=>Number(v||0),r0=v=>Math.round(n(v)),r1=v=>Math.round(n(v)*10)/10;\nconst tz='Europe/Moscow',today=new Intl.DateTimeFormat('sv-SE',{timeZone:tz}).format(new Date());\nconst rows=$items('CMD TODAY exact DB').map(i=>i.json)\n .filter(r=>r&&r.id&&r.deleted!==true&&String(r.eaten_day||'').slice(0,10)===today);\nconst s=$items('CMD DB settings')[0]?.json||{};\nconst sum=a=>a.reduce((x,r)=>(x.k+=n(r.kcal),x.p+=n(r.prot),x.f+=n(r.fat),x.c+=n(r.carb),x),{k:0,p:0,f:0,c:0});\nconst T=sum(rows),kt=n(s.kcal_target),pt=n(s.protein_target),ft=n(s.fat_target),ct=n(s.carb_target);\nconst pct=(v,t)=>t?Math.round(v/t*100):0;\n\nlet text=`🌙 *Итоги дня*\\n\\n🔥 ${r0(T.k)}${kt?` / ${r0(kt)} ккал · ${pct(T.k,kt)}%`:' ккал'}\\n🥩 Б ${r1(T.p)}${pt?` / ${r1(pt)} г · ${pct(T.p,pt)}%`:''}\\n🥑 Ж ${r1(T.f)}${ft?` / ${r1(ft)} г · ${pct(T.f,ft)}%`:''}\\n🍚 У ${r1(T.c)}${ct?` / ${r1(ct)} г · ${pct(T.c,ct)}%`:''}`;\n\nconst notes=[];\nif(!rows.length) notes.push('Сегодня пока нет записей питания.');\nif(kt&&rows.length){\n const d=T.k-kt;\n if(Math.abs(d)<=kt*.08)notes.push('✅ Калорийность близка к дневной цели.');\n else if(d>0)notes.push(`⚠️ Выше цели примерно на ${r0(d)} ккал.`);\n else notes.push(`До дневной цели не добрали примерно ${r0(-d)} ккал.`);\n}\nif(pt&&rows.length){\n const d=pt-T.p;\n if(d<=0)notes.push('✅ Белок закрыт.');\n else if(d<=15)notes.push(`Белок почти закрыт — осталось около ${r0(d)} г.`);\n else notes.push(`🥩 Белка недобрано около ${r0(d)} г.`);\n}\nif(ft&&T.f>ft*1.15)notes.push('Жиры заметно выше целевого уровня.');\nif(notes.length)text+='\\n\\n*Оценка*\\n'+notes.slice(0,4).map(x=>'• '+x).join('\\n');\n\nreturn [{json:{chat_id:Number(ctx.chat_id),text}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1880,
+        3700
+      ],
+      "id": "6f215c90-4ace-4301-8449-591ff06ce7f4",
+      "name": "CMD DB today summary recommend"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2120,
+        3780
+      ],
+      "id": "d0ab8129-bb0d-4689-81a9-d4c9331ddc01",
+      "name": "CMD merge profile direct"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2120,
+        3700
+      ],
+      "id": "245f453e-ce37-4efc-822f-66072ed40726",
+      "name": "CMD merge today direct"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{cmd:$items('When Executed by Another Workflow')[0].json.command}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2300,
+        3540
+      ],
+      "id": "57dfaf19-71f6-4133-85a2-cb2570b96f77",
+      "name": "CMD today direct router"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a265e047-e92f-4255-8c83-65872776eaf6",
+              "leftValue": "={{$json.cmd}}",
+              "rightValue": "today",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2140,
+        3500
+      ],
+      "id": "e8006af3-3f49-495c-afc5-5e1b70b9c2d9",
+      "name": "CMD direct is today"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5c93f0d1-ebcf-4c1c-847d-2c33e157fea4",
+              "leftValue": "={{$json.cmd}}",
+              "rightValue": "summary",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1980,
+        3580
+      ],
+      "id": "5569b899-a0a1-4886-9b52-bcd1daf9f62c",
+      "name": "CMD direct is summary"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{cmd:$items('When Executed by Another Workflow')[0].json.command}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2320,
+        3740
+      ],
+      "id": "e7460909-e80f-44d7-9e5a-78ddb9f513d3",
+      "name": "CMD DB settings router"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1d716fec-47e3-4f39-9b59-fc2b2faabb19",
+              "leftValue": "={{$json.cmd}}",
+              "rightValue": "profile",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2160,
+        3740
+      ],
+      "id": "e076bd6a-55ab-4cd8-a7ad-6dcd8cfb1b2f",
+      "name": "CMD DB settings is profile"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*TeddY, твой диетолог*\n\nЯ помогаю быстро вести питание без ручных таблиц.\n\n📸 Пришли фото еды — распознаю блюдо и КБЖУ.\n✍️ Знаешь точнее? Добавь подпись или используй `/v`.\n📋 Хочешь внести весь день сразу? Используй `/day`.\n\nГлавное:\n/today — сегодня\n/progress — прогресс\n/recommend — что съесть дальше\n/profile — профиль\n/help — все возможности",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        },
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📊 Сегодня",
+                    "additionalFields": {
+                      "callback_data": "menu_today"
+                    }
+                  },
+                  {
+                    "text": "➕ Добавить",
+                    "additionalFields": {
+                      "callback_data": "menu_add"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "📈 Прогресс",
+                    "additionalFields": {
+                      "callback_data": "menu_progress"
+                    }
+                  },
+                  {
+                    "text": "✨ Что съесть",
+                    "additionalFields": {
+                      "callback_data": "menu_recommend"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "👤 Профиль",
+                    "additionalFields": {
+                      "callback_data": "menu_profile"
+                    }
+                  },
+                  {
+                    "text": "💬 Поддержка",
+                    "additionalFields": {
+                      "callback_data": "menu_support"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "id": "481b8d98-4d31-4f06-9004-98138490bd88",
+      "name": "CMD start",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -150,
+        -760
+      ],
+      "webhookId": "7d514048-5a65-4a29-824d-47669ff84edb",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id || $json.message?.chat?.id}}",
+        "text": "*Внести весь день*\n\nПосле `/day` отправь одним сообщением питание за день.\n\nУдобный формат:\n\n`Утро`\n`Омлет 2 яйца`\n`Хлеб 60 г`\n`Кофе`\n\n`День`\n`Курица с рисом`\n`Салат`\n\n`Вечер`\n`Творог 200 г`\n`Банан`\n\nВес можно не указывать — если его нет, бот оценит порцию.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "9d3440bc-da40-41ef-82bf-144fbfe946b8",
+      "name": "CMD day",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -150,
+        -560
+      ],
+      "webhookId": "5f40112e-3a65-444f-a92a-c45395be8613",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx=$items('When Executed by Another Workflow')[0].json;\nconst tz='Europe/Moscow';\nconst today=new Intl.DateTimeFormat('sv-SE',{timeZone:tz}).format(new Date());\nconst rows=$items('CMD TODAY exact DB').map(i=>i.json)\n .filter(r=>r&&r.id&&r.deleted!==true&&String(r.eaten_day||'').slice(0,10)===today);\nconst st=$items('CMD DB settings')[0]?.json||{};\nconst p=$items('CMD DB profile')[0]?.json||{};\n\nconst n=v=>Number(v||0),r=v=>Math.round(n(v)*10)/10;\nconst sum=rows.reduce((s,x)=>(s.k+=n(x.kcal),s.p+=n(x.prot),s.f+=n(x.fat),s.c+=n(x.carb),s),{k:0,p:0,f:0,c:0});\nconst kt=n(st.kcal_target),pt=n(st.protein_target),ft=n(st.fat_target),ct=n(st.carb_target);\n\nfunction age(v){\n if(!v)return null;\n const b=new Date(v),now=new Date();\n if(Number.isNaN(b.getTime()))return null;\n let a=now.getFullYear()-b.getFullYear();\n const m=now.getMonth()-b.getMonth();\n if(m<0||(m===0&&now.getDate()<b.getDate()))a--;\n return a>0&&a<120?a:null;\n}\n\nconst payload={\n client_profile:{\n   first_name:String(p.first_name||''),\n   sex:String(st.sex||''),\n   age:age(st.birth_date),\n   height_cm:n(st.height_cm)||null,\n   current_weight_kg:n(st.current_weight_kg)||null,\n   target_weight_kg:n(st.target_weight_kg)||null,\n   goal:String(st.goal||'не указана'),\n   timezone:String(st.timezone||tz)\n },\n targets:{\n   kcal:kt||null,\n   protein_g:pt||null,\n   fat_g:ft||null,\n   carbs_g:ct||null\n },\n today:{\n   time:new Intl.DateTimeFormat('ru-RU',{timeZone:tz,hour:'2-digit',minute:'2-digit'}).format(new Date()),\n   eaten:{kcal:r(sum.k),protein_g:r(sum.p),fat_g:r(sum.f),carbs_g:r(sum.c)},\n   remaining:{\n     kcal:kt?Math.max(0,r(kt-sum.k)):null,\n     protein_g:pt?Math.max(0,r(pt-sum.p)):null,\n     fat_g:ft?Math.max(0,r(ft-sum.f)):null,\n     carbs_g:ct?Math.max(0,r(ct-sum.c)):null\n   },\n   exceeded:{\n     kcal:kt?Math.max(0,r(sum.k-kt)):0,\n     protein_g:pt?Math.max(0,r(sum.p-pt)):0,\n     fat_g:ft?Math.max(0,r(sum.f-ft)):0,\n     carbs_g:ct?Math.max(0,r(sum.c-ct)):0\n   },\n   foods:rows.slice(-12).map(x=>({\n     dish:String(x.dish||''),grams:n(x.grams)||null,kcal:r(x.kcal),\n     protein_g:r(x.prot),fat_g:r(x.fat),carbs_g:r(x.carb)\n   }))\n }\n};\nreturn [{json:{chat_id:Number(ctx.chat_id),prompt_data:JSON.stringify(payload,null,2)}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1700,
+        3660
+      ],
+      "id": "f8cf7ddc-efba-4ca9-a1a6-db60f25460e5",
+      "name": "CMD Recommend prompt"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "OPENAI/GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Ты — профессиональный нутрициолог сервиса TeddY.\n\nСформируй короткую, конкретную и персональную рекомендацию следующего приёма пищи.\n\nИспользуй ВСЮ доступную информацию профиля: пол, возраст, рост, текущий вес, целевой вес, цель питания и дневные КБЖУ. Используй её именно для принятия решения, а не для бессмысленного пересказа анкеты.\n\nТакже учитывай:\n- фактически съеденное сегодня;\n- остаток и превышение КБЖУ;\n- уже съеденные продукты;\n- текущее время суток.\n\nПравила:\n1. Не придумывай отсутствующие данные, болезни, аллергии или предпочтения.\n2. Не меняй цифры из входа.\n3. При наборе массы оценивай, достаточно ли плотный рацион и нужен ли полноценный приём.\n4. При снижении веса не советуй механически «добивать калории».\n5. При поддержании стремись к разумному попаданию в дневные цели.\n6. Белок — важный ориентир, но не единственный: учитывай жиры, углеводы и общую калорийность.\n7. Если дневная цель уже превышена, предложи лёгкий вариант только при голоде.\n8. Дай 2–3 конкретных варианта еды с примерными порциями. Не высчитывай псевдоточность до грамма, если это не следует из входа.\n9. Не назначай лекарства, БАДы или лечебные диеты.\n10. Ответ до ~900 символов, профессиональный и спокойный.\n\nФормат:\n\n🍽 Что съесть дальше\n\n1–2 предложения персональной оценки.\n\n🎯 Сейчас приоритет:\n• ...\n• ...\n\nПодойдут:\n1. ...\n2. ...\n3. ...\n\nВ конце — одна короткая практическая подсказка."
+            },
+            {
+              "role": "user",
+              "content": "={{$json.prompt_data}}"
+            }
+          ]
+        },
+        "jsonOutput": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1500,
+        3660
+      ],
+      "id": "1464446d-0b7a-4653-94fe-166c3f1ba7d0",
+      "name": "CMD Professional Nutritionist",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 500,
+      "credentials": {
+        "openAiApi": {
+          "id": "gQAneJwyj5J76uTe",
+          "name": "OpenRoute"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst ctx=$items('When Executed by Another Workflow')[0].json;\nconst j=$json||{};\nlet text='';\n\nconst candidates=[\n  j.output_text,\n  j.output,\n  j.text,\n  j.content,\n  j.message?.content,\n  j.choices?.[0]?.message?.content,\n  j.response?.output_text\n];\nfor(const x of candidates){\n  if(typeof x==='string'&&x.trim()){text=x.trim();break}\n  if(Array.isArray(x)){\n    const s=x.map(v=>typeof v==='string'?v:(v?.text||v?.content||'')).filter(Boolean).join('\\n').trim();\n    if(s){text=s;break}\n  }\n}\nif(!text){\n  text='🍽 *Что съесть дальше*\\n\\nНе удалось сформировать персональную рекомендацию. Попробуй ещё раз через несколько секунд.';\n}\nreturn [{json:{chat_id:Number(ctx.chat_id),text}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        3660
+      ],
+      "id": "22bbe6a4-8e89-4ce9-b54e-97883b2c5244",
+      "name": "CMD Recommend AI reply"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1900,
+        3660
+      ],
+      "id": "37c81fbb-495b-4825-8a59-045d2d356bc3",
+      "name": "CMD Recommend merge profile"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "86030afd-2f0e-484e-8930-b2ee0c7c69b9",
+              "leftValue": "={{$json.cmd}}",
+              "rightValue": "recommend",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2040,
+        3740
+      ],
+      "id": "8ed36a81-1ed5-418b-9fef-b49eada728ca",
+      "name": "CMD DB settings is recommend"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "premiumCoachV5",
+          "mode": "list",
+          "cachedResultName": "AI_Nutrition_Premium_Coach_v5_Smooth"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -2300,
+        4300
+      ],
+      "id": "b2548519-03c4-4a47-ad55-7ce2e6132f6c",
+      "name": "Run Premium Coach"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chat_id}}",
+        "text": "=🧭 *Недельный check-in*\n\nTeddY учитывает не только КБЖУ, но и голод, энергию и то, насколько легко соблюдать питание.\n\nОткрой на платформе раздел *TeddY Coach* и заполни короткий check-in — 3 ответа займут меньше минуты.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1900,
+        4700
+      ],
+      "id": "24f29c8c-16af-45f6-af6d-551e77bd5f84",
+      "name": "CMD checkin",
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Command Switch": {
+      "main": [
+        [
+          {
+            "node": "CMD start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD help",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD TODAY exact DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD day",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD add",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD delete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD DB week meals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD DB settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD weight",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD TODAY exact DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD DB week meals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD DB subscription",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD cancel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Premium Coach",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD checkin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Command Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD TODAY exact DB": {
+      "main": [
+        [
+          {
+            "node": "CMD today direct router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD today direct router": {
+      "main": [
+        [
+          {
+            "node": "CMD direct is today",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD direct is today": {
+      "main": [
+        [
+          {
+            "node": "CMD TODAY hard date formatter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD direct is summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD direct is summary": {
+      "main": [
+        [
+          {
+            "node": "CMD DB settings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CMD merge today direct",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD DB settings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CMD DB profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB settings": {
+      "main": [
+        [
+          {
+            "node": "CMD DB settings router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB settings router": {
+      "main": [
+        [
+          {
+            "node": "CMD DB settings is profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB settings is profile": {
+      "main": [
+        [
+          {
+            "node": "CMD DB profile",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CMD merge profile direct",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD DB settings is recommend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB profile": {
+      "main": [
+        [
+          {
+            "node": "CMD merge profile direct",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "CMD Recommend merge profile",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "CMD merge profile direct": {
+      "main": [
+        [
+          {
+            "node": "CMD DB profile reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD merge today direct": {
+      "main": [
+        [
+          {
+            "node": "CMD DB today summary recommend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB week meals": {
+      "main": [
+        [
+          {
+            "node": "CMD DB week reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB subscription": {
+      "main": [
+        [
+          {
+            "node": "CMD DB subscription reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB profile reply": {
+      "main": [
+        [
+          {
+            "node": "CMD data reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB week reply": {
+      "main": [
+        [
+          {
+            "node": "CMD data reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB subscription reply": {
+      "main": [
+        [
+          {
+            "node": "CMD data reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB today summary recommend": {
+      "main": [
+        [
+          {
+            "node": "CMD data reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD TODAY hard date formatter": {
+      "main": [
+        [
+          {
+            "node": "CMD data reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD DB settings is recommend": {
+      "main": [
+        [
+          {
+            "node": "CMD Recommend merge profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD merge today direct",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "CMD Recommend merge profile": {
+      "main": [
+        [
+          {
+            "node": "CMD Recommend prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD Recommend prompt": {
+      "main": [
+        [
+          {
+            "node": "CMD Professional Nutritionist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD Professional Nutritionist": {
+      "main": [
+        [
+          {
+            "node": "CMD Recommend AI reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CMD Recommend AI reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CMD Recommend AI reply": {
+      "main": [
+        [
+          {
+            "node": "CMD data reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Premium Coach": {
+      "main": [
+        []
+      ]
+    },
+    "CMD checkin": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "529f1ae8-d0eb-4740-b3c8-780779f7da39",
+  "meta": {
+    "instanceId": "169ae9c79d7aed5aceb64b989c1fc46ab74a2feb20b117eefd579dec340f104b"
+  },
+  "tags": []
+}

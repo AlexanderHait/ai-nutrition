@@ -26,6 +26,7 @@ export default async function Page(){
   const delta=latest&&previous?Number(latest.weight_kg)-Number(previous.weight_kg):null;
   const max=Math.max(target,1,...days.map(x=>x.total.kcal));
   const latestData=d.meals?.[0]?.eaten_at||d.weights?.[0]?.measured_at;
+  const premium=d.subscription?.status==="active"&&d.subscription?.plan==="premium"&&(!d.subscription?.ends_at||new Date(d.subscription.ends_at)>new Date());
 
   return <>
     <div className="pageHead"><div><p>Динамика</p><h1>Прогресс</h1><span>Главное за неделю и тренды за 14 дней.</span></div></div>
@@ -59,8 +60,8 @@ export default async function Page(){
       </section>
     </div>
 
-    <section className="card top">
-      <div className="sectionTitleRow"><div><h2>Дневные AI‑отчёты</h2><span className="muted">Рекомендации на основе сохранённого питания</span></div><Sparkles size={19}/></div>
+    {premium?<section className="card top">
+      <div className="sectionTitleRow"><div><h2>Premium AI‑отчёты</h2><span className="muted">Разбор сохранённого питания и динамики</span></div><Sparkles size={19}/></div>
       <div className="digestTimeline">
         {d.digests.slice(0,10).map((x:any)=><details className="digestItem modern" key={x.id}>
           <summary><div><b>{new Date(x.for_date+"T12:00:00").toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}</b><small>{fmt(x.kcal)} ккал</small></div><span>Открыть</span></summary>
@@ -68,7 +69,7 @@ export default async function Page(){
         </details>)}
       </div>
       {!d.digests.length&&<div className="clientEmptyNice compact"><Sparkles/><b>Отчётов пока нет</b><span>Они появятся после накопления данных.</span></div>}
-    </section>
+    </section>:<Link href="/client/plan" className="premiumProgressTeaser"><Sparkles/><span><b>Premium анализирует не только цифры</b><small>Недельная стратегия, динамика веса, персональные рекомендации и корректировка целей.</small></span><strong>Узнать больше →</strong></Link>}
   </>;
 }
 function Metric({icon,label,value,sub}:{icon:React.ReactNode;label:string;value:string;sub:string}){return <div className="clientMetricCard"><i>{icon}</i><span><small>{label}</small><b>{value}</b><em>{sub}</em></span></div>}
