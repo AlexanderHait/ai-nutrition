@@ -6,7 +6,13 @@ import {SupportMessageBody} from '@/components/support/SupportMessageBody';
 export default function SupportThread({messages,role}:{messages:SupportMessage[];role:'client'|'admin'}){
  const box=useRef<HTMLDivElement>(null),router=useRouter();
  useEffect(()=>{requestAnimationFrame(()=>{if(box.current)box.current.scrollTop=box.current.scrollHeight})},[messages.length]);
- useEffect(()=>{const t=window.setInterval(()=>router.refresh(),5000);return()=>clearInterval(t)},[router]);
+ useEffect(()=>{
+    const refresh=()=>{ if(document.visibilityState==='visible') router.refresh(); };
+    const t=window.setInterval(refresh,12000);
+    const onVisibility=()=>{ if(document.visibilityState==='visible') router.refresh(); };
+    document.addEventListener('visibilitychange',onVisibility);
+    return()=>{ clearInterval(t); document.removeEventListener('visibilitychange',onVisibility); };
+  },[router]);
  return <div className="supportMessages" ref={box}>
  {messages.length===0&&<div className="supportEmpty"><b>Диалог пока пуст</b><span>{role==='client'?'Напиши вопрос или оставь обратную связь — здесь ответит человек.':'Клиент ещё ничего не писал через сайт.'}</span></div>}
  {messages.map(m=>{const own=m.sender===role;return <article className={`supportBubble ${own?'own':'other'}`} key={m.id}>
