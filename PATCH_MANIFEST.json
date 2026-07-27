@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "purpose": "TeddY support dialogs image attachments",
+  "supabase_bucket": "support-media",
+  "database_table": "support_messages",
+  "required_fields": [
+    "attachment_path",
+    "attachment_mime",
+    "attachment_name",
+    "attachment_size"
+  ],
+  "files": [
+    "README_INTEGRATION.md",
+    "lib/support-types.ts",
+    "components/support/SupportAttachment.tsx",
+    "components/support/DialogThreadExample.tsx",
+    "components/support/SupportMessageBody.tsx",
+    "components/support/SupportComposer.tsx",
+    "app/api/support/send/route.ts",
+    "app/api/support/media/signed-url/route.ts"
+  ]
+}
