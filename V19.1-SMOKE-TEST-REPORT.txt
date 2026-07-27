@@ -1,0 +1,31 @@
+V19.1 pre-deploy smoke/static test
+
+TESTED
+PASS ZIP integrity.
+PASS JSON parsing for release workflows.
+PASS Workflow graph targets/sources.
+PASS No embedded Telegram token/JWT in release workflows.
+PASS Exactly one public Telegram Trigger after cleanup.
+PASS Current included subworkflow references resolve.
+PASS Legacy tx_text_synced/digest_synced moved outside deploy n8n tree.
+PASS Callback text fallback now points to tx_text_v28, not obsolete tx_text_v19.
+PASS SQL migrations include Reliability tables/RPCs.
+PASS Website source references expected schema tables/functions.
+
+FOUND AND FIXED DURING THIS RUN
+1. tg_callbacks_v17 node "tg_text" still referenced obsolete external workflow pQqRGrL3nIYwsXvN / tx_text_v19_food_cache.
+   FIX: now references txTextV28 included in release.
+2. n8n/tx_text_synced.json still contained a second Telegram Trigger.
+   Even if intended as legacy, importing/activating it could recreate double-ingress bugs.
+   FIX: legacy exports moved to legacy-reference/, outside deploy workflow directory.
+3. audit-workflows only needed stronger release invariants.
+   FIX: recursive audit now verifies included subworkflow IDs and exactly one Telegram Trigger.
+
+NOT POSSIBLE OFFLINE
+- Actual Telegram API delivery/webhook registration.
+- Actual n8n execution against your cloud credentials.
+- Supabase RPC execution against production database before migrations are installed.
+- OpenRouter/OpenAI live latency/failure behavior.
+- Vercel production build without installing dependencies/network.
+
+Therefore this is a strong pre-deploy test, not a claim that live integrations have executed.

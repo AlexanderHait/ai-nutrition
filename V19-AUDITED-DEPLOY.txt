@@ -1,0 +1,31 @@
+TeddY V19 audited release
+
+Use V19 directly. Do NOT deploy V18 first: V19 contains V18 migrations/features plus fixes.
+
+Order:
+1) Back up/export current Supabase schema and active n8n workflows.
+2) Apply migrations that are not yet installed in numeric order. For Premium specifically: 008_premium_coach.sql, then 009_intelligence_layer.sql.
+3) Import/publish n8n/v19/AI_Nutrition_Context_Engine_v19.json first.
+4) Import/publish Coach v2, PostMeal v2, Context Refresh, Morning v2, Nudges v2, Weekly v2.
+5) Import/publish Commands v12, then tx_text_v27, then callbacks v16.
+6) Deploy this website.
+7) Disable V18 Premium schedules/workflows after V19 smoke test to avoid duplicate notifications.
+
+Required Vercel env:
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+SESSION_SECRET (required; no fallback)
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CLIENT_ID
+TELEGRAM_CLIENT_SECRET
+NEXT_PUBLIC_SITE_URL
+BOT_INGEST_SECRET
+CRON_SECRET (required for cron route)
+
+Smoke test before enabling schedules:
+- Basic: photo, /v, /day, /today, delete/edit, site nutrition/history.
+- Premium: /recommend, /why, /plan, feedback, check-in, post-meal insight.
+- Confirm expired Premium cannot access Premium Coach/commands.
+- Confirm Morning/Nudges/Weekly each send at most once as intended.
+- Confirm admin Premium Health loads.

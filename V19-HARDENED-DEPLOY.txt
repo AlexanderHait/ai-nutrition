@@ -1,0 +1,11 @@
+TeddY V19 Hardened
+
+1. Apply migrations 002..010 in order (001 is intentionally disabled).
+2. Import/publish Context Engine -> Premium Coach -> PostMeal -> Morning/Nudges/Weekly/Refresh -> Commands -> tx_text -> callbacks.
+3. IMPORTANT: keep ONE active Telegram Trigger owner. callbacks already delegates text to tx_text; do not keep both public triggers active for the same bot.
+4. Set n8n workflow timezone explicitly. Current business logic is mostly Europe/Moscow; per-client scheduling is a later improvement.
+5. SECURITY: rotate Telegram bot token and Supabase service-role key before production. Earlier export contained them in plaintext. Update n8n/Vercel credentials after rotation.
+6. Run npm run audit:workflows before release.
+7. Smoke tests: photo+caption, /v multiline, save/edit/delete callbacks, /today, /summary, /progress, Basic/Premium/expired Premium, /recommend, /why, feedback, check-in, scheduled morning/nudges/weekly.
+
+010 adds claim_telegram_update() for idempotency. For the cleanest implementation, make a single Telegram ingress workflow that claims update_id first and dispatches by update type. This avoids duplicate processing/retries and is recommended before scaling traffic.

@@ -1,0 +1,75 @@
+TeddY V20 — PRODUCT + INTELLIGENCE
+
+WHAT'S NEW
+- Recognition Confidence: food / portion / nutrition confidence and review gate.
+- Client correction learning into personal food overrides.
+- Personal confirmed food data bypasses unnecessary web/AI lookup.
+- V20 cached Nutrition Context with invalidation.
+- Adaptive Coach profile and adaptive nudges.
+- AI budget + concurrency lease + circuit breaker + deterministic fallback.
+- Safe replay diagnostics (dry-run, no duplicate Telegram side effects).
+- Background job queue with retries/dead jobs.
+- Subscription lifecycle: trial/active/grace/cancelled/expired.
+- Premium onboarding: budget, cooking time, meals/day, likes/dislikes, training days, response detail.
+- Nutrition guardrails.
+- Knowledge Base for trainer materials with review/approval before AI use.
+- Admin System Health V2.
+- Telegram inline menu.
+- Automated V20 regression suite.
+
+INSTALL FROM SCRATCH
+1. Supabase migrations in order:
+   001... existing migrations
+   008_premium_coach.sql
+   009_intelligence_layer.sql / fixed version from prior release
+   010_production_hardening.sql
+   011_reliability_layer.sql
+   012_v20_product_intelligence.sql
+   013_coach_video_sources.sql
+
+2. n8n: import/publish all subworkflows first.
+3. Activate schedule workflows you want:
+   - Adaptive Coach
+   - Maintenance
+   - Morning
+   - Adaptive Nudges
+   - Weekly
+   - Context Refresh
+   - AI Queue Worker
+4. Import/publish Commands and tx_text.
+5. Import/publish callback workflow.
+6. LAST: AI_Nutrition_Telegram_Ingress_v20.
+   It must be the ONLY active Telegram Trigger.
+
+IMPORTANT
+- Do not activate old Telegram Trigger workflows.
+- Re-bind credentials if imported into another n8n workspace.
+- Knowledge Base: draft/source claims do not affect Premium until approved.
+- Replay is deliberately diagnostic/dry-run; it does not resend messages or re-save meals.
+- AI concurrency defaults to 4 Premium slots; budget defaults to 30 heavy Premium requests/user/day.
+- When OpenRouter circuit opens, Premium returns deterministic fallback instead of hanging.
+- Run before release:
+  npm run test:v20
+
+PRE-PRODUCTION SMOKE
+/start
+/help
+/today
+photo without caption
+photo + exact brand caption
+same corrected food a second time -> personal override
+multi-dish photo
+edit grams
+edit product identity
+delete last meal
+duplicate update_id
+/recommend
+/why
+Basic premium-block
+Premium trial
+AI failure -> fallback
+Coach feedback
+Coach onboarding
+Knowledge draft + approval
+Admin System
+Admin Replay diagnostic

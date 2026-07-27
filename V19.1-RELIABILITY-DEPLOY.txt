@@ -1,0 +1,52 @@
+TeddY V19.1 Reliability Layer
+
+УСТАНОВКА
+1. Если V18/V19 ещё не ставились: выполнить SQL migrations 008 -> 009 -> 010 -> 011.
+2. В n8n сначала импортировать и Publish все sub-workflows:
+   AI_Nutrition_Context_Engine_v19
+   AI_Nutrition_Premium_Coach_v3_Reliability
+   AI_Nutrition_Premium_PostMeal_v2_Outcome
+   AI_Nutrition_Premium_Morning_v2_Context
+   AI_Nutrition_Premium_Nudges_v2_Context
+   AI_Nutrition_Premium_Weekly_v2_Context
+   AI_Nutrition_Premium_Context_Refresh_v19
+   AI_Nutrition_Commands_v13_reliability
+   tx_text_v28_reliability_subworkflow
+   tg_callbacks_v17_reliability_subworkflow
+
+3. ПОСЛЕДНИМ импортировать AI_Nutrition_Telegram_Ingress_v19_1.
+   Это ЕДИНСТВЕННЫЙ workflow, где должен быть активен Telegram Trigger.
+   Publish + Activate только его как Telegram ingress.
+
+4. Старые tx_text/tg_callbacks с Telegram Trigger НЕ активировать одновременно.
+
+5. Развернуть сайт из этой сборки на Vercel Preview. Проверить env:
+   NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY
+   SUPABASE_SERVICE_ROLE_KEY
+   SESSION_SECRET (длинный случайный)
+   ADMIN_PASSWORD
+   TELEGRAM_BOT_TOKEN
+   TELEGRAM_BOT_USERNAME
+   CRON_SECRET
+
+6. Smoke tests:
+   /start, /help, /today, /recommend, /why
+   обычный текст, фото без подписи, фото с подписью SPAR
+   multi-dish, сохранить, поправить, удалить, отменить
+   повтор одного Telegram update не должен создать дубль
+   Basic не получает Premium AI
+   Premium получает fallback при превышении AI budget
+   Coach feedback + check-in
+   Админка -> Premium Health и Система
+
+АРХИТЕКТУРА
+Telegram -> ONE Ingress -> claim update_id -> text OR media/callback subworkflow.
+Повторный update_id останавливается до побочных эффектов.
+Premium AI: максимум 30 тяжёлых запросов/клиент/сутки, после чего deterministic fallback.
+Контекст инвалидируется после изменения meals/weight.
+System Health хранит системные события 45 дней и AI usage 90 дней.
+
+ВАЖНО
+В экспортированных workflow сохранены n8n credential references (ID/имена), но не сами секреты.
+Если импорт идёт в другой n8n workspace, перепривязать Telegram/OpenRouter/Supabase/Header Auth credentials.

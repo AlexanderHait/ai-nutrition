@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "audit:workflows": "node scripts/audit-workflows.mjs",
+    "test:v20": "node scripts/audit-workflows.mjs && node scripts/test-v20.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
