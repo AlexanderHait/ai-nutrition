@@ -112,25 +112,8 @@ export async function POST(req:NextRequest){
     if(file&&!data.attachment_path){
       throw new Error("Attachment was uploaded but was not persisted in support_messages");
     }
-
-    // Delivery is event-driven in Supabase/n8n. This extra webhook call is best-effort
-    // for installations where the DB webhook is not active; claim_support_reply_v20
-    // prevents duplicate Telegram delivery.
-    const replyWebhook=
-      process.env.TEDDY_SUPPORT_REPLY_WEBHOOK||
-      "https://rizen133.app.n8n.cloud/webhook/teddy-support-reply-v20";
-
-    try{
-      await fetch(replyWebhook,{
-        method:"POST",
-        headers:{"content-type":"application/json"},
-        body:JSON.stringify({message_id:data.id}),
-        signal:AbortSignal.timeout(5000),
-      });
-    }catch(deliveryError){
-      console.error("support telegram delivery request failed",deliveryError);
-    }
-
+    // Delivery to Telegram is triggered once by the Supabase INSERT trigger.
+    // Do not call n8n here: doing so creates duplicate workflow executions.
     return NextResponse.json({ok:true,message:data});
   }catch(error){
     console.error("support send error",error);
