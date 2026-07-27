@@ -13,3 +13,5 @@ TeddY — интеграция фото в Диалоги v2
 - вызов teddy-support-reply-v20 после ответа администратора.
 
 Важно: исходный архив не содержит node_modules, поэтому локальный Next build в sandbox выполнить невозможно. После загрузки проверить Vercel build.
+
+FIX v3: DialogThreadExample.tsx обновлён под текущий SupportComposer без onSent; устраняет Vercel type error.
