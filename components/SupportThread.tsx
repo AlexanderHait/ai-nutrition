@@ -7,11 +7,11 @@ export default function SupportThread({messages,role}:{messages:SupportMessage[]
  const box=useRef<HTMLDivElement>(null),router=useRouter();
  useEffect(()=>{requestAnimationFrame(()=>{if(box.current)box.current.scrollTop=box.current.scrollHeight})},[messages.length]);
  useEffect(()=>{
-    const refresh=()=>{if(document.visibilityState==='visible')router.refresh()};
+    const refresh=()=>{ if(document.visibilityState==='visible') router.refresh(); };
     const t=window.setInterval(refresh,12000);
-    const onVisibility=()=>{if(document.visibilityState==='visible')router.refresh()};
+    const onVisibility=()=>{ if(document.visibilityState==='visible') router.refresh(); };
     document.addEventListener('visibilitychange',onVisibility);
-    return()=>{clearInterval(t);document.removeEventListener('visibilitychange',onVisibility)};
+    return()=>{ clearInterval(t); document.removeEventListener('visibilitychange',onVisibility); };
   },[router]);
  return <div className="supportMessages" ref={box}>
  {messages.length===0&&<div className="supportEmpty"><b>Диалог пока пуст</b><span>{role==='client'?'Напиши вопрос или оставь обратную связь — здесь ответит человек.':'Клиент ещё ничего не писал через сайт.'}</span></div>}
