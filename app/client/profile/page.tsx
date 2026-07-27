@@ -1,11 +1,11 @@
 import TelegramAvatar from "@/components/TelegramAvatar";
 import { CheckCircle2, Flame, RefreshCw, Scale, Target, UserRound } from "lucide-react";
 import {requireClient} from "@/lib/auth";
-import {clientData,fmt,goalKind} from "@/lib/data";
+import {clientProfileData,fmt,goalKind} from "@/lib/data";
 export const dynamic="force-dynamic";
 
 export default async function Page({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}){
-  const s=await requireClient(),d=await clientData(s.chatId!),q=await searchParams;
+  const s=await requireClient(),d=await clientProfileData(s.chatId!),q=await searchParams;
   const current=Number(d.settings?.current_weight_kg||d.weights?.[0]?.weight_kg||0);
   const target=Number(d.settings?.target_weight_kg||0);
   const kcal=Number(d.settings?.kcal_target||2000);

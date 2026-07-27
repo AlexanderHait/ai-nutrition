@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Activity, Scale, Sparkles, Target, TrendingDown, TrendingUp } from "lucide-react";
 import { requireClient } from "@/lib/auth";
-import { clientData, dayKey, fmt, mealDay, mealSessions, sumMeals } from "@/lib/data";
+import { clientProgressData, dayKey, fmt, mealDay, mealSessions, sumMeals } from "@/lib/data";
 
 export const dynamic="force-dynamic";
 
@@ -9,7 +9,7 @@ function clean(text:string){return String(text||"").replace(/\\([_*`])/g,"$1").r
 
 export default async function Page(){
   const s=await requireClient();
-  const d=await clientData(s.chatId!);
+  const d=await clientProgressData(s.chatId!);
   const target=Number(d.settings?.kcal_target||2000);
   const targetWeight=Number(d.settings?.target_weight_kg||0);
 
@@ -25,10 +25,12 @@ export default async function Page(){
   const latest=d.weights?.[0],previous=d.weights?.[1];
   const delta=latest&&previous?Number(latest.weight_kg)-Number(previous.weight_kg):null;
   const max=Math.max(target,1,...days.map(x=>x.total.kcal));
+  const latestData=d.meals?.[0]?.eaten_at||d.weights?.[0]?.measured_at;
 
   return <>
     <div className="pageHead"><div><p>Динамика</p><h1>Прогресс</h1><span>Главное за неделю и тренды за 14 дней.</span></div></div>
 
+    <div className="dataFreshnessBar"><span>Актуальность данных</span><b>{latestData?new Date(latestData).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Moscow"}):"нет данных"}</b></div>
     <div className="progressHeroStats">
       <Metric icon={<Activity/>} label="Средние калории" value={avg?`${fmt(avg)} ккал`:"—"} sub={target?`цель ${fmt(target)} ккал`:"цель не задана"}/>
       <Metric icon={<Target/>} label="Дней с рационом" value={`${complete.length} / 7`} sub="за последние 7 дней"/>

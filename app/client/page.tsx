@@ -1,8 +1,8 @@
 import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from "next/link";
-import { AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, MessageCircle, Scale, Sparkles, Target, TrendingUp, UtensilsCrossed } from "lucide-react";
+import { AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, Clock3, Crown, MessageCircle, Scale, Sparkles, Target, TrendingUp, UtensilsCrossed } from "lucide-react";
 import { requireClient } from "@/lib/auth";
-import { clientData, dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
+import { clientHomeData, dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
 import { sessionQuality } from "@/lib/meal-quality";
 import FoodIcon from "@/components/FoodIcon";
 
@@ -20,7 +20,7 @@ function pct(v:number,t:number){return t>0?Math.min(100,Math.round(v/t*100)):0}
 
 export default async function Page(){
   const s=await requireClient();
-  const d=await clientData(s.chatId!);
+  const d=await clientHomeData(s.chatId!);
   const today=dayKey();
   const tm=d.meals.filter(m=>mealDay(m)===today);
   const sum=sumMeals(tm);
@@ -34,6 +34,8 @@ export default async function Page(){
   const targetWeight=Number(d.settings?.target_weight_kg||0);
   const remaining=kcalTarget-sum.kcal;
   const lastDigest=d.digests?.[0];
+  const latestMeal=d.meals?.[0];
+  const dataFresh=latestMeal?new Date(latestMeal.eaten_at).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Moscow"}):"пока нет записей";
 
   const recentDays=Array.from({length:7},(_,i)=>{
     const date=new Date();date.setDate(date.getDate()-(6-i));
@@ -74,10 +76,10 @@ export default async function Page(){
         <h1>{d.profile?.first_name?`Привет, ${d.profile.first_name}`:"Твой рацион"}</h1>
         <span>{d.settings?.goal||"Отслеживай питание без лишней рутины"}</span>
       </div>
-      <Link href="/client/profile" className="clientProfileChip">
+      <div className="clientWelcomeActions"><span className="freshDataChip"><Clock3 size={13}/>Данные: {dataFresh}</span><Link href="/client/profile" className="clientProfileChip">
         <TelegramAvatar profile={d.profile} size="small"/>
         <span><b>{d.profile?.first_name||"Профиль"}</b><small>{d.subscription?.status==="active"?String(d.subscription.plan).toUpperCase():"Настроить"}</small></span>
-      </Link>
+      </Link></div>
     </header>
 
     <section className="clientDashboardHero">
@@ -155,6 +157,8 @@ export default async function Page(){
         </div>:<div className="clientEmptyNice compact"><Sparkles/><b>Отчёт ещё формируется</b><span>Он появится после накопления данных о питании.</span></div>}
       </section>
     </div>
+
+    <Link href="/client/plan" className={`planTeaser ${d.subscription?.status==="active"&&d.subscription?.plan==="premium"?"premiumActive":""}`}><i><Crown size={20}/></i><span><small>{d.subscription?.status==="active"?"Твой тариф":"Подписка"}</small><b>{d.subscription?.status==="active"?String(d.subscription.plan).toUpperCase():"Открой больше аналитики"}</b><em>{d.subscription?.status==="active"&&d.subscription?.plan==="premium"?"Premium‑функции активны":"Сравнить Basic и Premium"}</em></span><ChevronRight size={18}/></Link>
 
     <section className="card top clientWeekStrip">
       <div className="sectionTitleRow"><div><h2>Неделя</h2><span className="muted">Нажми на день, чтобы открыть питание</span></div></div>

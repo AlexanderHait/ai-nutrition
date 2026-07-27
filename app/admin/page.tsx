@@ -1,118 +1,19 @@
 import TelegramAvatar from "@/components/TelegramAvatar";
-import Link from 'next/link';
-import {Activity,AlertTriangle,Crown,MessageSquare,Scale,Target,Users} from 'lucide-react';
-import {allData,dayKey,fmt,goalKind,sumMeals} from '@/lib/data';
-export const dynamic='force-dynamic';
-
-type Attention={id:number;name:string;username:string;score:number;reasons:string[]};
-
+import Link from "next/link";
+import {AlertTriangle,Crown,MessageSquare,Target,Users,Activity,BarChart3} from "lucide-react";
+import {adminDashboardData,fmt,goalKind,sumMeals} from "@/lib/data";
+export const dynamic="force-dynamic";
+type Attention={id:number;profile:any;name:string;username:string;score:number;reasons:string[]};
 export default async function Page(){
-  const {profiles,meals,logs,settings,subscriptions,support,weights}=await allData();
-  const now=Date.now(),today=dayKey(),week=now-7*86400000;
-  const active7=new Set<number>();
-  const activity=new Map<number,number>();
-
-  for(const m of meals){
-    const id=Number(m.chat_id),ts=new Date(m.eaten_at).getTime();
-    if(ts>=week)active7.add(id);
-    activity.set(id,Math.max(activity.get(id)||0,ts));
-  }
-  for(const l of logs as any[]){
-    const id=Number(l.chat_id),ts=new Date(l.created_at).getTime();
-    if(ts>=week)active7.add(id);
-    activity.set(id,Math.max(activity.get(id)||0,ts));
-  }
-
-  const settingsMap=new Map((settings as any[]).map(x=>[Number(x.chat_id),x]));
-  const latestSubs=new Map<number,any>();
-  for(const s of subscriptions as any[])if(!latestSubs.has(Number(s.chat_id)))latestSubs.set(Number(s.chat_id),s);
-
-  const lastWeight=new Map<number,any>();
-  for(const w of weights as any[])if(!lastWeight.has(Number(w.chat_id)))lastWeight.set(Number(w.chat_id),w);
-
-  const unreadByClient=new Map<number,number>();
-  for(const m of support as any[]){
-    if(m.sender==='client'&&!m.read_by_admin_at){
-      const id=Number(m.chat_id);
-      unreadByClient.set(id,(unreadByClient.get(id)||0)+1);
-    }
-  }
-
-  const attention:Attention[]=profiles.map(p=>{
-    const id=Number(p.telegram_id),reasons:string[]=[];
-    const last=activity.get(id)||0;
-    const st:any=settingsMap.get(id);
-    const dayMeals=meals.filter(m=>Number(m.chat_id)===id&&m.eaten_day===today);
-    const dayTotal=sumMeals(dayMeals);
-    const target=Number(st?.kcal_target||0);
-    const weight:any=lastWeight.get(id);
-    const unread=unreadByClient.get(id)||0;
-
-    if(unread)reasons.push(`${unread} непрочит. сообщ.`);
-    if(!last)reasons.push('ещё не было активности');
-    else if(now-last>3*86400000)reasons.push(`${Math.floor((now-last)/86400000)} дн. без активности`);
-    if(target>0&&dayTotal.kcal>0&&dayTotal.kcal<target*.7)reasons.push('сегодня <70% калорий');
-    if(!st?.goal)reasons.push('не заполнена цель');
-    if(!weight)reasons.push('нет измерений веса');
-    else if(now-new Date(weight.measured_at).getTime()>10*86400000)reasons.push('вес не обновлялся 10+ дней');
-
-    return{
-      id,name:p.first_name||p.username||`Telegram ${id}`,username:p.username?`@${p.username}`:'',
-      score:unread*5+reasons.length,reasons
-    };
-  }).filter(x=>x.reasons.length).sort((a,b)=>b.score-a.score).slice(0,10);
-
-  const premium=[...latestSubs.values()].filter(x=>x.plan==='premium'&&x.status==='active').length;
-  const unread=[...unreadByClient.values()].reduce((a,b)=>a+b,0);
-
-  return <>
-    <header className="pageHead adminWelcome">
-      <div><p>AI‑Nutrition / Админка</p><h1>Панель управления</h1><span>С утра сразу видно, кому нужно внимание и что происходит с базой.</span></div>
-      <div className="adminHeadActions"><form action="/api/admin/sync-avatars" method="post"><button className="secondaryBtn compactBtn" type="submit">Обновить аватары</button></form><Link className="primary compactBtn" href="/admin/mailings">Новая рассылка</Link></div>
-    </header>
-
-    <div className="adminKpis">
-      <Kpi icon={<Users/>} l="Всего клиентов" v={fmt(profiles.length)} sub={`${active7.size} активны за 7 дней`}/>
-      <Kpi icon={<MessageSquare/>} l="Непрочитанные" v={fmt(unread)} sub={unread?'нужен ответ':'всё разобрано'}/>
-      <Kpi icon={<AlertTriangle/>} l="Требуют внимания" v={fmt(attention.length)} sub="по текущим правилам"/>
-      <Kpi icon={<Crown/>} l="Premium" v={fmt(premium)} sub="активных подписок"/>
-    </div>
-
-    <div className="dashboardMain top">
-      <section className="card attentionCenter">
-        <div className="sectionTitleRow">
-          <div><h2>Центр внимания</h2><span className="muted">Приоритетные клиенты на сегодня</span></div>
-          <Link className="textLink" href="/admin/analytics">Вся аналитика →</Link>
-        </div>
-        {attention.length?<div className="attentionCards">
-          {attention.map(x=><Link href={`/admin/clients/${x.id}`} className="attentionCard" key={x.id}>
-            <TelegramAvatar profile={profiles.find(p=>Number(p.telegram_id)===x.id)} size="small"/>
-            <div><b>{x.name}</b><small>{x.username}</small><p>{x.reasons.slice(0,3).join(' · ')}</p></div>
-            <span>Открыть</span>
-          </Link>)}
-        </div>:<div className="positiveEmpty"><Target/><b>На сегодня всё спокойно</b><span>Новых сигналов внимания нет.</span></div>}
-      </section>
-
-      <aside className="dashboardSide">
-        <section className="card">
-          <div className="sectionTitleRow"><div><h2>Быстрые действия</h2><span className="muted">Без лишних переходов</span></div></div>
-          <div className="quickAdmin vertical">
-            <Link href="/admin/dialogs"><MessageSquare/><b>Ответить клиентам</b><span>{unread?`${unread} непрочитанных`:'Новых нет'}</span></Link>
-            <Link href="/admin/mailings"><Activity/><b>Создать рассылку</b><span>Сегменты и шаблоны</span></Link>
-            <Link href="/admin/clients"><Users/><b>Найти клиента</b><span>Профиль и питание</span></Link>
-            <Link href="/admin/analytics"><Scale/><b>Открыть аналитику</b><span>Цели, тарифы, активность</span></Link>
-          </div>
-        </section>
-
-        <section className="card recentCompact">
-          <div className="sectionTitleRow"><div><h2>Новые клиенты</h2><span className="muted">Последние регистрации</span></div></div>
-          {profiles.slice(0,5).map(p=><Link className="recentClient" href={`/admin/clients/${p.telegram_id}`} key={p.id}>
-            <TelegramAvatar profile={p} size="small"/>
-            <span><b>{p.first_name||'Без имени'}</b><small>{p.username?'@'+p.username:p.telegram_id}</small></span>
-          </Link>)}
-        </section>
-      </aside>
-    </div>
-  </>;
+ const {profiles,meals,logs,settings,subscriptions,support,weights}=await adminDashboardData();const now=Date.now(),week=now-7*86400000;
+ const settingsMap=new Map((settings as any[]).map(x=>[Number(x.chat_id),x])),latestSubs=new Map<number,any>(),lastWeight=new Map<number,any>(),activity=new Map<number,number>(),todayMeals=new Map<number,any[]>(),unread=new Map<number,number>();
+ for(const x of subscriptions as any[])if(!latestSubs.has(Number(x.chat_id)))latestSubs.set(Number(x.chat_id),x);
+ for(const w of weights as any[])if(!lastWeight.has(Number(w.chat_id)))lastWeight.set(Number(w.chat_id),w);
+ for(const m of meals as any[]){const id=Number(m.chat_id),ts=new Date(m.eaten_at).getTime();activity.set(id,Math.max(activity.get(id)||0,ts));if(!todayMeals.has(id))todayMeals.set(id,[]);todayMeals.get(id)!.push(m)}
+ for(const l of logs as any[]){const id=Number(l.chat_id),ts=new Date(l.created_at).getTime();activity.set(id,Math.max(activity.get(id)||0,ts))}
+ for(const m of support as any[])if(m.sender==="client"&&!m.read_by_admin_at){const id=Number(m.chat_id);unread.set(id,(unread.get(id)||0)+1)}
+ const active7=[...activity.values()].filter(x=>x>=week).length,totalUnread=[...unread.values()].reduce((a,b)=>a+b,0),premium=[...latestSubs.values()].filter(x=>x.plan==="premium"&&x.status==="active").length;
+ const attention:Attention[]=profiles.map((p:any)=>{const id=Number(p.telegram_id),st:any=settingsMap.get(id),last=activity.get(id)||0,dayTotal=sumMeals((todayMeals.get(id)||[]) as any),target=Number(st?.kcal_target||0),reasons:string[]=[];const u=unread.get(id)||0;if(u)reasons.push(`${u} непрочит. сообщ.`);if(!last)reasons.push("нет активности");else if(now-last>3*86400000)reasons.push(`${Math.floor((now-last)/86400000)} дн. без активности`);if(target&&dayTotal.kcal>0&&dayTotal.kcal<target*.7)reasons.push("сегодня <70% калорий");if(!st?.goal)reasons.push("не заполнена цель");const w:any=lastWeight.get(id);if(!w)reasons.push("нет веса");return{id,profile:p,name:p.first_name||p.username||`Telegram ${id}`,username:p.username?`@${p.username}`:"",score:u*5+reasons.length,reasons}}).filter(x=>x.reasons.length).sort((a,b)=>b.score-a.score).slice(0,8);
+ return <><header className="pageHead adminWelcome"><div><p>AI‑Nutrition / Админка</p><h1>Обзор</h1><span>Главное на сегодня. Детали вынесены в отдельные разделы, чтобы страница оставалась быстрой.</span></div><Link className="primary compactBtn" href="/admin/dialogs">Открыть диалоги</Link></header><div className="adminKpis"><K icon={<Users/>} l="Клиенты" v={fmt(profiles.length)} sub={`${active7} активны за 7 дней`}/><K icon={<MessageSquare/>} l="Непрочитанные" v={fmt(totalUnread)} sub={totalUnread?"нужен ответ":"всё разобрано"}/><K icon={<AlertTriangle/>} l="Сигналы" v={fmt(attention.length)} sub="приоритет на сегодня"/><K icon={<Crown/>} l="Premium" v={fmt(premium)} sub="активных"/></div><div className="dashboardMain top"><section className="card attentionCenter"><div className="sectionTitleRow"><div><h2>Центр внимания</h2><span className="muted">Показываем только тех, кому сейчас нужен взгляд</span></div><Link className="textLink" href="/admin/activity">Вся активность →</Link></div>{attention.length?<div className="attentionCards">{attention.map(x=><Link href={`/admin/clients/${x.id}`} className="attentionCard" key={x.id}><TelegramAvatar profile={x.profile} size="small"/><div><b>{x.name}</b><small>{x.username}</small><p>{x.reasons.slice(0,3).join(" · ")}</p></div><span>Открыть</span></Link>)}</div>:<div className="positiveEmpty"><Target/><b>На сегодня всё спокойно</b><span>Новых сигналов нет.</span></div>}</section><aside className="dashboardSide"><section className="card"><div className="sectionTitleRow"><div><h2>Разделы</h2><span className="muted">Детали не грузятся на главной</span></div></div><div className="quickAdmin vertical"><Link href="/admin/clients"><Users/><b>Клиенты</b><span>профили и рацион</span></Link><Link href="/admin/dialogs"><MessageSquare/><b>Диалоги</b><span>{totalUnread?`${totalUnread} непрочитанных`:"новых нет"}</span></Link><Link href="/admin/activity"><Activity/><b>Активность</b><span>кто выпал и кто вернулся</span></Link><Link href="/admin/analytics"><BarChart3/><b>Аналитика</b><span>воронка и бизнес</span></Link></div></section><section className="card recentCompact"><div className="sectionTitleRow"><div><h2>Новые клиенты</h2><span className="muted">Последние регистрации</span></div></div>{profiles.slice(0,5).map((p:any)=><Link className="recentClient" href={`/admin/clients/${p.telegram_id}`} key={p.id}><TelegramAvatar profile={p} size="small"/><span><b>{p.first_name||"Без имени"}</b><small>{p.username?`@${p.username}`:p.telegram_id}</small></span></Link>)}</section></aside></div></>;
 }
-function Kpi({icon,l,v,sub}:{icon:React.ReactNode,l:string,v:string,sub:string}){return <div className="adminKpi"><i>{icon}</i><div><span>{l}</span><b>{v}</b><small>{sub}</small></div></div>}
+function K({icon,l,v,sub}:{icon:React.ReactNode;l:string;v:string;sub:string}){return <div className="adminKpi"><i>{icon}</i><div><span>{l}</span><b>{v}</b><small>{sub}</small></div></div>}

@@ -15,32 +15,26 @@ export default async function Shell({
     ["/admin","Главная","home"],
     ["/admin/clients","Клиенты","clients"],
     ["/admin/dialogs","Диалоги","dialogs"],
+    ["/admin/activity","Активность","activity"],
     ["/admin/analytics","Аналитика","analytics"],
-    ["/admin/mailings","Рассылки","mailings"],
+    ["/admin/catalog","Food Cache","catalog"],
     ["/admin/subscriptions","Подписки","subscriptions"],
+    ["/admin/mailings","Рассылки","mailings"],
   ] as const;
   const client=[
     ["/client","Главная","home"],
     ["/client/nutrition","Питание","nutrition"],
     ["/client/progress","Прогресс","progress"],
+    ["/client/plan","Подписка","plan"],
     ["/client/support","Поддержка","support"],
     ["/client/profile","Профиль","profile"],
   ] as const;
 
   let unreadDialogs=0;
-  let paletteClients:{id:number;name:string;username:string}[]=[];
   if(role==="admin"){
     const s=getSupabaseAdmin();
-    const [{count},{data:profiles}]=await Promise.all([
-      s.from("support_messages").select("id",{count:"exact",head:true}).eq("sender","client").is("read_by_admin_at",null),
-      s.from("profiles").select("telegram_id,first_name,username").order("created_at",{ascending:false}).limit(300)
-    ]);
+    const {count}=await s.from("support_messages").select("id",{count:"exact",head:true}).eq("sender","client").is("read_by_admin_at",null);
     unreadDialogs=count||0;
-    paletteClients=(profiles||[]).map((p:any)=>({
-      id:Number(p.telegram_id),
-      name:String(p.first_name||p.username||`Telegram ${p.telegram_id}`),
-      username:p.username?`@${p.username}`:""
-    }));
   }
 
   const items=role==="admin"?admin:client;
@@ -64,7 +58,7 @@ export default async function Shell({
     </header>
 
     <main className="content">
-      {role==="admin"&&<div className="adminToolbar"><AdminCommandPalette clients={paletteClients}/></div>}
+      {role==="admin"&&<div className="adminToolbar"><AdminCommandPalette/></div>}
       {children}
     </main>
 

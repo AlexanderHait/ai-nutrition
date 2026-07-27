@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, Sparkles } from "lucide-react";
 import {requireClient} from "@/lib/auth";
-import {clientData,dayKey,fmt,mealDay,mealSessions,pluralMeals,sumMeals} from "@/lib/data";
+import {clientNutritionData,dayKey,fmt,mealDay,mealSessions,pluralMeals,sumMeals} from "@/lib/data";
 import {mealQuality,sessionQuality} from "@/lib/meal-quality";
 import FoodIcon from "@/components/FoodIcon";
 
@@ -12,13 +12,13 @@ function label(day:string){return new Date(day+"T12:00:00").toLocaleDateString("
 
 export default async function Page({searchParams}:{searchParams:SearchParams}){
   const s=await requireClient();
-  const d=await clientData(s.chatId!);
+  const meals=await clientNutritionData(s.chatId!,45);
   const q=await searchParams;
   const selected=typeof q.day==="string"?q.day:"";
   const today=dayKey();
 
-  const groups=new Map<string,typeof d.meals>();
-  for(const m of d.meals){const dk=mealDay(m);if(!groups.has(dk))groups.set(dk,[]);groups.get(dk)!.push(m)}
+  const groups=new Map<string,typeof meals>();
+  for(const m of meals){const dk=mealDay(m);if(!groups.has(dk))groups.set(dk,[]);groups.get(dk)!.push(m)}
   let entries=[...groups.entries()].sort(([a],[b])=>b.localeCompare(a));
   if(selected)entries.sort(([a],[b])=>a===selected?-1:b===selected?1:b.localeCompare(a));
 
