@@ -17,7 +17,7 @@ export function SupportMessageBody({ message }: { message: SupportMessage }) {
       ) : null}
 
       {text && !onlyPlaceholderPhoto ? (
-        <div className={message.attachment_path ? "mt-2 whitespace-pre-wrap" : "whitespace-pre-wrap"}>
+        <div className="supportMessageText">
           {text}
         </div>
       ) : null}

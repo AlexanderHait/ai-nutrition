@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import {session} from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -40,8 +41,8 @@ export async function POST(req: NextRequest) {
   let uploadedPath: string | null = null;
 
   try {
-    // IMPORTANT:
-    // Keep/insert your existing admin authentication and CSRF protection here.
+    const auth=await session();
+    if(auth?.role!=="admin") return NextResponse.json({error:"Unauthorized"},{status:401});
     const form = await req.formData();
 
     const chatId = Number(form.get("chat_id"));
@@ -119,6 +120,13 @@ export async function POST(req: NextRequest) {
       throw new Error(`support_messages insert failed: ${error.message}`);
     }
 
+    const replyWebhook=process.env.TEDDY_SUPPORT_REPLY_WEBHOOK || "https://rizen133.app.n8n.cloud/webhook/teddy-support-reply-v20";
+    try{
+      await fetch(replyWebhook,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({
+        message_id:data.id,chat_id:chatId,content:data.content,attachment_path:data.attachment_path,
+        attachment_mime:data.attachment_mime,attachment_name:data.attachment_name
+      }),signal:AbortSignal.timeout(5000)});
+    }catch(deliveryError){console.error("support telegram delivery request failed",deliveryError)}
     return NextResponse.json({ ok: true, message: data });
   } catch (error) {
     console.error("support send error", error);

@@ -39,7 +39,7 @@ export function SupportAttachment({ path, name }: Props) {
 
   if (failed) {
     return (
-      <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/45">
+      <div className="supportAttachmentError">
         Не удалось загрузить изображение
       </div>
     );
@@ -47,7 +47,7 @@ export function SupportAttachment({ path, name }: Props) {
 
   if (!url) {
     return (
-      <div className="mt-2 h-32 w-52 animate-pulse rounded-xl bg-white/[0.05]" />
+      <div className="supportAttachmentLoading" />
     );
   }
 
@@ -56,20 +56,20 @@ export function SupportAttachment({ path, name }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-2 block overflow-hidden rounded-xl border border-white/10 bg-black/20 text-left transition hover:border-white/20"
+        className="supportAttachmentThumb"
         aria-label="Открыть изображение"
       >
         <img
           src={url}
           alt={name || "Вложение поддержки"}
           loading="lazy"
-          className="max-h-64 w-auto max-w-[360px] object-cover"
+          className="supportAttachmentImage"
         />
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-5 backdrop-blur-sm"
+          className="supportLightbox"
           onClick={() => setOpen(false)}
           role="dialog"
           aria-modal="true"
@@ -77,7 +77,7 @@ export function SupportAttachment({ path, name }: Props) {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="absolute right-5 top-5 rounded-full bg-white/10 px-3 py-2 text-white hover:bg-white/15"
+            className="supportLightboxClose"
             aria-label="Закрыть"
           >
             ✕
@@ -86,7 +86,7 @@ export function SupportAttachment({ path, name }: Props) {
           <img
             src={url}
             alt={name || "Вложение поддержки"}
-            className="max-h-[90vh] max-w-[92vw] rounded-2xl object-contain shadow-2xl"
+            className="supportLightboxImage"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
