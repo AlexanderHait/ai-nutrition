@@ -1,70 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { session } from "@/lib/auth";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 type Plan = "none" | "basic" | "premium";
 const ALLOWED = new Set<Plan>(["none", "basic", "premium"]);
 
-function supabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Supabase env vars are missing");
-  return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
-
-async function assertAdmin(_request: NextRequest) {
-  // IMPORTANT: replace this with the EXISTING admin-session check from TeddY.
-  // Example:
-  // const admin = await requireAdmin();
-  // if (!admin) throw new Error("FORBIDDEN");
-  return true;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    await assertAdmin(request);
-
+    const auth = await session();
+    if (auth?.role !== "admin") return NextResponse.json({ok:false,error:"Нет доступа"},{status:403});
     const body = await request.json();
     const chatId = Number(body?.chatId);
     const plan = String(body?.plan || "").toLowerCase() as Plan;
+    if (!Number.isFinite(chatId) || chatId <= 0) return NextResponse.json({ok:false,error:"Некорректный chatId"},{status:400});
+    if (!ALLOWED.has(plan)) return NextResponse.json({ok:false,error:"Некорректный тариф"},{status:400});
 
-    if (!Number.isFinite(chatId) || chatId <= 0) {
-      return NextResponse.json({ ok: false, error: "Некорректный chatId" }, { status: 400 });
-    }
-    if (!ALLOWED.has(plan)) {
-      return NextResponse.json({ ok: false, error: "Некорректный тариф" }, { status: 400 });
-    }
-
-    const db = supabaseAdmin();
+    const db = getSupabaseAdmin();
+    const now = new Date().toISOString();
 
     if (plan === "none") {
-      const { error } = await db
-        .from("subscription_lifecycle")
-        .delete()
-        .eq("chat_id", chatId);
-      if (error) throw error;
+      const {error:e1}=await db.from("subscription_lifecycle").delete().eq("chat_id",chatId);
+      if(e1) throw e1;
+      const {error:e2}=await db.from("subscriptions").insert({chat_id:chatId,plan:"basic",status:"inactive",started_at:now,ends_at:now});
+      if(e2) throw e2;
     } else {
-      const { error } = await db
-        .from("subscription_lifecycle")
-        .upsert(
-          {
-            chat_id: chatId,
-            plan,
-            state: "active",
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "chat_id" },
-        );
-      if (error) throw error;
+      const {error:e1}=await db.from("subscription_lifecycle").upsert({chat_id:chatId,plan,state:"active",cancel_at_period_end:false,current_period_start:now,current_period_end:null,updated_at:now},{onConflict:"chat_id"});
+      if(e1) throw e1;
+      const {error:e2}=await db.from("subscriptions").insert({chat_id:chatId,plan,status:"active",started_at:now,ends_at:null});
+      if(e2) throw e2;
     }
-
-    return NextResponse.json({ ok: true, chatId, plan });
+    return NextResponse.json({ok:true,chatId,plan});
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Ошибка";
-    return NextResponse.json(
-      { ok: false, error: message },
-      { status: message === "FORBIDDEN" ? 403 : 500 },
-    );
+    console.error("admin subscription update failed",e);
+    return NextResponse.json({ok:false,error:"Не удалось изменить подписку"},{status:500});
   }
 }
