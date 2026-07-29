@@ -8,7 +8,7 @@ import {LogOut} from "lucide-react";
 type NavGroup={label:string;items:readonly NavItem[]};
 export default async function Shell({children,role,isPremium=false}:{children:React.ReactNode;role:"admin"|"client";isPremium?:boolean}){
   const adminGroups:readonly NavGroup[]=[
-    {label:"Работа",items:[["/admin","Главная","home"],["/admin/dialogs","Диалоги","dialogs"],["/admin/clients","Клиенты","clients"],["/admin/activity","Активность","activity"],["/admin/analytics","Аналитика","analytics"]]},
+    {label:"Работа",items:[["/admin","Главная","home"],["/admin/dialogs","Диалоги","dialogs"],["/admin/clients","Клиенты","clients"],["/admin/activity","Активность","activity"],["/admin/analytics","Аналитика","analytics"],["/admin/n8n","n8n","n8n"]]},
     {label:"Контент и коммуникации",items:[["/admin/catalog","Продукты","catalog"],["/admin/knowledge","База знаний","catalog"],["/admin/mailings","Рассылки","mailings"],["/admin/replay","Повтор обработки","activity"]]},
     {label:"Управление",items:[["/admin/subscriptions","Подписки","subscriptions"],["/admin/premium-health","Premium · контроль","activity"],["/admin/system","Система","settings"]]},
   ];

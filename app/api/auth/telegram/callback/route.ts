@@ -145,17 +145,22 @@ export async function GET(req: Request) {
       await supabase.from("profiles").update({ avatar_url: avatarUrl, avatar_updated_at: new Date().toISOString() }).eq("telegram_id", telegramId);
     }
 
+    // A Telegram user explicitly appointed by the owner opens the admin panel.
+    // Subscription plan never grants admin rights.
+    const {data:adminRole}=await supabase.from("admin_users").select("is_active").eq("chat_id",telegramId).maybeSingle();
+    const loginRole = adminRole?.is_active ? "admin" : "client";
+
     // Always return to the canonical site URL. This also prevents www/non-www
     // cookie inconsistencies after mobile authorization.
     const finalOrigin = (
       process.env.NEXT_PUBLIC_SITE_URL || currentUrl.origin
     ).replace(/\/$/, "");
-    const res = NextResponse.redirect(new URL("/client", finalOrigin));
+    const res = NextResponse.redirect(new URL(loginRole==="admin"?"/admin":"/client", finalOrigin));
 
     res.cookies.set(
       sessionCookie,
       signSession({
-        role: "client",
+        role: loginRole,
         chatId: telegramId,
         name: profile.first_name || String(payload.name || ""),
       }),
