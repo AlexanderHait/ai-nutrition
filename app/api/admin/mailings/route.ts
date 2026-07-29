@@ -17,12 +17,13 @@ async function signedMedia(path:string|null){
   const {data}=await s.storage.from("mailing-media").createSignedUrl(path,60*60);
   return data?.signedUrl||null;
 }
-async function sendTelegram(ids:number[],text:string,mediaPath:string|null){
+async function sendTelegram(ids:number[],text:string,mediaPath:string|null,mediaKind:string|null){
   const token=process.env.TELEGRAM_BOT_TOKEN;if(!token)throw new Error("TELEGRAM_BOT_TOKEN не задан");
-  const photo=await signedMedia(mediaPath);let sent=0;
+  const media=await signedMedia(mediaPath);let sent=0;
   for(const chat_id of ids){
-    const method=photo?"sendPhoto":"sendMessage";
-    const body=photo?{chat_id,photo,caption:text}:{chat_id,text};
+    let method="sendMessage",body:any={chat_id,text};
+    if(media&&mediaKind==="image"){method="sendPhoto";body={chat_id,photo:media,caption:text}}
+    if(media&&mediaKind==="pdf"){method="sendDocument";body={chat_id,document:media,caption:text}}
     const r=await fetch(`https://api.telegram.org/bot${token}/${method}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
     if(r.ok)sent++;
   }return sent;
@@ -34,15 +35,17 @@ export async function POST(req:Request){
   if(!title||!content)return NextResponse.redirect(new URL("/admin/mailings?error=empty",req.url));
   const s=getSupabaseAdmin();let mediaPath:string|null=null;
   const image=f.get("image");
+  let mediaKind:string|null=null;
   if(image instanceof File&&image.size>0){
-    const allowed=["image/jpeg","image/png","image/webp","image/gif"];
-    if(!allowed.includes(image.type)||image.size>10*1024*1024)return NextResponse.redirect(new URL("/admin/mailings?error=image",req.url));
-    const ext=image.name.split(".").pop()?.toLowerCase()||"jpg";mediaPath=`${Date.now()}-${crypto.randomUUID()}.${ext}`;
+    const allowed=["image/jpeg","image/png","image/webp","image/gif","application/pdf"];
+    if(!allowed.includes(image.type)||image.size>20*1024*1024)return NextResponse.redirect(new URL("/admin/mailings?error=attachment",req.url));
+    mediaKind=image.type==="application/pdf"?"pdf":"image";
+    const ext=image.name.split(".").pop()?.toLowerCase()||(mediaKind==="pdf"?"pdf":"jpg");mediaPath=`${Date.now()}-${crypto.randomUUID()}.${ext}`;
     const {error}=await s.storage.from("mailing-media").upload(mediaPath,Buffer.from(await image.arrayBuffer()),{contentType:image.type,upsert:false});
     if(error)return NextResponse.redirect(new URL("/admin/mailings?error=upload",req.url));
   }
   const ids=await recipients(segment);
-  if(action==="send"){const sent=await sendTelegram(ids,content,mediaPath);await s.from("mailings").insert({title,content,segment,status:"sent",recipient_count:ids.length,sent_count:sent,sent_at:new Date().toISOString(),media_path:mediaPath,media_kind:mediaPath?"image":null})}
-  else await s.from("mailings").insert({title,content,segment,status:"scheduled",recipient_count:ids.length,scheduled_at:scheduled?new Date(scheduled).toISOString():new Date().toISOString(),media_path:mediaPath,media_kind:mediaPath?"image":null});
+  if(action==="send"){const sent=await sendTelegram(ids,content,mediaPath,mediaKind);await s.from("mailings").insert({title,content,segment,status:"sent",recipient_count:ids.length,sent_count:sent,sent_at:new Date().toISOString(),media_path:mediaPath,media_kind:mediaKind})}
+  else await s.from("mailings").insert({title,content,segment,status:"scheduled",recipient_count:ids.length,scheduled_at:scheduled?new Date(scheduled).toISOString():new Date().toISOString(),media_path:mediaPath,media_kind:mediaKind});
   return NextResponse.redirect(new URL("/admin/mailings?ok=1",req.url));
 }
