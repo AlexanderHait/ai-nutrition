@@ -1,9 +1,11 @@
 import {getSupabaseAdmin} from "@/lib/supabase-admin";
+import {adminChatIds} from "@/lib/data";
+import AdminBadge from "@/components/AdminBadge";
 import {Activity,BrainCircuit,Camera,Users} from "lucide-react";
 export const dynamic="force-dynamic";
 
 export default async function Page(){
-  const s=getSupabaseAdmin(),from=new Date(Date.now()-30*86400000).toISOString();
+  const s=getSupabaseAdmin(),adminIds=await adminChatIds(),from=new Date(Date.now()-30*86400000).toISOString();
   const [{data:events},{data:profiles},{data:subs}]=await Promise.all([
     s.from("ai_usage_events").select("*").gte("created_at",from).order("created_at",{ascending:false}).limit(20000),
     s.from("profiles").select("telegram_id,first_name,username"),
@@ -19,7 +21,7 @@ export default async function Page(){
   <div className="adminKpis"><K i={<Activity/>} l="Executions" v={total.exec}/><K i={<BrainCircuit/>} l="AI-запросы" v={total.ai}/><K i={<Camera/>} l="Vision" v={total.vision}/><K i={<Users/>} l="Клиентов" v={rows.length}/></div>
   <section className="card top"><div className="sectionTitleRow"><div><h2>По клиентам</h2><span className="muted">Basic / Premium · 30 дней</span></div></div>
   {!rows.length?<p className="muted">Телеметрия появится после подключения n8n к /api/bot/usage. Таблица уже готова.</p>:
-  <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th align="left">Клиент</th><th>Тариф</th><th>Executions</th><th>AI</th><th>Vision</th><th>Web</th><th>Стоимость*</th></tr></thead><tbody>{rows.map(([id,v])=>{const p:any=pm.get(id);return <tr key={id}><td>{p?.first_name||p?.username||id}<small style={{display:"block",opacity:.55}}>{p?.username?`@${p.username}`:`ID ${id}`}</small></td><td align="center">{String(latest.get(id)||"basic").toUpperCase()}</td><td align="center">{v.exec}</td><td align="center">{v.ai}</td><td align="center">{v.vision}</td><td align="center">{v.web}</td><td align="center">{v.cost?v.cost.toFixed(2)+" ₽":"—"}</td></tr>})}</tbody></table></div>}
+  <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th align="left">Клиент</th><th>Тариф</th><th>Executions</th><th>AI</th><th>Vision</th><th>Web</th><th>Стоимость*</th></tr></thead><tbody>{rows.map(([id,v])=>{const p:any=pm.get(id);return <tr key={id}><td>{p?.first_name||p?.username||id}{adminIds.has(id)&&<AdminBadge/>}<small style={{display:"block",opacity:.55}}>{p?.username?`@${p.username}`:`ID ${id}`}</small></td><td align="center">{String(latest.get(id)||"basic").toUpperCase()}</td><td align="center">{v.exec}</td><td align="center">{v.ai}</td><td align="center">{v.vision}</td><td align="center">{v.web}</td><td align="center">{v.cost?v.cost.toFixed(2)+" ₽":"—"}</td></tr>})}</tbody></table></div>}
   <p className="muted" style={{marginTop:14}}>* Стоимость отображается, когда n8n передаёт рассчитанную стоимость запроса.</p></section></>
 }
 function K({i,l,v}:{i:React.ReactNode;l:string;v:number}){return <div className="adminKpi"><i>{i}</i><div><span>{l}</span><b>{v.toLocaleString("ru-RU")}</b><small>за 30 дней</small></div></div>}

@@ -1,5 +1,12 @@
 import { getSupabaseAdmin } from './supabase-admin';
 
+export async function adminChatIds(){
+  const s=getSupabaseAdmin();
+  const {data}=await s.from('admin_users').select('chat_id').eq('is_active',true);
+  return new Set<number>((data||[]).map((x:any)=>Number(x.chat_id)).filter(Number.isFinite));
+}
+
+
 export type Meal={
   id:number;chat_id:number;dish:string;grams:number;kcal:number;prot:number;fat:number;carb:number;
   eaten_at:string;eaten_day:string;deleted:boolean
