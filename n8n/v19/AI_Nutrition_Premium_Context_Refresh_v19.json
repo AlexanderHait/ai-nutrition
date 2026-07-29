@@ -42,7 +42,7 @@
           "parameters": [
             {
               "name": "_days",
-              "value": 14
+              "value": 30
             }
           ]
         }
