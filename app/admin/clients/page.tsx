@@ -1,7 +1,7 @@
 import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from "next/link";
 import {Search,SlidersHorizontal,Users} from "lucide-react";
-import {adminClientsData,dayKey,fmt,goalKind,mealDay,mealSessions,sumMeals} from "@/lib/data";
+import {adminChatIds,adminClientsData,dayKey,fmt,goalKind,mealDay,mealSessions,sumMeals} from "@/lib/data";
 import AdminBadge from "@/components/AdminBadge";
 export const dynamic="force-dynamic";
 type SP=Promise<{q?:string;goal?:string;plan?:string;activity?:string}>;
