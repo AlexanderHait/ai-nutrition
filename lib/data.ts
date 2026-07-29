@@ -332,13 +332,15 @@ export async function premiumHealth(){
  const latest=new Map<number,any>();for(const x of subs||[])if(!latest.has(Number(x.chat_id)))latest.set(Number(x.chat_id),x);
  const ids=[...latest.values()].filter((x:any)=>x.status==='active'&&x.plan==='premium'&&(!x.ends_at||new Date(x.ends_at)>new Date())).map((x:any)=>Number(x.chat_id));
  if(!ids.length)return[];
- const [{data:profiles},{data:snapshots},{data:checkins},{data:recs}]=await Promise.all([
+ const from14=new Date(Date.now()-13*86400000);from14.setHours(0,0,0,0);
+ const [{data:profiles},{data:snapshots},{data:checkins},{data:recs},{data:meals}]=await Promise.all([
    s.from('profiles').select('telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at').in('telegram_id',ids),
    s.from('premium_context_snapshots').select('*').in('chat_id',ids),
    s.from('premium_checkins').select('*').in('chat_id',ids).order('week_end',{ascending:false}).limit(3000),
-   s.from('premium_recommendations').select('chat_id,feedback,feedback_reason,created_at').in('chat_id',ids).gte('created_at',new Date(Date.now()-14*86400000).toISOString()).limit(5000)
+   s.from('premium_recommendations').select('chat_id,feedback,feedback_reason,created_at').in('chat_id',ids).gte('created_at',new Date(Date.now()-14*86400000).toISOString()).limit(5000),
+   s.from('meals').select('chat_id,eaten_at,kcal').in('chat_id',ids).gte('eaten_at',from14.toISOString()).limit(10000)
  ]);
- return ids.map(id=>({chatId:id,profile:(profiles||[]).find((p:any)=>Number(p.telegram_id)===id),snapshot:(snapshots||[]).find((x:any)=>Number(x.chat_id)===id),checkin:(checkins||[]).find((x:any)=>Number(x.chat_id)===id),badFeedback:(recs||[]).filter((x:any)=>Number(x.chat_id)===id&&x.feedback==='not_fit').length}));
+ return ids.map(id=>{const own=(meals||[]).filter((m:any)=>Number(m.chat_id)===id);const days=new Set(own.map((m:any)=>mealDay(m)));const kcalByDay=new Map<string,number>();for(const m of own as any[]){const d=mealDay(m);kcalByDay.set(d,(kcalByDay.get(d)||0)+Number(m.kcal||0))}const vals=[...kcalByDay.values()].filter(v=>v>0);return{chatId:id,profile:(profiles||[]).find((p:any)=>Number(p.telegram_id)===id),snapshot:(snapshots||[]).find((x:any)=>Number(x.chat_id)===id),checkin:(checkins||[]).find((x:any)=>Number(x.chat_id)===id),badFeedback:(recs||[]).filter((x:any)=>Number(x.chat_id)===id&&x.feedback==='not_fit').length,activeDays14:days.size,avgKcalActive:vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0}});
 }
 
 

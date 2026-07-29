@@ -733,3 +733,21 @@ table{font-variant-numeric:tabular-nums}
     animation-iteration-count:1!important;
   }
 }
+
+
+/* V20.1 — admin readability + stable client grids */
+.clientsGridV3{display:grid;align-items:center;gap:18px}
+.healthRow{padding:16px 10px;gap:18px}
+.healthRow.head{font-size:11px;letter-spacing:.05em}
+.healthRow b{font-size:13px;line-height:1.35}
+.healthRow small{font-size:11px;line-height:1.4;margin-top:4px}
+.healthStatus{font-size:12px}
+.optimizedClients .tableHead{font-size:11px}
+.optimizedClients .tableRow{font-size:13px}
+.optimizedClients .clientIdentity b{font-size:14px}
+.optimizedClients .clientIdentity small{font-size:11px}
+.optimizedClients .clientMetric small,.filterCount{font-size:11px}
+.adminKpi span,.adminKpi small,.metricCard span,.metricCard small{font-size:11px}
+.activityRow,.catalogRow,.subscriptionRow{font-size:12px}
+.activityHead,.catalogRow.head{font-size:10px}
+@media(min-width:1200px){.content{max-width:1480px}.healthRow{grid-template-columns:1.55fr .85fr .85fr .9fr 1.1fr .85fr}}
