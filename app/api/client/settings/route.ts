@@ -24,6 +24,8 @@ export async function POST(req: Request) {
     goal: String(form.get("goal") || "").trim() || null,
     sex: sex || null,
     birth_date: birthDate || null,
+    age_years: num(form.get("age_years")),
+    activity_level: String(form.get("activity_level") || "").trim() || null,
     kcal_target: num(form.get("kcal_target")),
     protein_target: num(form.get("protein_target")),
     fat_target: num(form.get("fat_target")),

@@ -433,7 +433,7 @@
     {
       "parameters": {
         "chatId": "={{ $('Switch').item.json.message.from.id }}",
-        "text": "=*Привет, {{ $('Switch').item.json.message.from.first_name }}!*\n\nЯ помогу тебе отслеживать рацион, считать КБЖУ и подсказывать, как питаться лучше.\n\n🧾 *Как начать:*\n📸 Просто *отправь фото еды* — я распознаю блюдо и рассчитаю КБЖУ.  \n🧠 Каждое блюдо *сохраняется в твоём дневнике* — можно вернуться, пересмотреть и задать вопросы.  \n📬 *Каждый вечер* я присылаю краткий отчёт и даю рекомендации на завтра.\n\n📝 *Можно вводить вручную:*  \nПример: _/v омлет 2 яйца 09:00_\n\n⚖️ Если не знаешь вес — опиши на глаз, я прикину сам.\n\nГотов? Тогда начинаем — *просто пришли фото!*",
+        "text": "=*Привет, {{ $('Switch').item.json.message.from.first_name }}!*\n\nЯ TeddY — AI-нутрициолог. Я считаю КБЖУ по фото и тексту, веду дневник питания, показываю прогресс и помогаю держать цель.\n\n*Сначала познакомимся.* Я сам рассчитаю твои персональные калории и БЖУ и сохраню их в профиль.\n\nОтветь одним сообщением по примеру:\n`Мужчина, 24 года, 176 см, 69 кг, цель — набор, активность — высокая`\n\nЦель: снижение / поддержание / набор.\nАктивность: низкая / лёгкая / средняя / высокая / очень высокая.\n\nПосле этого можешь просто присылать фото еды — всё остальное я возьму на себя.",
         "additionalFields": {
           "appendAttribution": false,
           "parse_mode": "Markdown"
@@ -2058,6 +2058,133 @@
       ],
       "id": "325d7c68-8fb9-4ea8-8bcf-6fbcdc4fe173",
       "name": "Run Commands"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/start_client_onboarding_v2",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_chat_id",
+              "value": "={{ $('Switch').item.json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "325c6c91-1548-4ea0-9042-709ca283b0e3",
+      "name": "Start client onboarding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2350,
+        2950
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asgcofyqfflpvchhgtph.supabase.co/rest/v1/rpc/process_client_onboarding_text",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "_chat_id",
+              "value": "={{ $('Switch').item.json.message.chat.id }}"
+            },
+            {
+              "name": "_text",
+              "value": "={{ $('Switch').item.json.message.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "23ebde72-3de1-40be-a9a4-2f4b20e714d7",
+      "name": "Process onboarding input",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2820,
+        4320
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DUNna4C7qCXaLaNX",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fffc2c55-8e25-4b8a-a52b-0afd875efc63",
+              "leftValue": "={{ $json.handled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "544b4b60-38ca-4f8f-aa2b-a2a94a256523",
+      "name": "IF onboarding handled",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2600,
+        4320
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch').item.json.message.chat.id }}",
+        "text": "={{ $json.complete ? ('✅ *Готово. Я рассчитал твои персональные цели*\\n\\n🔥 '+$json.targets.kcal_target+' ккал\\n🥩 Б '+$json.targets.protein_target+' г\\n🥑 Ж '+$json.targets.fat_target+' г\\n🍚 У '+$json.targets.carb_target+' г\\n\\nРасчёт сделан по Mifflin–St Jeor с учётом пола, возраста, роста, веса, активности и цели. Эти значения уже сохранены в твоём профиле TeddY и будут использоваться ботом и платформой независимо от подписки.\\n\\nТеперь просто присылай еду 📸') : $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "f371b5d5-e18a-444a-920c-41ba23bb9266",
+      "name": "Onboarding reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2350,
+        4240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "gZFEE4w4yKIJ2OdY",
+          "name": "Telegram account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -2094,7 +2221,7 @@
         ],
         [
           {
-            "node": "User Log",
+            "node": "Process onboarding input",
             "type": "main",
             "index": 0
           }
@@ -2133,7 +2260,7 @@
       "main": [
         [
           {
-            "node": "start",
+            "node": "Start client onboarding",
             "type": "main",
             "index": 0
           }
@@ -2162,7 +2289,7 @@
         ],
         [
           {
-            "node": "start",
+            "node": "Start client onboarding",
             "type": "main",
             "index": 0
           }
@@ -2747,6 +2874,46 @@
     "Run Commands": {
       "main": [
         []
+      ]
+    },
+    "Start client onboarding": {
+      "main": [
+        [
+          {
+            "node": "start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process onboarding input": {
+      "main": [
+        [
+          {
+            "node": "IF onboarding handled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF onboarding handled": {
+      "main": [
+        [
+          {
+            "node": "Onboarding reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "User Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
