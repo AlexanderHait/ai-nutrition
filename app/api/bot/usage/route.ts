@@ -1,8 +1,9 @@
 import {NextResponse} from "next/server";
 import {getSupabaseAdmin} from "@/lib/supabase-admin";
 
-const ALLOWED_EVENT_TYPES=new Set(["execution","ai_request","vision_request","web_search"]);
-const EVENT_ALIASES:Record<string,string>={
+const MAX_BATCH_SIZE=500;
+const ALLOWED_REQUEST_TYPES=new Set(["execution","ai_request","vision_request","web_search"]);
+const REQUEST_TYPE_ALIASES:Record<string,string>={
   ai:"ai_request",
   llm:"ai_request",
   openai:"ai_request",
@@ -16,51 +17,123 @@ const EVENT_ALIASES:Record<string,string>={
   n8n:"execution"
 };
 
-function eventType(value:any){
+function requestType(value:unknown){
   const raw=String(value||"execution").trim().toLowerCase();
-  const normalized=EVENT_ALIASES[raw]||raw;
-  return ALLOWED_EVENT_TYPES.has(normalized)?normalized:"execution";
+  const normalized=REQUEST_TYPE_ALIASES[raw]||raw;
+  return ALLOWED_REQUEST_TYPES.has(normalized)?normalized:"execution";
 }
 
-function numericOrNull(value:any){
-  const n=Number(value);
-  return Number.isFinite(n)?n:null;
+function textOrNull(value:unknown){
+  if(value===null||value===undefined)return null;
+  const text=String(value).trim();
+  return text||null;
+}
+
+function numberOrNull(value:unknown){
+  if(value===null||value===undefined||value==="")return null;
+  const number=Number(value);
+  return Number.isFinite(number)&&number>=0?number:null;
+}
+
+function integerOrNull(value:unknown){
+  const number=numberOrNull(value);
+  return number===null?null:Math.trunc(number);
+}
+
+function booleanValue(value:unknown){
+  if(value===false||value==="false"||value===0||value==="0")return false;
+  return true;
+}
+
+function safeChatId(value:unknown){
+  const number=Number(value);
+  return Number.isSafeInteger(number)&&number>0?number:null;
+}
+
+function safeTimestamp(value:unknown){
+  if(!value)return new Date().toISOString();
+  const parsed=new Date(String(value));
+  return Number.isNaN(parsed.getTime())?new Date().toISOString():parsed.toISOString();
+}
+
+function objectMetadata(value:unknown){
+  return value&&typeof value==="object"&&!Array.isArray(value)?{...(value as Record<string,unknown>)}:{};
 }
 
 export async function POST(req:Request){
   const secret=process.env.N8N_USAGE_SECRET;
-  if(!secret||req.headers.get("authorization")!==`Bearer ${secret}`)
+  if(!secret||req.headers.get("authorization")!==`Bearer ${secret}`){
     return NextResponse.json({ok:false,error:"Unauthorized"},{status:401});
+  }
+
   const body=await req.json().catch(()=>null);
-  const rows=Array.isArray(body)?body:[body];
-  const clean=(rows||[]).filter(Boolean).map((x:any)=>({
-    chat_id:Number.isSafeInteger(Number(x.chat_id))?Number(x.chat_id):null,
-    workflow_id:x.workflow_id?String(x.workflow_id):null,
-    workflow_name:x.workflow_name?String(x.workflow_name):null,
-    execution_id:x.execution_id?String(x.execution_id):null,
-    event_type:eventType(x.event_type),
-    provider:x.provider?String(x.provider):null,
-    model:x.model?String(x.model):null,
-    subscription_plan:x.subscription_plan?String(x.subscription_plan):null,
-    input_tokens:numericOrNull(x.input_tokens),
-    output_tokens:numericOrNull(x.output_tokens),
-    estimated_cost_rub:numericOrNull(x.estimated_cost_rub),
-    metadata:x.metadata&&typeof x.metadata==="object"?x.metadata:{},
-    created_at:x.created_at||new Date().toISOString()
-  }));
-  if(!clean.length)return NextResponse.json({ok:true,inserted:0});
+  if(body===null){
+    return NextResponse.json({ok:false,error:"Invalid JSON"},{status:400});
+  }
+
+  const sourceRows=Array.isArray(body)?body:[body];
+  if(sourceRows.length>MAX_BATCH_SIZE){
+    return NextResponse.json({ok:false,error:`Batch limit is ${MAX_BATCH_SIZE}`},{status:413});
+  }
+
+  const clean=sourceRows
+    .filter((row):row is Record<string,unknown>=>Boolean(row&&typeof row==="object"&&!Array.isArray(row)))
+    .map(row=>{
+      const normalizedRequestType=requestType(row.request_type||row.event_type);
+      const metadata=objectMetadata(row.metadata);
+      const legacyFields:Record<string,unknown>={
+        workflow_id:textOrNull(row.workflow_id),
+        workflow_name:textOrNull(row.workflow_name),
+        execution_id:textOrNull(row.execution_id),
+        subscription_plan:textOrNull(row.subscription_plan),
+        image_count:integerOrNull(row.image_count),
+        estimated_cost_rub:numberOrNull(row.estimated_cost_rub)
+      };
+      for(const [key,value] of Object.entries(legacyFields)){
+        if(value!==null&&metadata[key]===undefined)metadata[key]=value;
+      }
+
+      return {
+        source_event_id:textOrNull(row.source_event_id||row.event_id||row.idempotency_key),
+        chat_id:safeChatId(row.chat_id),
+        feature:textOrNull(row.feature)||normalizedRequestType,
+        request_type:normalizedRequestType,
+        provider:textOrNull(row.provider),
+        model:textOrNull(row.model),
+        workflow:textOrNull(row.workflow||row.workflow_name||row.workflow_id),
+        success:booleanValue(row.success),
+        latency_ms:integerOrNull(row.latency_ms),
+        input_tokens:integerOrNull(row.input_tokens),
+        output_tokens:integerOrNull(row.output_tokens),
+        estimated_input_tokens:integerOrNull(row.estimated_input_tokens),
+        estimated_output_tokens:integerOrNull(row.estimated_output_tokens),
+        cost_usd:numberOrNull(row.cost_usd??row.estimated_cost_usd),
+        error_code:textOrNull(row.error_code),
+        metadata,
+        created_at:safeTimestamp(row.created_at)
+      };
+    });
+
+  if(!clean.length){
+    return NextResponse.json({ok:true,inserted:0,duplicates:0});
+  }
+
   const s=getSupabaseAdmin();
-  let inserted=0,duplicates=0;
+  let inserted=0;
+  let duplicates=0;
+
   for(const row of clean){
     const {error}=await s.from("ai_usage_events").insert(row);
     if(error){
-      if(error.code==="23505"){
+      if(error.code==="23505"&&row.source_event_id){
         duplicates++;
         continue;
       }
-      return NextResponse.json({ok:false,error:error.message},{status:500});
+      console.error("usage telemetry insert failed",{code:error.code,message:error.message,feature:row.feature,workflow:row.workflow});
+      return NextResponse.json({ok:false,error:"Telemetry insert failed",code:error.code},{status:500});
     }
     inserted++;
   }
+
   return NextResponse.json({ok:true,inserted,duplicates});
 }
