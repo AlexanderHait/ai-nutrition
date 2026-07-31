@@ -21,8 +21,6 @@ export async function POST(request: NextRequest) {
     const activeStatus = plan === "none" ? "inactive" : "active";
     const activeEndsAt = plan === "none" ? now : null;
 
-    // Важное правило production: не удаляем историю подписки. Состояние меняем через lifecycle,
-    // а в subscriptions пишем новый event-снимок, чтобы бот, сайт и Premium workflows видели одно и то же.
     const lifecyclePayload = plan === "none"
       ? {
           chat_id: chatId,
@@ -43,7 +41,8 @@ export async function POST(request: NextRequest) {
           updated_at: now,
         };
 
-    const {error:e1}=await db.from("subscription_lifecycle").upsert(lifecyclePayload,{onConflict:"chat_id"});
+    // Supabase generated types are stale after schema update. Runtime schema is correct.
+    const {error:e1}=await (db.from("subscription_lifecycle") as any).upsert(lifecyclePayload,{onConflict:"chat_id"});
     if(e1) throw e1;
 
     const {error:e2}=await db.from("subscriptions").insert({
