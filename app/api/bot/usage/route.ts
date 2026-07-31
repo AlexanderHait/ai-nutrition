@@ -1,7 +1,9 @@
+import {createHmac,timingSafeEqual} from "crypto";
 import {NextResponse} from "next/server";
 import {getSupabaseAdmin} from "@/lib/supabase-admin";
 
 const MAX_BATCH_SIZE=500;
+const SIGNATURE_TTL_MS=5*60*1000;
 const ALLOWED_REQUEST_TYPES=new Set(["execution","ai_request","vision_request","web_search"]);
 const REQUEST_TYPE_ALIASES:Record<string,string>={
   ai:"ai_request",
@@ -16,6 +18,8 @@ const REQUEST_TYPE_ALIASES:Record<string,string>={
   web:"web_search",
   n8n:"execution"
 };
+
+type AuthMode="bearer"|"signed";
 
 function requestType(value:unknown){
   const raw=String(value||"execution").trim().toLowerCase();
@@ -60,14 +64,39 @@ function objectMetadata(value:unknown){
   return value&&typeof value==="object"&&!Array.isArray(value)?{...(value as Record<string,unknown>)}:{};
 }
 
+function safeHexEqual(actual:string,expected:string){
+  if(!/^[a-f0-9]{64}$/i.test(actual)||actual.length!==expected.length)return false;
+  return timingSafeEqual(Buffer.from(actual,"hex"),Buffer.from(expected,"hex"));
+}
+
+function authorize(req:Request,rawBody:string):AuthMode|null{
+  const authorization=req.headers.get("authorization");
+  const usageSecret=process.env.N8N_USAGE_SECRET;
+  if(usageSecret&&authorization===`Bearer ${usageSecret}`)return "bearer";
+
+  const signingSecret=process.env.BOT_INGEST_SECRET;
+  const timestamp=req.headers.get("x-teddy-timestamp");
+  const signature=req.headers.get("x-teddy-signature");
+  if(!signingSecret||!timestamp||!signature)return null;
+
+  const timestampMs=Number(timestamp);
+  if(!Number.isFinite(timestampMs)||Math.abs(Date.now()-timestampMs)>SIGNATURE_TTL_MS)return null;
+
+  const expected=createHmac("sha256",signingSecret).update(`${timestamp}.${rawBody}`).digest("hex");
+  return safeHexEqual(signature,expected)?"signed":null;
+}
+
 export async function POST(req:Request){
-  const secret=process.env.N8N_USAGE_SECRET;
-  if(!secret||req.headers.get("authorization")!==`Bearer ${secret}`){
+  const rawBody=await req.text().catch(()=>"");
+  const authMode=authorize(req,rawBody);
+  if(!authMode){
     return NextResponse.json({ok:false,error:"Unauthorized"},{status:401});
   }
 
-  const body=await req.json().catch(()=>null);
-  if(body===null){
+  let body:unknown=null;
+  try{
+    body=JSON.parse(rawBody);
+  }catch{
     return NextResponse.json({ok:false,error:"Invalid JSON"},{status:400});
   }
 
@@ -116,6 +145,10 @@ export async function POST(req:Request){
 
   if(!clean.length){
     return NextResponse.json({ok:true,inserted:0,duplicates:0});
+  }
+
+  if(authMode==="signed"&&clean.some(row=>!row.source_event_id)){
+    return NextResponse.json({ok:false,error:"source_event_id is required for signed telemetry"},{status:400});
   }
 
   const s=getSupabaseAdmin();
