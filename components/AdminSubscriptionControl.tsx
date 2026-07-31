@@ -7,9 +7,11 @@ export type SubscriptionPlan = "none" | "basic" | "premium";
 export default function AdminSubscriptionControl({
   chatId,
   currentPlan = "none",
+  compact = false,
 }: {
   chatId: number | string;
   currentPlan?: SubscriptionPlan | null;
+  compact?: boolean;
 }) {
   const [plan, setPlan] = useState<SubscriptionPlan>(currentPlan ?? "none");
   const [saving, setSaving] = useState(false);
@@ -39,9 +41,9 @@ export default function AdminSubscriptionControl({
   }
 
   return (
-    <div style={{ display: "grid", gap: 8 }}>
-      <div style={{ fontSize: 13, opacity: 0.65 }}>Подписка</div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+    <div className={compact ? "subscriptionControl compact" : "subscriptionControl"}>
+      {!compact ? <div className="subscriptionControlLabel">Подписка</div> : null}
+      <div className="subscriptionControlButtons">
         {[
           ["none", "Без подписки"],
           ["basic", "Basic"],
@@ -53,22 +55,15 @@ export default function AdminSubscriptionControl({
               key={value}
               disabled={saving}
               onClick={() => changePlan(value as SubscriptionPlan)}
-              style={{
-                padding: "8px 14px",
-                borderRadius: 12,
-                border: active ? "2px solid currentColor" : "1px solid #9995",
-                background: "transparent",
-                color: "inherit",
-                fontWeight: active ? 700 : 500,
-                cursor: saving ? "default" : "pointer",
-              }}
+              className={active ? "active" : ""}
+              type="button"
             >
               {label}
             </button>
           );
         })}
       </div>
-      {error ? <div style={{ color: "#d33", fontSize: 13 }}>{error}</div> : null}
+      {error ? <div className="subscriptionControlError">{error}</div> : null}
     </div>
   );
 }

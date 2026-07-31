@@ -17,18 +17,44 @@ export async function POST(request: NextRequest) {
 
     const db = getSupabaseAdmin();
     const now = new Date().toISOString();
+    const activePlan = plan === "none" ? "basic" : plan;
+    const activeStatus = plan === "none" ? "inactive" : "active";
+    const activeEndsAt = plan === "none" ? now : null;
 
-    if (plan === "none") {
-      const {error:e1}=await db.from("subscription_lifecycle").delete().eq("chat_id",chatId);
-      if(e1) throw e1;
-      const {error:e2}=await db.from("subscriptions").insert({chat_id:chatId,plan:"basic",status:"inactive",started_at:now,ends_at:now});
-      if(e2) throw e2;
-    } else {
-      const {error:e1}=await db.from("subscription_lifecycle").upsert({chat_id:chatId,plan,state:"active",cancel_at_period_end:false,current_period_start:now,current_period_end:null,updated_at:now},{onConflict:"chat_id"});
-      if(e1) throw e1;
-      const {error:e2}=await db.from("subscriptions").insert({chat_id:chatId,plan,status:"active",started_at:now,ends_at:null});
-      if(e2) throw e2;
-    }
+    // Важное правило production: не удаляем историю подписки. Состояние меняем через lifecycle,
+    // а в subscriptions пишем новый event-снимок, чтобы бот, сайт и Premium workflows видели одно и то же.
+    const lifecyclePayload = plan === "none"
+      ? {
+          chat_id: chatId,
+          plan: "basic",
+          state: "inactive",
+          cancel_at_period_end: false,
+          current_period_start: null,
+          current_period_end: now,
+          updated_at: now,
+        }
+      : {
+          chat_id: chatId,
+          plan,
+          state: "active",
+          cancel_at_period_end: false,
+          current_period_start: now,
+          current_period_end: null,
+          updated_at: now,
+        };
+
+    const {error:e1}=await db.from("subscription_lifecycle").upsert(lifecyclePayload,{onConflict:"chat_id"});
+    if(e1) throw e1;
+
+    const {error:e2}=await db.from("subscriptions").insert({
+      chat_id: chatId,
+      plan: activePlan,
+      status: activeStatus,
+      started_at: now,
+      ends_at: activeEndsAt,
+    });
+    if(e2) throw e2;
+
     return NextResponse.json({ok:true,chatId,plan});
   } catch (e) {
     console.error("admin subscription update failed",e);

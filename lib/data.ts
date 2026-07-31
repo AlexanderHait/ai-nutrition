@@ -180,7 +180,7 @@ export async function adminClientsData(){
     {data:profiles,error:pe},{data:settings},{data:subscriptions},{data:meals,error:me},{data:logs}
   ]=await Promise.all([
     s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').order('created_at',{ascending:false}),
-    s.from('client_settings').select('chat_id,goal,kcal_target,current_weight_kg,target_weight_kg'),
+    s.from('client_settings').select('chat_id,goal,kcal_target,protein_target,protein_target_g,fat_target,fat_target_g,carb_target,carb_target_g,current_weight_kg,target_weight_kg'),
     s.from('subscriptions').select('chat_id,plan,status,created_at,ends_at').order('created_at',{ascending:false}),
     s.from('meals').select('id,chat_id,dish,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(6000),
     s.from('chat_logs').select('chat_id,created_at').gte('created_at',d30).order('created_at',{ascending:false}).limit(4000)
@@ -193,16 +193,18 @@ export async function adminClientOverviewData(chatId:number){
   const s=getSupabaseAdmin();
   const d14=new Date();d14.setDate(d14.getDate()-13);const fromDay=dayKey(d14);
   const [
-    {data:profile},{data:settings},{data:subscription},{data:meals},{data:weights},{count:unread}
+    {data:profile},{data:settings},{data:subscription},{data:meals},{data:weights},{count:unread},{data:logs},{data:recognition,error:recognitionError}
   ]=await Promise.all([
     s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').eq('telegram_id',chatId).maybeSingle(),
     s.from('client_settings').select('*').eq('chat_id',chatId).maybeSingle(),
     s.from('subscriptions').select('plan,status,price_rub,started_at,ends_at,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
     s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(1200),
     s.from('weight_logs').select('id,weight_kg,measured_at').eq('chat_id',chatId).order('measured_at',{ascending:false}).limit(12),
-    s.from('support_messages').select('id',{count:'exact',head:true}).eq('chat_id',chatId).eq('sender','client').is('read_by_admin_at',null)
+    s.from('support_messages').select('id',{count:'exact',head:true}).eq('chat_id',chatId).eq('sender','client').is('read_by_admin_at',null),
+    s.from('chat_logs').select('created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1),
+    s.from('recognition_events').select('confidence_food,confidence_portion,confidence_nutrition,needs_confirmation,latency_ms,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(200)
   ]);
-  return{profile,settings,subscription,meals:(meals||[]) as Meal[],weights:weights||[],unread:unread||0};
+  return{profile,settings,subscription,meals:(meals||[]) as Meal[],weights:weights||[],unread:unread||0,logs:logs||[],recognition:recognitionError?[]:(recognition||[])};
 }
 
 export async function clientHomeData(chatId:number){
