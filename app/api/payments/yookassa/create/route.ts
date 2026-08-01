@@ -6,6 +6,7 @@ import {
   createYooPayment,
   publicSiteUrl,
   rublesToYooValue,
+  yooKassaConfigured,
   YooCreatePaymentBody,
 } from "@/lib/yookassa";
 
@@ -29,6 +30,9 @@ export async function POST(request: Request) {
 
   if (!ALLOWED_PLANS.has(plan)) {
     return NextResponse.redirect(new URL("/client/plan?payment=invalid_plan", request.url), 303);
+  }
+  if (!yooKassaConfigured()) {
+    return NextResponse.redirect(new URL("/client/plan?payment=unavailable", request.url), 303);
   }
   if (!accepted) return NextResponse.redirect(checkoutUrl(request.url, plan, "terms"), 303);
   if (email && !EMAIL_RE.test(email)) {
