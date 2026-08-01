@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CheckCircle2, CreditCard, ShieldCheck } from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { yooKassaConfigured } from "@/lib/yookassa";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export default async function Page({
   const { plan } = await params;
   const query = await searchParams;
   if (plan !== "basic" && plan !== "premium") redirect("/client/plan");
+  if (!yooKassaConfigured()) redirect("/client/plan?payment=unavailable");
 
   const db = getSupabaseAdmin();
   const { data: product } = await db
