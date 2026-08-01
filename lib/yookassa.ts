@@ -60,6 +60,12 @@ export class YooKassaError extends Error {
   }
 }
 
+export function yooKassaConfigured() {
+  return Boolean(
+    process.env.YOOKASSA_SHOP_ID?.trim() && process.env.YOOKASSA_SECRET_KEY?.trim(),
+  );
+}
+
 function credentials() {
   const shopId = process.env.YOOKASSA_SHOP_ID?.trim();
   const secretKey = process.env.YOOKASSA_SECRET_KEY?.trim();
