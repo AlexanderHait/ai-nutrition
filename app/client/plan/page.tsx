@@ -16,6 +16,7 @@ import {
 import { requireClient } from "@/lib/auth";
 import { clientProfileData, subscriptionLifecycleData } from "@/lib/data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { yooKassaConfigured } from "@/lib/yookassa";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +69,7 @@ export default async function Page({
   const auth = await requireClient();
   const query = await searchParams;
   const db = getSupabaseAdmin();
+  const paymentReady = yooKassaConfigured();
   const [data, life, productsResult] = await Promise.all([
     clientProfileData(auth.chatId!),
     subscriptionLifecycleData(auth.chatId!),
@@ -113,7 +115,7 @@ export default async function Page({
         <div className="subscriptionControlError"><XCircle size={16} />Оплата не завершена. Деньги повторно не списывались.</div>
       ) : null}
       {["unavailable", "invalid_plan", "order_not_found", "missing_order"].includes(query.payment || "") ? (
-        <div className="subscriptionControlError">Не удалось открыть платёж. Выбери тариф ещё раз.</div>
+        <div className="subscriptionControlError">Оплата пока недоступна. Текущий доступ продолжает работать.</div>
       ) : null}
 
       {life ? (
@@ -164,6 +166,7 @@ export default async function Page({
           desc="Для тех, кому нужен быстрый и удобный контроль рациона."
           features={basic}
           product={basicProduct}
+          paymentReady={paymentReady}
           active={isBasic}
           included={isPremium}
           openHref="/client/nutrition"
@@ -175,6 +178,7 @@ export default async function Page({
           desc="Для тех, кто хочет не считать самому, а получать персональную стратегию каждый день."
           features={premiumFeatures}
           product={premiumProduct}
+          paymentReady={paymentReady}
           active={isPremium}
           openHref="/client/coach"
           openLabel="Открыть Premium"
@@ -210,6 +214,7 @@ function Plan({
   desc,
   features,
   product,
+  paymentReady,
   active,
   included = false,
   openHref,
@@ -221,6 +226,7 @@ function Plan({
   desc: string;
   features: string[];
   product?: Product;
+  paymentReady: boolean;
   active: boolean;
   included?: boolean;
   openHref: string;
@@ -251,14 +257,14 @@ function Plan({
       ) : active ? (
         <>
           <Link className={premium ? "primary planCta" : "secondaryBtn planCta"} href={openHref}>{openLabel}</Link>
-          {product ? <Link className="secondaryBtn planCta" href={checkoutHref}>Продлить за {price} ₽</Link> : null}
+          {product && paymentReady ? <Link className="secondaryBtn planCta" href={checkoutHref}>Продлить за {price} ₽</Link> : null}
         </>
-      ) : product ? (
+      ) : product && paymentReady ? (
         <Link className={premium ? "primary planCta" : "secondaryBtn planCta"} href={checkoutHref}>
           {premium ? `Подключить Premium за ${price} ₽` : `Подключить Basic за ${price} ₽`}
         </Link>
       ) : (
-        <span className="muted">Оплата временно недоступна</span>
+        <span className="muted">Оплата подключается</span>
       )}
     </section>
   );
