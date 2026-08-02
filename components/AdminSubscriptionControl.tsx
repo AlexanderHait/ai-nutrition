@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import TimelinePanel from "@/components/TimelinePanel";
+import CoachScoreRemote from "@/components/CoachScoreRemote";
 
 export type SubscriptionPlan = "none" | "basic" | "premium";
 
@@ -65,6 +66,7 @@ export default function AdminSubscriptionControl({
         })}
       </div>
       {error ? <div className="subscriptionControlError">{error}</div> : null}
+      {!compact ? <CoachScoreRemote chatId={Number(chatId)} /> : null}
       {!compact ? <TimelinePanel chatId={Number(chatId)} embedded /> : null}
     </div>
   );
