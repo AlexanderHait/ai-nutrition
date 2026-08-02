@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { isAuthorizedBotRequest } from "@/lib/bot-api-auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { dayKey, mealSessions, sumMeals, type Meal } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  if (req.headers.get("authorization") !== `Bearer ${process.env.BOT_INGEST_SECRET}`) {
+  if (!isAuthorizedBotRequest(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
