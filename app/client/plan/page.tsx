@@ -14,8 +14,8 @@ import {
   XCircle,
 } from "lucide-react";
 import { requireClient } from "@/lib/auth";
-import { clientProfileData, subscriptionLifecycleData } from "@/lib/data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { subscriptionAccess } from "@/lib/subscription-access";
 import { yooKassaConfigured } from "@/lib/yookassa";
 
 export const dynamic = "force-dynamic";
@@ -27,10 +27,13 @@ const basic = [
   "Сегодняшний остаток КБЖУ",
   "История и базовый прогресс",
   "Вес и личный профиль",
+  "До 10 фото-анализов в месяц",
+  "До 20 AI-запросов в месяц",
 ];
 
 const premiumFeatures = [
   "Всё из Basic",
+  "Безлимитные фото-анализы и AI-запросы",
   "Персональный AI‑нутрициолог",
   "Ежедневный план питания",
   "Рекомендации следующего приёма",
@@ -51,28 +54,17 @@ type Product = {
   enabled: boolean;
 };
 
-function lifecycleIsActive(life: any, plan: "basic" | "premium") {
-  return Boolean(
-    life?.plan === plan &&
-      ["trial", "active", "grace"].includes(String(life?.state || "")) &&
-      (!life?.current_period_end ||
-        new Date(life.current_period_end) > new Date() ||
-        life?.state === "grace"),
-  );
-}
-
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ payment?: string }>;
+  searchParams: Promise<{ payment?: string; trial?: string }>;
 }) {
   const auth = await requireClient();
   const query = await searchParams;
   const db = getSupabaseAdmin();
   const paymentReady = yooKassaConfigured();
-  const [data, life, productsResult] = await Promise.all([
-    clientProfileData(auth.chatId!),
-    subscriptionLifecycleData(auth.chatId!),
+  const [access, productsResult] = await Promise.all([
+    subscriptionAccess(auth.chatId!),
     db
       .from("subscription_products")
       .select("plan,price_rub,period_days,enabled")
@@ -80,23 +72,14 @@ export default async function Page({
       .order("sort_order"),
   ]);
 
-  const subscription: any = data.subscription || {};
-  const fallbackPremium =
-    subscription.status === "active" &&
-    subscription.plan === "premium" &&
-    (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
-  const fallbackBasic =
-    subscription.status === "active" &&
-    subscription.plan === "basic" &&
-    (!subscription.ends_at || new Date(subscription.ends_at) > new Date());
-
-  const isPremium = lifecycleIsActive(life, "premium") || fallbackPremium;
-  const isBasic = !isPremium && (lifecycleIsActive(life, "basic") || fallbackBasic);
   const products = new Map<string, Product>(
     ((productsResult.data || []) as Product[]).map((product) => [product.plan, product]),
   );
   const basicProduct = products.get("basic");
   const premiumProduct = products.get("premium");
+  const isPremium = access.premium;
+  const isBasic = !isPremium;
+  const accessEnd = access.trial_ends_at || access.current_period_end;
 
   return (
     <>
@@ -117,43 +100,48 @@ export default async function Page({
       {["unavailable", "invalid_plan", "order_not_found", "missing_order"].includes(query.payment || "") ? (
         <div className="subscriptionControlError">Оплата пока недоступна. Текущий доступ продолжает работать.</div>
       ) : null}
-
-      {life ? (
-        <section className="subscriptionLifecycleBar">
-          <div>
-            <small>Текущий доступ</small>
-            <b>{isPremium ? "Premium" : isBasic ? "Basic" : "Без активной подписки"}</b>
-            <span>
-              {life.current_period_end
-                ? `до ${new Date(life.current_period_end).toLocaleDateString("ru-RU")}`
-                : "без указанного срока"}
-            </span>
-          </div>
-          {life.provider !== "yookassa" &&
-          life.plan === "premium" &&
-          ["trial", "active", "grace"].includes(life.state) &&
-          !life.cancel_at_period_end ? (
-            <form action="/api/subscription/lifecycle" method="post">
-              <button className="secondaryBtn" name="action" value="cancel">Отключить автопродление</button>
-            </form>
-          ) : null}
-        </section>
+      {query.trial === "started" ? (
+        <div className="successNotice"><CheckCircle2 size={16} />Premium trial активирован на 7 дней.</div>
       ) : null}
+      {query.trial === "used" ? (
+        <div className="subscriptionControlError">Пробный Premium уже был использован.</div>
+      ) : null}
+      {query.trial === "error" ? (
+        <div className="subscriptionControlError">Не удалось активировать trial. Текущий Basic продолжает работать.</div>
+      ) : null}
+
+      <section className="subscriptionLifecycleBar">
+        <div>
+          <small>Текущий доступ</small>
+          <b>{isPremium ? (access.state === "trial" ? "Premium trial" : "Premium") : "Basic"}</b>
+          <span>
+            {accessEnd
+              ? `до ${new Date(accessEnd).toLocaleDateString("ru-RU")}`
+              : isPremium
+                ? "без указанного срока"
+                : "базовый доступ активен"}
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
+          <span><small>Фото в этом месяце</small><b>{isPremium ? "Безлимит" : `${access.remaining.photo_analysis} из ${access.limits.photo_analysis}`}</b></span>
+          <span><small>AI-запросы</small><b>{isPremium ? "Безлимит" : `${access.remaining.ai_request} из ${access.limits.ai_request}`}</b></span>
+        </div>
+      </section>
 
       {isPremium ? (
         <Link href="/client/coach" className="premiumActiveBanner">
           <Crown />
-          <span><small>Premium активен</small><b>Открыть персонального нутрициолога</b></span>
+          <span><small>{access.state === "trial" ? "Premium trial активен" : "Premium активен"}</small><b>Открыть персонального нутрициолога</b></span>
           →
         </Link>
       ) : null}
 
-      {!isPremium && !life ? (
+      {!isPremium && access.trial_available ? (
         <form action="/api/subscription/lifecycle" method="post" className="trialBanner">
           <div>
-            <small>7 дней</small>
+            <small>7 дней бесплатно</small>
             <b>Попробовать TeddY Premium</b>
-            <span>Персональный Coach, планы, рекомендации и недельная стратегия.</span>
+            <span>Полный доступ без оплаты и автоматического списания. После trial останется Basic.</span>
           </div>
           <button className="primary" name="action" value="trial">Начать trial</button>
         </form>
