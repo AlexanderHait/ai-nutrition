@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CheckCircle2, CreditCard, ShieldCheck } from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { subscriptionAccess } from "@/lib/subscription-access";
 import { yooKassaConfigured } from "@/lib/yookassa";
 
 export const dynamic = "force-dynamic";
@@ -12,8 +13,11 @@ const ERRORS: Record<string, string> = {
   email: "Проверь адрес электронной почты.",
   email_required: "Для формирования чека нужен адрес электронной почты.",
   unavailable: "Этот тариф временно недоступен.",
-  order: "Не удалось создать заказ. Попробуй ещё раз.",
-  provider: "Не удалось перейти к оплате. Проверь настройки ЮKassa или попробуй ещё раз.",
+  order: "Не удалось подготовить заказ. Попробуй ещё раз.",
+  provider: "ЮKassa отклонила создание платежа. Деньги не списаны.",
+  processing: "ЮKassa ещё обрабатывает запрос. Повтори переход через несколько секунд: сайт восстановит тот же платёж и не создаст второй.",
+  canceled: "Предыдущий платёж отменён. Можно создать новый.",
+  already_active: "Premium уже активен без ограничения по сроку. Доплачивать сейчас не нужно.",
 };
 
 export default async function Page({
@@ -23,20 +27,26 @@ export default async function Page({
   params: Promise<{ plan: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
-  await requireClient();
+  const auth = await requireClient();
   const { plan } = await params;
   const query = await searchParams;
   if (plan !== "basic" && plan !== "premium") redirect("/client/plan");
   if (!yooKassaConfigured()) redirect("/client/plan?payment=unavailable");
 
   const db = getSupabaseAdmin();
-  const { data: product } = await db
-    .from("subscription_products")
-    .select("plan,title,description,price_rub,period_days,enabled")
-    .eq("plan", plan)
-    .eq("enabled", true)
-    .maybeSingle();
+  const [{ data: product }, access] = await Promise.all([
+    db
+      .from("subscription_products")
+      .select("plan,title,description,price_rub,period_days,enabled")
+      .eq("plan", plan)
+      .eq("enabled", true)
+      .maybeSingle(),
+    subscriptionAccess(auth.chatId!),
+  ]);
   if (!product) redirect("/client/plan?payment=unavailable");
+  if (plan === "premium" && access.premium && access.state === "active" && !access.current_period_end) {
+    redirect("/client/plan");
+  }
 
   const price = Number(product.price_rub).toLocaleString("ru-RU");
   const error = query.error ? ERRORS[query.error] : null;
