@@ -13,7 +13,7 @@ export default async function Shell({children,role,isPremium=false}:{children:Re
     {label:"Управление",items:[["/admin/subscriptions","Подписки","subscriptions"],["/admin/premium-health","Premium · контроль","activity"],["/admin/system","Система","settings"]]},
   ];
   const clientGroups:readonly NavGroup[]=[
-    {label:"Основное",items:[["/client","Главная","home"],["/client/nutrition","Питание","nutrition"],["/client/progress","Прогресс","progress"],["/client/coach","TeddY Coach","coach",{premium:true}]]},
+    {label:"Основное",items:[["/client","Главная","home"],["/client/nutrition","Питание","nutrition"],["/client/progress","Прогресс","progress"],["/client/history","История","history"],["/client/coach","TeddY Coach","coach",{premium:true}]]},
     {label:"Аккаунт",items:[["/client/profile","Профиль","profile"],["/client/plan","Подписка","plan"],["/client/support","Поддержка","support"]]},
   ];
   let unreadDialogs=0;
