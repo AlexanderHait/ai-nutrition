@@ -49,7 +49,7 @@ export default function CoachScoreCard({ score, compact = false }: { score: Coac
         <BrainCircuit size={20} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: compact ? "110px minmax(0,1fr)" : "140px minmax(0,1fr)", gap: 22, alignItems: "center", marginTop: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: compact ? "repeat(auto-fit,minmax(140px,1fr))" : "repeat(auto-fit,minmax(210px,1fr))", gap: 22, alignItems: "center", marginTop: 18 }}>
         <div
           style={{
             width: compact ? 104 : 132,
@@ -57,16 +57,17 @@ export default function CoachScoreCard({ score, compact = false }: { score: Coac
             borderRadius: "50%",
             display: "grid",
             placeItems: "center",
+            justifySelf: "center",
             background: `conic-gradient(#6366f1 ${ringValue}%, rgba(148,163,184,.15) 0)`,
             position: "relative",
           }}
         >
-          <div style={{ width: "78%", height: "78%", borderRadius: "50%", background: "var(--card, #111827)", display: "grid", placeItems: "center", textAlign: "center" }}>
+          <div style={{ width: "78%", height: "78%", borderRadius: "50%", background: "var(--panel)", display: "grid", placeItems: "center", textAlign: "center" }}>
             <span><b style={{ display: "block", fontSize: compact ? 25 : 32 }}>{value == null ? "—" : value}</b><small>/ 100</small></span>
           </div>
         </div>
 
-        <div style={{ display: "grid", gap: 10 }}>
+        <div style={{ display: "grid", gap: 10, minWidth: 0 }}>
           <div style={{ display: "flex", gap: 9, alignItems: "center", flexWrap: "wrap" }}>
             <b>{scoreLabel(value)}</b>
             {trend != null ? (
