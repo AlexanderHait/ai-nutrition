@@ -1,23 +1,31 @@
-import { NextResponse } from 'next/server';
-import { sessionCookie } from '@/lib/auth';
+import { NextResponse } from "next/server";
+import { sessionCookie } from "@/lib/auth";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
-function logout(req: Request) {
-  const res = NextResponse.redirect(new URL('/login', req.url), 303);
-  res.cookies.set(sessionCookie, '', {
+async function logout(request: Request) {
+  try {
+    const supabase = await getSupabaseServer();
+    await supabase.auth.signOut();
+  } catch {
+    // The local session is still cleared below.
+  }
+
+  const response = NextResponse.redirect(new URL("/login", request.url), 303);
+  response.cookies.set(sessionCookie, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
     expires: new Date(0),
     maxAge: 0,
   });
-  return res;
+  return response;
 }
 
-export async function GET(req: Request) {
-  return logout(req);
+export async function GET(request: Request) {
+  return logout(request);
 }
 
-export async function POST(req: Request) {
-  return logout(req);
+export async function POST(request: Request) {
+  return logout(request);
 }
