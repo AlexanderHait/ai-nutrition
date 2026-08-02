@@ -3,6 +3,7 @@ import TelegramLogin from "@/components/TelegramLogin";
 
 const errors: Record<string, string> = {
   credentials: "Неверный логин, email или пароль.",
+  email_unconfirmed: "Email ещё не подтверждён. Подтверди адрес по письму или отправь письмо повторно.",
   register_fields: "Проверь email, логин и пароль. Пароль — не менее 10 символов.",
   login_taken: "Этот логин уже занят.",
   email_taken: "Аккаунт с этим email уже существует.",
@@ -26,6 +27,7 @@ export default async function Login({
   const query = await searchParams;
   const mode = typeof query.mode === "string" ? query.mode : "login";
   const error = typeof query.error === "string" ? query.error : "";
+  const email = typeof query.email === "string" ? query.email : "";
 
   return (
     <main className="login">
@@ -36,7 +38,16 @@ export default async function Login({
 
         {error ? <div className="notice">{errors[error] || "Не удалось выполнить вход."}</div> : null}
         {query.registered === "1" ? <div className="successNotice">Аккаунт создан. Подтверди email по письму и войди.</div> : null}
+        {query.confirmation === "sent" ? <div className="successNotice">Письмо подтверждения отправлено повторно.</div> : null}
         {query.reset === "sent" ? <div className="successNotice">Если такой email зарегистрирован, ссылка для восстановления уже отправлена.</div> : null}
+
+        {error === "email_unconfirmed" ? (
+          <form action="/api/auth/password/resend-confirmation" method="post" className="loginBlock">
+            <h3>Подтвердить email</h3>
+            <input name="email" type="email" autoComplete="email" defaultValue={email} placeholder="Email" required />
+            <button className="secondaryBtn">Отправить письмо повторно</button>
+          </form>
+        ) : null}
 
         {mode === "register" ? (
           <form action="/api/auth/password/register" method="post" className="loginBlock">
