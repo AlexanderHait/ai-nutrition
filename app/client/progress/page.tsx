@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Activity, Scale, Sparkles, Target, TrendingDown, TrendingUp } from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { clientProgressData, dayKey, fmt, mealDay, mealSessions, sumMeals } from "@/lib/data";
+import { coachScore } from "@/lib/coach-score";
+import { subscriptionAccess } from "@/lib/subscription-access";
+import CoachScoreCard from "@/components/CoachScoreCard";
 
 export const dynamic="force-dynamic";
 
@@ -9,7 +12,11 @@ function clean(text:string){return String(text||"").replace(/\\([_*`])/g,"$1").r
 
 export default async function Page(){
   const s=await requireClient();
-  const d=await clientProgressData(s.chatId!);
+  const [d,score,access]=await Promise.all([
+    clientProgressData(s.chatId!),
+    coachScore(s.chatId!),
+    subscriptionAccess(s.chatId!),
+  ]);
   const target=Number(d.settings?.kcal_target||2000);
   const targetWeight=Number(d.settings?.target_weight_kg||0);
 
@@ -26,7 +33,7 @@ export default async function Page(){
   const delta=latest&&previous?Number(latest.weight_kg)-Number(previous.weight_kg):null;
   const max=Math.max(target,1,...days.map(x=>x.total.kcal));
   const latestData=d.meals?.[0]?.eaten_at||d.weights?.[0]?.measured_at;
-  const premium=d.subscription?.status==="active"&&d.subscription?.plan==="premium"&&(!d.subscription?.ends_at||new Date(d.subscription.ends_at)>new Date());
+  const premium=access.premium;
 
   return <>
     <div className="pageHead"><div><p>Динамика</p><h1>Прогресс</h1><span>Главное за неделю и тренды за 14 дней.</span></div></div>
@@ -38,6 +45,8 @@ export default async function Page(){
       <Metric icon={delta!==null&&delta<=0?<TrendingDown/>:<TrendingUp/>} label="Изменение веса" value={delta!==null?`${delta>0?"+":""}${fmt(delta,1)} кг`:"—"} sub="к предыдущему измерению"/>
       <Metric icon={<Sparkles/>} label="Попадание в цель" value={complete.length?`${adherence}%`:"—"} sub="±12% от калорийности"/>
     </div>
+
+    <div className="top"><CoachScoreCard score={score}/></div>
 
     <div className="clientProgressGrid top">
       <section className="card progressChartCard">
