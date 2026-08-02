@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     password,
     options: {
       data: { display_name: name || login, login },
-      emailRedirectTo: `${origin}/auth/callback?next=/client`,
+      emailRedirectTo: `${origin}/auth/callback?next=/client/profile`,
     },
   });
 
@@ -42,8 +42,13 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL(`/login?mode=register&error=${code}`, request.url), 303);
   }
 
+  const identities = data.user?.identities;
+  if (!data.user || (Array.isArray(identities) && identities.length === 0)) {
+    return NextResponse.redirect(new URL("/login?mode=register&error=email_taken", request.url), 303);
+  }
+
   return NextResponse.redirect(
-    new URL(data.session ? "/client" : "/login?registered=1", request.url),
+    new URL(data.session ? "/client/profile" : `/login?registered=1&email=${encodeURIComponent(email)}`, request.url),
     303,
   );
 }
