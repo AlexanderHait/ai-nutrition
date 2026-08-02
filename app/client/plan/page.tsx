@@ -3,7 +3,6 @@ import { BrainCircuit, Camera, ChartNoAxesCombined, Check, CheckCircle2, Crown, 
 import { requireClient } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { subscriptionAccess } from "@/lib/subscription-access";
-import { yooKassaConfigured } from "@/lib/yookassa";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +42,6 @@ export default async function Page({
   const current = await requireClient();
   const query = await searchParams;
   const db = getSupabaseAdmin();
-  const paymentReady = yooKassaConfigured();
   const [access, productsResult] = await Promise.all([
     subscriptionAccess(current.accountId!),
     db.from("subscription_products")
@@ -67,7 +65,7 @@ export default async function Page({
       {query.payment === "success" ? <div className="successNotice"><CheckCircle2 size={16} />Оплата подтверждена. Подписка активирована.</div> : null}
       {query.payment === "canceled" ? <div className="subscriptionControlError"><XCircle size={16} />Оплата не завершена. Деньги повторно не списывались.</div> : null}
       {["unavailable", "invalid_plan", "order_not_found", "missing_order"].includes(query.payment || "") ? <div className="subscriptionControlError">Оплата пока недоступна. Текущий доступ продолжает работать.</div> : null}
-      {query.trial === "started" ? <div className="successNotice"><CheckCircle2 size={16} />Premium trial активирован на 7 дней.</div> : null}
+      {query.trial === "started" ? <div className="successNotice"><CheckCircle2 size={16} />Premium trial активирован на 3 дня.</div> : null}
       {query.trial === "used" ? <div className="subscriptionControlError">Пробный Premium уже был использован.</div> : null}
       {query.trial === "error" ? <div className="subscriptionControlError">Не удалось активировать trial.</div> : null}
 
@@ -83,14 +81,14 @@ export default async function Page({
 
       {!isPremium && access.trial_available ? (
         <form action="/api/subscription/lifecycle" method="post" className="trialBanner">
-          <div><small>7 дней бесплатно</small><b>Попробовать TeddY Premium</b><span>Без оплаты и автоматического списания. После trial останется Basic.</span></div>
+          <div><small>3 дня бесплатно</small><b>Попробовать TeddY Premium</b><span>Без оплаты и автоматического списания. После trial останется Basic.</span></div>
           <button className="primary" name="action" value="trial">Начать trial</button>
         </form>
       ) : null}
 
       <div className="plansGrid premiumComparison top">
-        <Plan name="Basic" sub="Трекер питания" desc="Для быстрого и удобного контроля рациона." features={basic} product={basicProduct} paymentReady={paymentReady} active={!isPremium} included={isPremium} openHref="/client/nutrition" openLabel="Открыть трекер" />
-        <Plan name="Premium" sub="AI‑нутрициолог" desc="Персональная стратегия и сопровождение каждый день." features={premiumFeatures} product={premiumProduct} paymentReady={paymentReady} active={isPremium} openHref="/client/coach" openLabel="Открыть Premium" premium />
+        <Plan name="Basic" sub="Трекер питания" desc="Для быстрого и удобного контроля рациона." features={basic} product={basicProduct} active={!isPremium} included={isPremium} openHref="/client/nutrition" openLabel="Открыть трекер" />
+        <Plan name="Premium" sub="AI‑нутрициолог" desc="Персональная стратегия и сопровождение каждый день." features={premiumFeatures} product={premiumProduct} active={isPremium} openHref="/client/coach" openLabel="Открыть Premium" premium />
       </div>
 
       <section className="premiumDifference top">
@@ -112,13 +110,12 @@ export default async function Page({
   );
 }
 
-function Plan({ name, sub, desc, features, product, paymentReady, active, included = false, openHref, openLabel, premium }: {
+function Plan({ name, sub, desc, features, product, active, included = false, openHref, openLabel, premium }: {
   name: "Basic" | "Premium";
   sub: string;
   desc: string;
   features: string[];
   product?: Product;
-  paymentReady: boolean;
   active: boolean;
   included?: boolean;
   openHref: string;
@@ -126,13 +123,32 @@ function Plan({ name, sub, desc, features, product, paymentReady, active, includ
   premium?: boolean;
 }) {
   const price = product ? Number(product.price_rub).toLocaleString("ru-RU") : null;
-  const checkoutHref = `/client/checkout/${name.toLowerCase()}`;
+  const checkoutAction = `/client/checkout/${name.toLowerCase()}`;
+  const purchaseLabel = premium ? `Оформить Premium${price ? ` за ${price} ₽` : ""}` : `Оформить Basic${price ? ` за ${price} ₽` : ""}`;
+
   return (
     <section className={`planCard ${premium ? "premium" : "basic"}`}>
       {premium ? <em>ПОЛНОЕ СОПРОВОЖДЕНИЕ</em> : null}
       <div className="planCardHead"><i>{premium ? <Crown /> : <Camera />}</i><div><small>{sub}</small><h2>{name}</h2><p>{desc}</p>{price ? <p><b>{price} ₽</b> · {product?.period_days} дней</p> : null}</div></div>
       <div className="planFeatures">{features.map((feature) => <div key={feature}><Check size={15} /><span>{feature}</span></div>)}</div>
-      {included ? <Link className="secondaryBtn planCta" href={openHref}>Включено в Premium</Link> : active ? <><Link className={premium ? "primary planCta" : "secondaryBtn planCta"} href={openHref}>{openLabel}</Link>{product && paymentReady ? <Link className="secondaryBtn planCta" href={checkoutHref}>Продлить за {price} ₽</Link> : null}</> : product && paymentReady ? <Link className={premium ? "primary planCta" : "secondaryBtn planCta"} href={checkoutHref}>{premium ? `Подключить Premium за ${price} ₽` : `Подключить Basic за ${price} ₽`}</Link> : <span className="muted">Оплата подключается</span>}
+      {included ? (
+        <Link className="secondaryBtn planCta" href={openHref}>Включено в Premium</Link>
+      ) : active ? (
+        <>
+          <Link className={premium ? "primary planCta" : "secondaryBtn planCta"} href={openHref}>{openLabel}</Link>
+          {product ? (
+            <form action={checkoutAction} method="get">
+              <button className="secondaryBtn planCta" type="submit">{premium ? `Продлить Premium за ${price} ₽` : `Продлить Basic за ${price} ₽`}</button>
+            </form>
+          ) : null}
+        </>
+      ) : product ? (
+        <form action={checkoutAction} method="get">
+          <button className={premium ? "primary planCta" : "secondaryBtn planCta"} type="submit">{purchaseLabel}</button>
+        </form>
+      ) : (
+        <span className="muted">Тариф временно недоступен</span>
+      )}
     </section>
   );
 }
