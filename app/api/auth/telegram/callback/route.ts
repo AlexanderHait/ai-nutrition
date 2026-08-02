@@ -11,6 +11,8 @@ const JWKS = createRemoteJWKSet(
 type StatePayload = {
   v: string;
   ts: number;
+  mode?: "link";
+  authUserId?: string;
 };
 
 function secret() {
@@ -26,66 +28,51 @@ function verifyState(state: string): StatePayload | null {
   try {
     const key = secret();
     if (!key) return null;
-
     const [body, sig] = state.split(".");
     if (!body || !sig) return null;
-
     const expected = crypto
       .createHmac("sha256", key)
       .update(body)
       .digest("base64url");
-
     const a = Buffer.from(sig);
     const b = Buffer.from(expected);
     if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
-
     const payload = JSON.parse(
       Buffer.from(body, "base64url").toString("utf8"),
     ) as StatePayload;
-
-    if (!payload.v || !payload.ts) return null;
-
-    // Authorization flow must be reasonably fresh.
-    if (Date.now() - payload.ts > 10 * 60 * 1000) return null;
-
+    if (!payload.v || !payload.ts || Date.now() - payload.ts > 10 * 60 * 1000) {
+      return null;
+    }
+    if (payload.mode === "link" && !payload.authUserId) return null;
     return payload;
   } catch {
     return null;
   }
 }
 
-function loginError(req: Request, code: string) {
-  return NextResponse.redirect(new URL(`/login?error=${code}`, req.url));
+function loginError(request: Request, code: string, linkMode = false) {
+  return NextResponse.redirect(
+    new URL(linkMode ? `/client/profile?telegram=${code}` : `/login?error=${code}`, request.url),
+  );
 }
 
-export async function GET(req: Request) {
-  const currentUrl = new URL(req.url);
+export async function GET(request: Request) {
+  const currentUrl = new URL(request.url);
   const code = currentUrl.searchParams.get("code");
   const state = currentUrl.searchParams.get("state");
-  const error = currentUrl.searchParams.get("error");
-
-  if (error || !code || !state) {
-    return loginError(req, "telegram_callback");
-  }
+  const callbackError = currentUrl.searchParams.get("error");
+  if (callbackError || !code || !state) return loginError(request, "telegram_callback");
 
   const clientId = process.env.TELEGRAM_CLIENT_ID;
   const clientSecret = process.env.TELEGRAM_CLIENT_SECRET;
-  if (!clientId || !clientSecret) {
-    return loginError(req, "telegram_config");
-  }
+  if (!clientId || !clientSecret) return loginError(request, "telegram_config");
 
-  // IMPORTANT: no browser cookie is required here.
-  // Mobile Telegram may return the user in a different browser context.
   const statePayload = verifyState(state);
-  if (!statePayload) {
-    return loginError(req, "telegram_state");
-  }
+  if (!statePayload) return loginError(request, "telegram_state");
+  const linkMode = statePayload.mode === "link";
 
-  const origin = (
-    process.env.NEXT_PUBLIC_SITE_URL || currentUrl.origin
-  ).replace(/\/$/, "");
+  const origin = (process.env.NEXT_PUBLIC_SITE_URL || currentUrl.origin).replace(/\/$/, "");
   const redirectUri = `${origin}/api/auth/telegram/callback`;
-
   const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
   const tokenResponse = await fetch("https://oauth.telegram.org/token", {
     method: "POST",
@@ -104,65 +91,85 @@ export async function GET(req: Request) {
   });
 
   if (!tokenResponse.ok) {
-    console.error(
-      "Telegram token exchange failed",
-      tokenResponse.status,
-      await tokenResponse.text(),
-    );
-    return loginError(req, "telegram_token");
+    console.error("Telegram token exchange failed", tokenResponse.status, await tokenResponse.text());
+    return loginError(request, "telegram_token", linkMode);
   }
 
   const tokens = (await tokenResponse.json()) as { id_token?: string };
-  if (!tokens.id_token) {
-    return loginError(req, "telegram_token");
-  }
+  if (!tokens.id_token) return loginError(request, "telegram_token", linkMode);
 
   try {
     const { payload } = await jwtVerify(tokens.id_token, JWKS, {
       issuer: "https://oauth.telegram.org",
       audience: clientId,
     });
-
     const telegramId = Number(payload.id ?? payload.sub);
     if (!Number.isSafeInteger(telegramId) || telegramId <= 0) {
       throw new Error("Telegram ID is missing from ID token");
     }
 
-    const supabase = getSupabaseAdmin();
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("telegram_id, first_name, username")
-      .eq("telegram_id", telegramId)
-      .maybeSingle();
-
-    if (profileError) throw profileError;
-    if (!profile) {
-      return loginError(req, "telegram_unknown");
-    }
-
+    const db = getSupabaseAdmin();
+    const firstName = String(payload.given_name || payload.name || "").trim();
+    const username = String(payload.preferred_username || "").trim();
     const avatarUrl = typeof payload.picture === "string" ? payload.picture : "";
-    if (avatarUrl) {
-      await supabase.from("profiles").update({ avatar_url: avatarUrl, avatar_updated_at: new Date().toISOString() }).eq("telegram_id", telegramId);
+
+    let accountId: string;
+    let profile: { first_name?: string | null } | null = null;
+    let redirectPath = "/client";
+
+    if (linkMode) {
+      const { data: result, error } = await db.rpc("link_telegram_account_v1", {
+        _auth_user_id: statePayload.authUserId,
+        _telegram_id: telegramId,
+        _first_name: firstName || null,
+        _username: username || null,
+        _avatar_url: avatarUrl || null,
+      });
+      if (error || !result?.account_id) {
+        console.error("Telegram account linking failed", error);
+        return loginError(request, error?.code === "23505" ? "already_linked" : "link_error", true);
+      }
+      accountId = String(result.account_id);
+      redirectPath = "/client/profile?telegram=linked";
+      const { data } = await db.from("profiles").select("first_name").eq("account_id", accountId).maybeSingle();
+      profile = data;
+    } else {
+      const { data: account, error } = await db
+        .from("customer_accounts")
+        .select("id,status")
+        .eq("telegram_id", telegramId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!account || account.status !== "active") return loginError(request, "telegram_unknown");
+      accountId = account.id;
+      const { data } = await db.from("profiles").select("first_name").eq("account_id", accountId).maybeSingle();
+      profile = data;
     }
 
-    // A Telegram user explicitly appointed by the owner opens the admin panel.
-    // Subscription plan never grants admin rights.
-    const {data:adminRole}=await supabase.from("admin_users").select("is_active").eq("chat_id",telegramId).maybeSingle();
-    const loginRole = adminRole?.is_active ? "admin" : "client";
+    if (avatarUrl) {
+      await db.from("profiles").update({
+        avatar_url: avatarUrl,
+        avatar_updated_at: new Date().toISOString(),
+      }).eq("account_id", accountId);
+    }
 
-    // Always return to the canonical site URL. This also prevents www/non-www
-    // cookie inconsistencies after mobile authorization.
-    const finalOrigin = (
-      process.env.NEXT_PUBLIC_SITE_URL || currentUrl.origin
-    ).replace(/\/$/, "");
-    const res = NextResponse.redirect(new URL(loginRole==="admin"?"/admin":"/client", finalOrigin));
+    const { data: adminRole } = await db
+      .from("admin_users")
+      .select("is_active")
+      .eq("chat_id", telegramId)
+      .maybeSingle();
+    const loginRole = !linkMode && adminRole?.is_active ? "admin" : "client";
+    if (loginRole === "admin") redirectPath = "/admin";
 
-    res.cookies.set(
+    const response = NextResponse.redirect(new URL(redirectPath, origin));
+    response.cookies.set(
       sessionCookie,
       signSession({
         role: loginRole,
+        accountId,
         chatId: telegramId,
-        name: profile.first_name || String(payload.name || ""),
+        authUserId: linkMode ? statePayload.authUserId : undefined,
+        name: profile?.first_name || firstName,
       }),
       {
         httpOnly: true,
@@ -172,10 +179,9 @@ export async function GET(req: Request) {
         maxAge: 60 * 60 * 24 * 30,
       },
     );
-
-    return res;
-  } catch (e) {
-    console.error("Telegram ID token verification failed", e);
-    return loginError(req, "telegram_verify");
+    return response;
+  } catch (error) {
+    console.error("Telegram ID token verification failed", error);
+    return loginError(request, "telegram_verify", linkMode);
   }
 }
