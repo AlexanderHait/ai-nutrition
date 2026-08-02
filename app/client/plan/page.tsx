@@ -65,19 +65,19 @@ export default async function Page({
       {query.payment === "success" ? <div className="successNotice"><CheckCircle2 size={16} />Оплата подтверждена. Подписка активирована.</div> : null}
       {query.payment === "canceled" ? <div className="subscriptionControlError"><XCircle size={16} />Оплата не завершена. Деньги повторно не списывались.</div> : null}
       {["unavailable", "invalid_plan", "order_not_found", "missing_order"].includes(query.payment || "") ? <div className="subscriptionControlError">Оплата пока недоступна. Текущий доступ продолжает работать.</div> : null}
-      {query.trial === "started" ? <div className="successNotice"><CheckCircle2 size={16} />Premium trial активирован на 3 дня.</div> : null}
+      {query.trial === "started" ? <div className="successNotice"><CheckCircle2 size={16} />Пробный Premium активирован на 3 дня.</div> : null}
       {query.trial === "used" ? <div className="subscriptionControlError">Пробный Premium уже был использован.</div> : null}
-      {query.trial === "error" ? <div className="subscriptionControlError">Не удалось активировать trial.</div> : null}
+      {query.trial === "error" ? <div className="subscriptionControlError">Не удалось активировать пробный Premium.</div> : null}
 
       <section className="subscriptionLifecycleBar">
-        <div><small>Текущий доступ</small><b>{isPremium ? (access.state === "trial" ? "Premium trial" : "Premium") : "Basic"}</b><span>{accessEnd ? `до ${new Date(accessEnd).toLocaleDateString("ru-RU")}` : isPremium ? "без указанного срока" : "базовый доступ активен"}</span></div>
+        <div><small>Текущий доступ</small><b>{isPremium ? (access.state === "trial" ? "Пробный Premium" : "Premium") : "Basic"}</b><span>{accessEnd ? `до ${new Date(accessEnd).toLocaleDateString("ru-RU")}` : isPremium ? "без указанного срока" : "базовый доступ активен"}</span></div>
         <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
           <span><small>Фото в этом месяце</small><b>{isPremium ? "Безлимит" : `${access.remaining.photo_analysis} из ${access.limits.photo_analysis}`}</b></span>
           <span><small>AI-запросы</small><b>{isPremium ? "Безлимит" : `${access.remaining.ai_request} из ${access.limits.ai_request}`}</b></span>
         </div>
       </section>
 
-      {isPremium ? <Link href="/client/coach" className="premiumActiveBanner"><Crown /><span><small>{access.state === "trial" ? "Premium trial активен" : "Premium активен"}</small><b>Открыть персонального нутрициолога</b></span>→</Link> : null}
+      {isPremium ? <Link href="/client/coach" className="premiumActiveBanner"><Crown /><span><small>{access.state === "trial" ? "Пробный Premium активен" : "Premium активен"}</small><b>Открыть персонального нутрициолога</b></span>→</Link> : null}
 
       {!isPremium && access.trial_available ? (
         <form action="/api/subscription/lifecycle" method="post" className="trialBanner">
