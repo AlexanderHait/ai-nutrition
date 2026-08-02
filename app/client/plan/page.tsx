@@ -82,7 +82,7 @@ export default async function Page({
       {!isPremium && access.trial_available ? (
         <form action="/api/subscription/lifecycle" method="post" className="trialBanner">
           <div><small>3 дня бесплатно</small><b>Попробовать TeddY Premium</b><span>Без оплаты и автоматического списания. После trial останется Basic.</span></div>
-          <button className="primary" name="action" value="trial">Начать trial</button>
+          <button className="primary" name="action" value="trial">Попробовать 3 дня</button>
         </form>
       ) : null}
 
