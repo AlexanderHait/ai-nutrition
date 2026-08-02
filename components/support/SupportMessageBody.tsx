@@ -5,7 +5,7 @@ import { SupportAttachment } from "./SupportAttachment";
 
 export function SupportMessageBody({ message }: { message: SupportMessage }) {
   const text = String(message.content || "").trim();
-  const onlyPlaceholderPhoto = message.attachment_path && text === "Фото";
+  const placeholder = Boolean(message.attachment_path) && ["фото", "pdf", "документ"].includes(text.toLowerCase());
 
   return (
     <div>
@@ -13,14 +13,10 @@ export function SupportMessageBody({ message }: { message: SupportMessage }) {
         <SupportAttachment
           path={message.attachment_path}
           name={message.attachment_name}
+          mime={message.attachment_mime}
         />
       ) : null}
-
-      {text && !onlyPlaceholderPhoto ? (
-        <div className="supportMessageText">
-          {text}
-        </div>
-      ) : null}
+      {text && !placeholder ? <div className="supportMessageText">{text}</div> : null}
     </div>
   );
 }
