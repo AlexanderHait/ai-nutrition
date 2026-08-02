@@ -1,10 +1,23 @@
 import Link from "next/link";
 import TelegramAvatar from "@/components/TelegramAvatar";
-import { CheckCircle2, ChevronDown, Flame, Link2, RefreshCw, Scale, Target } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  CreditCard,
+  Flame,
+  Headphones,
+  History,
+  Link2,
+  RefreshCw,
+  Scale,
+  Target,
+} from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { clientProfileAccountData } from "@/lib/account-data";
 import { fmt, goalKind } from "@/lib/data";
 import SimplifiedSections from "@/components/SimplifiedSections";
+import MichelinSections from "@/components/MichelinSections";
 
 export const dynamic = "force-dynamic";
 
@@ -34,12 +47,21 @@ export default async function Page({
   const fat = Number(data.settings?.fat_target || 0);
   const carb = Number(data.settings?.carb_target || 0);
   const telegramLinked = Boolean(data.account?.telegram_id);
+  const activePremium = data.subscription?.plan === "premium"
+    && data.subscription?.status === "active"
+    && (!data.subscription?.ends_at || new Date(data.subscription.ends_at) > new Date());
 
   return (
     <>
       <SimplifiedSections />
+      <MichelinSections />
+
       <div className="pageHead">
-        <div><p>Профиль</p><h1>Мои данные</h1><span>Сначала — короткая сводка. Полные настройки открываются только когда нужно что-то изменить.</span></div>
+        <div>
+          <p>Профиль</p>
+          <h1>Профиль и настройки</h1>
+          <span>Цели, вес, подписка и помощь собраны в одном спокойном разделе.</span>
+        </div>
       </div>
 
       {query.saved === "1" ? <div className="successNotice"><CheckCircle2 size={17} />Изменения сохранены.</div> : null}
@@ -76,6 +98,24 @@ export default async function Page({
         <div className="profileOverviewItem"><span>Калории</span><b>{fmt(kcal)} ккал</b></div>
         <div className="profileOverviewItem"><span>КБЖУ</span><b>Б {fmt(protein)} · Ж {fmt(fat)} · У {fmt(carb)}</b></div>
         <div className="profileOverviewItem"><span>Активность</span><b>{activityLabel(data.settings?.activity_level)}</b></div>
+      </section>
+
+      <section className="profileHub top">
+        <Link href="/client/plan">
+          <i><CreditCard size={18} /></i>
+          <span><b>Подписка</b><small>{activePremium ? "Premium активен" : "Basic · посмотреть Premium"}</small></span>
+          <ChevronRight size={17} />
+        </Link>
+        <Link href="/client/support">
+          <i><Headphones size={18} /></i>
+          <span><b>Поддержка</b><small>Задать вопрос по аккаунту или оплате</small></span>
+          <ChevronRight size={17} />
+        </Link>
+        <Link href="/client/nutrition">
+          <i><History size={18} /></i>
+          <span><b>История питания</b><small>Все дни, приёмы и изменения</small></span>
+          <ChevronRight size={17} />
+        </Link>
       </section>
 
       <div className="profileLayout top">
@@ -124,9 +164,9 @@ export default async function Page({
           </div>
         </details>
 
-        <aside className="profileAside">
+        <aside className="profileAside" id="weight">
           <section className="card">
-            <div className="sectionTitleRow"><div><h2>Записать вес</h2><span className="muted">Одно действие без открытия настроек</span></div></div>
+            <div className="sectionTitleRow"><div><h2>Записать вес</h2><span className="muted">Быстрое измерение без открытия настроек</span></div></div>
             <form action="/api/client/weight" method="post" className="quickWeightForm vertical">
               <input name="weight_kg" type="number" min="30" max="400" step="0.1" placeholder="Например, 68.4" required />
               <button className="primary" type="submit">Записать вес</button>

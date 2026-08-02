@@ -3,16 +3,18 @@ import Link from "next/link";
 import {
   AlertTriangle,
   CheckCircle2,
-  Crown,
+  ChevronRight,
+  CreditCard,
   LayoutGrid,
   MessageSquare,
-  Settings,
   Target,
+  WalletCards,
 } from "lucide-react";
 import { adminChatIds, adminDashboardData, dayKey, fmt, mealDay, sumMeals } from "@/lib/data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import AdminBadge from "@/components/AdminBadge";
 import SimplifiedSections from "@/components/SimplifiedSections";
+import MichelinSections from "@/components/MichelinSections";
 
 export const dynamic = "force-dynamic";
 
@@ -28,10 +30,13 @@ type Attention = {
 export default async function Page() {
   const db = getSupabaseAdmin();
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const since30d = new Date(Date.now() - 30 * 86400000).toISOString();
+
   const [
     { profiles, meals, logs, settings, subscriptions, support },
     adminIds,
     systemResult,
+    paymentsResult,
   ] = await Promise.all([
     adminDashboardData(),
     adminChatIds(),
@@ -40,6 +45,11 @@ export default async function Page() {
       .gte("created_at", since24h)
       .order("created_at", { ascending: false })
       .limit(100),
+    db.from("payment_events")
+      .select("status,amount_rub,created_at")
+      .gte("created_at", since30d)
+      .order("created_at", { ascending: false })
+      .limit(1000),
   ]);
 
   const now = Date.now();
@@ -63,8 +73,7 @@ export default async function Page() {
   for (const meal of meals as any[]) {
     const id = Number(meal.chat_id);
     if (!(id > 0)) continue;
-    const timestamp = new Date(meal.eaten_at).getTime();
-    activity.set(id, Math.max(activity.get(id) || 0, timestamp));
+    activity.set(id, Math.max(activity.get(id) || 0, new Date(meal.eaten_at).getTime()));
     if (mealDay(meal) === today) {
       if (!todayMeals.has(id)) todayMeals.set(id, []);
       todayMeals.get(id)!.push(meal);
@@ -83,13 +92,21 @@ export default async function Page() {
   }
 
   const totalUnread = [...unread.values()].reduce((sum, value) => sum + value, 0);
-  const premium = [...latestSubscriptions.values()].filter((item) => item.plan === "premium" && item.status === "active").length;
-  const systemIssues = (systemResult.data || [])
-    .filter((issue: any) => ["warning", "error", "critical"].includes(String(issue.severity || "").toLowerCase()))
-    .slice(0, 10);
-  const topSystemIssue = systemIssues[0];
+  const criticalIssues = (systemResult.data || [])
+    .filter((issue: any) => ["error", "critical"].includes(String(issue.severity || "").toLowerCase()));
 
-  const attention: Attention[] = profiles.flatMap((profile: any) => {
+  const successfulPayments = (paymentsResult.data || []).filter((payment: any) =>
+    ["succeeded", "paid", "success", "completed"].includes(String(payment.status || "").toLowerCase()),
+  );
+  const revenue30 = successfulPayments.reduce((sum: number, payment: any) => sum + Number(payment.amount_rub || 0), 0);
+
+  const expiring = [...latestSubscriptions.values()].filter((subscription: any) => {
+    if (subscription.status !== "active" || !subscription.ends_at) return false;
+    const end = new Date(subscription.ends_at).getTime();
+    return end >= now && end <= now + 7 * 86400000;
+  });
+
+  const attention: Attention[] = (profiles as any[]).flatMap((profile: any): Attention[] => {
     const id = Number(profile.telegram_id);
     if (!Number.isFinite(id) || id <= 0) return [];
 
@@ -103,7 +120,7 @@ export default async function Page() {
     if (unreadCount) reasons.push(`${unreadCount} непрочит. сообщ.`);
     if (!last && profile.created_at && now - new Date(profile.created_at).getTime() > 3 * 86400000) reasons.push("нет активности");
     if (last && now - last > 3 * 86400000) reasons.push(`${Math.floor((now - last) / 86400000)} дн. без активности`);
-    if (hour >= 18 && target > 0 && dayTotal.kcal > 0 && dayTotal.kcal < target * 0.7) reasons.push("сегодня меньше 70% калорий");
+    if (hour >= 18 && target > 0 && dayTotal.kcal > 0 && dayTotal.kcal < target * 0.7) reasons.push("заметный недобор калорий");
 
     return [{
       id,
@@ -113,33 +130,49 @@ export default async function Page() {
       score: unreadCount * 5 + reasons.length,
       reasons,
     }];
-  }).filter((item) => item.reasons.length)
-    .sort((a, b) => b.score - a.score)
+  }).filter((item: Attention) => item.reasons.length)
+    .sort((a: Attention, b: Attention) => b.score - a.score)
     .slice(0, 6);
 
   return (
     <>
       <SimplifiedSections />
+      <MichelinSections />
+
       <header className="pageHead adminWelcome">
         <div>
           <p>Админка</p>
-          <h1>Сегодня</h1>
-          <span>{profiles.length} клиентов. Здесь только то, что требует действия.</span>
+          <h1>Что требует действия</h1>
+          <span>На главной только клиенты, сообщения, оплаты и критические ошибки.</span>
         </div>
-        <Link className="primary compactBtn" href="/admin/dialogs">Диалоги</Link>
+        <Link className="primary compactBtn" href="/admin/dialogs">Открыть диалоги</Link>
       </header>
 
-      <div className="adminKpis adminKpisCompact">
+      <div className="adminKpis adminMichelinKpis">
         <K icon={<MessageSquare />} label="Сообщения" value={fmt(totalUnread)} sub={totalUnread ? "нужно ответить" : "новых нет"} />
         <K icon={<AlertTriangle />} label="Клиенты" value={fmt(attention.length)} sub="нужен взгляд" />
-        <K icon={systemIssues.length ? <AlertTriangle /> : <CheckCircle2 />} label="Система" value={fmt(systemIssues.length)} sub={systemIssues.length ? "событий за сутки" : "работает штатно"} />
+        <K icon={<WalletCards />} label="Оплаты за 30 дней" value={`${fmt(revenue30)} ₽`} sub={`${successfulPayments.length} успешных`} />
+        <K icon={<CreditCard />} label="Заканчиваются" value={fmt(expiring.length)} sub="в ближайшие 7 дней" />
       </div>
+
+      {criticalIssues.length ? (
+        <Link href="/admin/system" className="criticalSystemBanner top">
+          <AlertTriangle size={18} />
+          <span><b>Есть критические события системы</b><small>{criticalIssues.length} за последние 24 часа · открыть проверку</small></span>
+          <ChevronRight size={17} />
+        </Link>
+      ) : (
+        <div className="healthySystemBanner top">
+          <CheckCircle2 size={18} />
+          <span><b>Система работает штатно</b><small>Критических ошибок за последние 24 часа нет.</small></span>
+        </div>
+      )}
 
       <div className="adminPriorityGrid top">
         <section className="card attentionCenter">
           <div className="sectionTitleRow">
-            <div><h2>Кому нужен взгляд</h2><span className="muted">Сообщения, пауза или заметный недобор</span></div>
-            <Link className="textLink" href="/admin/activity">Все →</Link>
+            <div><h2>Кому нужен взгляд</h2><span className="muted">Только реальные причины для действия</span></div>
+            <Link className="textLink" href="/admin/activity">Все сигналы →</Link>
           </div>
           {attention.length ? (
             <div className="attentionCards">
@@ -147,7 +180,7 @@ export default async function Page() {
                 <Link href={`/admin/clients/${item.id}`} className="attentionCard" key={item.id}>
                   <TelegramAvatar profile={item.profile} size="small" />
                   <div>
-                    <b>{item.name}{adminIds.has(item.id) && <AdminBadge />}</b>
+                    <b>{item.name}{adminIds.has(item.id) ? <AdminBadge /> : null}</b>
                     <small>{item.username}</small>
                     <p>{item.reasons.join(" · ")}</p>
                   </div>
@@ -156,36 +189,32 @@ export default async function Page() {
               ))}
             </div>
           ) : (
-            <div className="positiveEmpty"><Target /><b>Сейчас всё спокойно</b><span>Новых сигналов нет.</span></div>
+            <div className="positiveEmpty"><Target /><b>Сейчас всё спокойно</b><span>Новых клиентских сигналов нет.</span></div>
           )}
         </section>
 
         <aside className="dashboardSide">
-          <section className="card">
-            <div className="sectionTitleRow"><div><h2>Коротко</h2><span className="muted">Остальное вынесено отдельно</span></div></div>
+          <section className="card adminBusinessCard">
+            <div className="sectionTitleRow"><div><h2>Подписки и оплаты</h2><span className="muted">Только ближайшие действия</span></div></div>
             <div className="adminActionList">
+              <Link className="adminAction" href="/admin/subscriptions">
+                <i><CreditCard size={16} /></i>
+                <span><b>Проверить подписки</b><small>{expiring.length ? `${expiring.length} скоро закончатся` : "срочных продлений нет"}</small></span>
+                <strong>→</strong>
+              </Link>
               <Link className="adminAction" href="/admin/dialogs">
                 <i><MessageSquare size={16} /></i>
-                <span><b>Ответить клиентам</b><small>{totalUnread ? `${totalUnread} новых сообщений` : "новых сообщений нет"}</small></span>
-                <strong>→</strong>
-              </Link>
-              <Link className="adminAction" href="/admin/system">
-                <i>{systemIssues.length ? <AlertTriangle size={16} /> : <Settings size={16} />}</i>
-                <span><b>Система</b><small>{topSystemIssue ? topSystemIssue.workflow || topSystemIssue.event_type : "ошибок за сутки нет"}</small></span>
-                <strong>{systemIssues.length}</strong>
-              </Link>
-              <Link className="adminAction" href="/admin/subscriptions">
-                <i><Crown size={16} /></i>
-                <span><b>Подписки</b><small>{premium} активных Premium</small></span>
-                <strong>→</strong>
-              </Link>
-              <Link className="adminAction" href="/admin/tools">
-                <i><LayoutGrid size={16} /></i>
-                <span><b>Все разделы</b><small>Аналитика, продукты, n8n и управление</small></span>
+                <span><b>Ответить клиентам</b><small>{totalUnread ? `${totalUnread} новых сообщений` : "всё разобрано"}</small></span>
                 <strong>→</strong>
               </Link>
             </div>
           </section>
+
+          <Link className="allToolsQuiet" href="/admin/tools">
+            <LayoutGrid size={17} />
+            <span><b>Все разделы</b><small>Аналитика, каталог, рассылки, n8n и управление</small></span>
+            <ChevronRight size={17} />
+          </Link>
         </aside>
       </div>
     </>

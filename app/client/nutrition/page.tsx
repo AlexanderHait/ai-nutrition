@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, Sparkles } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, History, Sparkles } from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { clientNutritionAccountData } from "@/lib/account-data";
 import { dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
 import { mealQuality, sessionQuality } from "@/lib/meal-quality";
 import FoodIcon from "@/components/FoodIcon";
+import TimelinePanel from "@/components/TimelinePanel";
 import SimplifiedSections from "@/components/SimplifiedSections";
+import MichelinSections from "@/components/MichelinSections";
 
 export const dynamic = "force-dynamic";
 type SearchParams = Promise<{ day?: string }>;
@@ -20,7 +22,7 @@ function label(day: string) {
 
 export default async function Page({ searchParams }: { searchParams: SearchParams }) {
   const session = await requireClient();
-  const meals = await clientNutritionAccountData(session.accountId!, 45);
+  const meals = await clientNutritionAccountData(session.accountId!, 90);
   const query = await searchParams;
   const selected = typeof query.day === "string" ? query.day : "";
   const today = dayKey();
@@ -49,11 +51,17 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
   return (
     <>
       <SimplifiedSections />
+      <MichelinSections />
+
       <div className="pageHead nutritionPageHead">
-        <div><p>Дневник</p><h1>Питание</h1><span>Сначала последние приёмы. Календарь и старые дни открываются только при необходимости.</span></div>
+        <div>
+          <p>Питание</p>
+          <h1>Дневник питания</h1>
+          <span>Текущие и прошлые приёмы собраны в одном разделе. История сопровождения находится ниже.</span>
+        </div>
       </div>
 
-      {!!entries.length && (
+      {!!entries.length ? (
         <details className="secondaryDisclosure">
           <summary>
             <span><b>Выбрать другой день</b><small>Последние 14 дней · {groups.size} дней с записями</small></span>
@@ -75,10 +83,10 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
             </div>
           </div>
         </details>
-      )}
+      ) : null}
 
       <div className="nutritionDays modernNutrition top">
-        {entries.slice(0, 30).map(([day, rows]) => {
+        {entries.slice(0, 45).map(([day, rows]) => {
           const total = sumMeals(rows);
           const sessions = mealSessions(rows);
           const active = day === selected;
@@ -90,14 +98,14 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
               </header>
 
               <div className="visualMealHistory">
-                {sessions.map((item, index) => (
+                {sessions.map((item: any, index: number) => (
                   <details className="clientSessionCard" key={item.key} open={active && index === 0}>
                     <summary>
-                      <div className="sessionIconStack">{item.meals.slice(0, 3).map((meal) => <i key={meal.id}><FoodIcon dish={meal.dish} /></i>)}</div>
+                      <div className="sessionIconStack">{item.meals.slice(0, 3).map((meal: any) => <i key={meal.id}><FoodIcon dish={meal.dish} /></i>)}</div>
                       <div className="sessionTitle">
                         <time>{item.time}</time>
                         <b>{item.meals.length === 1 ? item.meals[0].dish : `${item.meals.length} позиции`}</b>
-                        <small>{item.meals.slice(0, 3).map((meal) => meal.dish).join(" · ")}{item.meals.length > 3 ? "…" : ""}</small>
+                        <small>{item.meals.slice(0, 3).map((meal: any) => meal.dish).join(" · ")}{item.meals.length > 3 ? "…" : ""}</small>
                       </div>
                       <div className="sessionTotal"><b>{fmt(item.total.kcal)} ккал</b><small>Б {fmt(item.total.prot, 1)} · Ж {fmt(item.total.fat, 1)} · У {fmt(item.total.carb, 1)}</small></div>
                       {sessionQuality(item.meals).ok
@@ -106,13 +114,13 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
                       <ChevronDown className="sessionChevron" size={17} />
                     </summary>
                     <div className="sessionItems">
-                      {item.meals.map((meal) => (
+                      {item.meals.map((meal: any) => (
                         <div className="sessionFoodRow" key={meal.id}>
                           <i><FoodIcon dish={meal.dish} /></i>
                           <span>
                             <b>{meal.dish}</b>
                             <small>{fmt(meal.grams)} г · Б {fmt(meal.prot, 1)} · Ж {fmt(meal.fat, 1)} · У {fmt(meal.carb, 1)}</small>
-                            {mealQuality(meal).level !== "ok" && <em className="mealIssue">{mealQuality(meal).reasons[0]}</em>}
+                            {mealQuality(meal).level !== "ok" ? <em className="mealIssue">{mealQuality(meal).reasons[0]}</em> : null}
                           </span>
                           <strong>{fmt(meal.kcal)} ккал</strong>
                         </div>
@@ -125,14 +133,24 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
           );
         })}
 
-        {!entries.length && (
+        {!entries.length ? (
           <section className="card emptyGuidance">
             <Sparkles />
             <b>Добавь первый день питания</b>
             <span>Отправляй фото или названия продуктов боту. После трёх заполненных дней TeddY покажет первые закономерности и рекомендации.</span>
           </section>
-        )}
+        ) : null}
       </div>
+
+      <details className="secondaryDisclosure top" id="history">
+        <summary>
+          <span><b>История сопровождения</b><small>Вес, питание и решения TeddY в одной хронологии</small></span>
+          <History size={18} />
+        </summary>
+        <div className="disclosureBody timelineInsideNutrition">
+          <TimelinePanel />
+        </div>
+      </details>
     </>
   );
 }
