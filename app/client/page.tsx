@@ -2,7 +2,8 @@ import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from "next/link";
 import { AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, Clock3, Crown, MessageCircle, Scale, Sparkles, Target, TrendingUp, UtensilsCrossed } from "lucide-react";
 import { requireClient } from "@/lib/auth";
-import { clientHomeData, dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
+import { clientHomeAccountData } from "@/lib/account-data";
+import { dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals } from "@/lib/data";
 import { sessionQuality } from "@/lib/meal-quality";
 import FoodIcon from "@/components/FoodIcon";
 
@@ -20,7 +21,7 @@ function pct(v:number,t:number){return t>0?Math.min(100,Math.round(v/t*100)):0}
 
 export default async function Page(){
   const s=await requireClient();
-  const d=await clientHomeData(s.chatId!);
+  const d=await clientHomeAccountData(s.accountId!);
   const today=dayKey();
   const tm=d.meals.filter(m=>mealDay(m)===today);
   const sum=sumMeals(tm);
