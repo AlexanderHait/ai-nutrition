@@ -10,8 +10,8 @@ type Profile={telegram_id:number;first_name?:string|null;username?:string|null;a
 type AiSummary={events:number;executions:number;ai_requests:number;vision_requests:number;web_searches:number;failures:number;tokens:number;cost_usd:number;last_event_at:string|null;with_workflow:number;with_model:number;with_tokens:number;with_cost:number;with_source_event_id:number};
 type Latency={samples:number;avg_ms:number|null;p50_ms:number|null;p95_ms:number|null;p99_ms:number|null};
 type Breakdown={model?:string;provider?:string;workflow?:string;events:number;failures:number;tokens:number;cost_usd:number;avg_ms:number|null;p95_ms:number|null;last_event_at:string|null};
-type ClientMetric={chat_id:number;bot_events:number;photos:number;saved:number;edited:number;cache_hits:number;recognitions:number;review_required:number;avg_confidence:number;recognition_avg_ms:number;ai:number;vision:number;web:number;failures:number;tokens:number;cost_usd:number;ai_avg_ms:number;ai_p95_ms:number;last_event_at:string|null;activity:number};
-type Metrics={generated_at:string;period_days:number;recognition_period_days:number;ai:{summary:AiSummary;latency:Latency;models:Breakdown[];workflows:Breakdown[];daily:Array<{day:string;events:number;failures:number;tokens:number;cost_usd:number}>};bot:{events:number;photos:number;saved:number;edited:number;cache_hits:number};recognition:{recognitions:number;review_required:number;avg_confidence:number;avg_ms:number|null;p50_ms:number|null;p95_ms:number|null;p99_ms:number|null};clients:ClientMetric[]};
+type ClientMetric={chat_id:number;bot_events:number;photos:number;saved:number;edited:number;cache_hits:number;recognitions:number;review_required:number;avg_confidence:number;confidence_samples:number;zero_confidence:number;recognition_avg_ms:number;ai:number;vision:number;web:number;failures:number;tokens:number;cost_usd:number;ai_avg_ms:number;ai_p95_ms:number;last_event_at:string|null;activity:number};
+type Metrics={generated_at:string;period_days:number;recognition_period_days:number;ai:{summary:AiSummary;latency:Latency;models:Breakdown[];workflows:Breakdown[];daily:Array<{day:string;events:number;failures:number;tokens:number;cost_usd:number}>};bot:{events:number;photos:number;saved:number;edited:number;cache_hits:number};recognition:{recognitions:number;review_required:number;avg_confidence:number;confidence_samples:number;zero_confidence:number;avg_ms:number|null;p50_ms:number|null;p95_ms:number|null;p99_ms:number|null};clients:ClientMetric[]};
 
 function planFor(subs:any[],chatId:number){
   const row=subs.find(x=>Number(x.chat_id)===chatId&&x.status==="active");
@@ -32,7 +32,7 @@ export default async function Page(){
   const s=getSupabaseAdmin();
   const [adminIds,metricsResult,profilesResult,subsResult]=await Promise.all([
     adminChatIds(),
-    s.rpc("admin_platform_metrics_v1",{_days:30,_recognition_days:7,_client_limit:80}),
+    s.rpc("admin_platform_metrics_v2",{_days:30,_recognition_days:7,_client_limit:80}),
     s.from("profiles").select("telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at"),
     s.from("subscriptions").select("chat_id,plan,status,created_at").order("created_at",{ascending:false})
   ]);
@@ -58,7 +58,7 @@ export default async function Page(){
     <div className="adminKpis">
       <K i={<Activity/>} l="Bot events · 30 дней" v={metrics.bot.events} s={`${metrics.bot.saved} сохранений · ${metrics.bot.edited} правок`}/>
       <K i={<Camera/>} l="Фото · 30 дней" v={metrics.bot.photos} s={`${metrics.bot.cache_hits} cache events`}/>
-      <K i={<CheckCircle2/>} l="Точность · 7 дней" v={`${metrics.recognition.avg_confidence||0}%`} s={`${metrics.recognition.review_required}/${metrics.recognition.recognitions} требуют проверки`}/>
+      <K i={<CheckCircle2/>} l="Точность · 7 дней" v={`${metrics.recognition.avg_confidence||0}%`} s={`${metrics.recognition.confidence_samples}/${metrics.recognition.recognitions} валидных оценок`}/>
       <K i={<BrainCircuit/>} l="AI telemetry" v={ai.events} s={`${fmt(ai.tokens)} tokens · ${usd(ai.cost_usd)}`}/>
     </div>
 
@@ -77,7 +77,7 @@ export default async function Page(){
     <div className="metricGrid top">
       <M icon={<Timer/>} k="Распознавание P50" v={ms(metrics.recognition.p50_ms)} note={`${metrics.recognition.recognitions} результатов`}/>
       <M icon={<Timer/>} k="Распознавание P95" v={ms(metrics.recognition.p95_ms)} note={`среднее ${ms(metrics.recognition.avg_ms)}`}/>
-      <M icon={<AlertTriangle/>} k="Распознавание P99" v={ms(metrics.recognition.p99_ms)} note="худшие 1% запросов"/>
+      <M icon={<AlertTriangle/>} k="Распознавание P99" v={ms(metrics.recognition.p99_ms)} note={`${metrics.recognition.zero_confidence} технических нулей исключены`}/>
       <M icon={<CheckCircle2/>} k="Без проверки" v={`${Math.max(0,metrics.recognition.recognitions-metrics.recognition.review_required)}`} note={`${metrics.recognition.review_required} требуют подтверждения`}/>
     </div>
 
@@ -97,7 +97,7 @@ export default async function Page(){
           <span><b>{fmt(v.bot_events)}</b><small>{fmt(v.edited)} правок</small></span>
           <span><b>{fmt(v.photos)}</b><small>{fmt(v.cache_hits)} cache</small></span>
           <span><b>{fmt(v.saved)}</b><small>{v.recognitions} recognitions</small></span>
-          <span><b>{v.avg_confidence?`${v.avg_confidence}%`:"—"}</b><small>{v.review_required}/{v.recognitions} проверка</small></span>
+          <span><b>{v.avg_confidence?`${v.avg_confidence}%`:"—"}</b><small>{v.confidence_samples}/{v.recognitions} валидно</small></span>
           <span><b>{v.ai+v.vision+v.web}</b><small>{usd(v.cost_usd)} · {v.failures} ошибок</small></span>
         </div>;
       })}
