@@ -246,7 +246,7 @@ export default async function Page() {
         />
       </div>
 
-      <details className="secondaryDisclosure progressDetails top">
+      <details open className="secondaryDisclosure progressDetails top">
         <summary>
           <span><b>Подробная статистика</b><small>КБЖУ, Coach Score, графики и недельные разборы</small></span>
           <ChevronDown size={18} />
