@@ -1,5 +1,5 @@
-import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
+import { isAuthorizedBotRequest } from "@/lib/bot-api-auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
@@ -11,14 +11,6 @@ type Body = {
   source_event_id?: string;
   metadata?: Record<string, unknown>;
 };
-
-function authorized(request: Request) {
-  const secret = process.env.BOT_INGEST_SECRET?.trim();
-  const actual = request.headers.get("authorization") || "";
-  const expected = secret ? `Bearer ${secret}` : "";
-  if (!expected || actual.length !== expected.length) return false;
-  return timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
-}
 
 function safeChatId(value: unknown) {
   const chatId = Number(value);
@@ -34,7 +26,7 @@ function limitMessage(feature: string, access: any) {
 }
 
 export async function GET(request: Request) {
-  if (!authorized(request)) {
+  if (!isAuthorizedBotRequest(request)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
@@ -59,7 +51,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!authorized(request)) {
+  if (!isAuthorizedBotRequest(request)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
