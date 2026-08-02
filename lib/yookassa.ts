@@ -60,6 +60,9 @@ export class YooKassaError extends Error {
   }
 }
 
+const REQUEST_TIMEOUT_MS = 10_000;
+const RETRY_DELAYS_MS = [250, 750] as const;
+
 export function yooKassaConfigured() {
   return Boolean(
     process.env.YOOKASSA_SHOP_ID?.trim() && process.env.YOOKASSA_SECRET_KEY?.trim(),
@@ -75,44 +78,86 @@ function credentials() {
   return { shopId, secretKey };
 }
 
-async function yooRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+function isAbortError(error: unknown) {
+  return error instanceof Error && error.name === "AbortError";
+}
+
+export function isTransientYooKassaError(error: unknown) {
+  if (error instanceof YooKassaError) return error.status >= 500 || error.status === 429;
+  return isAbortError(error) || error instanceof TypeError;
+}
+
+async function sleep(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function yooRequest<T>(
+  path: string,
+  init: RequestInit = {},
+  retryCount = 0,
+): Promise<T> {
   const { shopId, secretKey } = credentials();
-  const response = await fetch(`https://api.yookassa.ru/v3${path}`, {
-    ...init,
-    cache: "no-store",
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString("base64")}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...(init.headers || {}),
-    },
-  });
+  let lastError: unknown;
 
-  const text = await response.text();
-  let body: unknown = null;
-  try {
-    body = text ? JSON.parse(text) : null;
-  } catch {
-    body = text;
+  for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(`https://api.yookassa.ru/v3${path}`, {
+        ...init,
+        cache: "no-store",
+        signal: controller.signal,
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString("base64")}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...(init.headers || {}),
+        },
+      });
+
+      const text = await response.text();
+      let body: unknown = null;
+      try {
+        body = text ? JSON.parse(text) : null;
+      } catch {
+        body = text;
+      }
+
+      if (!response.ok) {
+        throw new YooKassaError(
+          `YooKassa request failed (${response.status})`,
+          response.status,
+          body,
+        );
+      }
+
+      return body as T;
+    } catch (error) {
+      lastError = error;
+      if (attempt >= retryCount || !isTransientYooKassaError(error)) throw error;
+      await sleep(RETRY_DELAYS_MS[Math.min(attempt, RETRY_DELAYS_MS.length - 1)]);
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
-  if (!response.ok) {
-    throw new YooKassaError(`YooKassa request failed (${response.status})`, response.status, body);
-  }
-
-  return body as T;
+  throw lastError instanceof Error ? lastError : new Error("YooKassa request failed");
 }
 
 export async function createYooPayment(body: YooCreatePaymentBody, idempotencyKey: string) {
-  return yooRequest<YooPayment>("/payments", {
-    method: "POST",
-    headers: { "Idempotence-Key": idempotencyKey },
-    body: JSON.stringify(body),
-  });
+  return yooRequest<YooPayment>(
+    "/payments",
+    {
+      method: "POST",
+      headers: { "Idempotence-Key": idempotencyKey },
+      body: JSON.stringify(body),
+    },
+    2,
+  );
 }
 
 export async function getYooPayment(paymentId: string) {
-  return yooRequest<YooPayment>(`/payments/${encodeURIComponent(paymentId)}`);
+  return yooRequest<YooPayment>(`/payments/${encodeURIComponent(paymentId)}`, {}, 1);
 }
 
 export function normalizeYooStatus(status: YooPayment["status"] | string) {
