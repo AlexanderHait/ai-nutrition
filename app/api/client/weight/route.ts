@@ -2,39 +2,42 @@ import { NextResponse } from "next/server";
 import { session } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
-export async function POST(req: Request) {
-  const s = await session();
-  if (s?.role !== "client" || !s.chatId) {
-    return NextResponse.redirect(new URL("/login", req.url));
+export async function POST(request: Request) {
+  const current = await session();
+  if (current?.role !== "client" || !current.accountId) {
+    return NextResponse.redirect(new URL("/login", request.url), 303);
   }
 
-  const form = await req.formData();
+  const form = await request.formData();
   const weight = Number(form.get("weight_kg"));
   if (!Number.isFinite(weight) || weight < 30 || weight > 400) {
-    return NextResponse.redirect(new URL("/client/profile?error=weight", req.url));
+    return NextResponse.redirect(new URL("/client/profile?error=weight", request.url), 303);
   }
 
-  const supabase = getSupabaseAdmin();
-
+  const db = getSupabaseAdmin();
+  const now = new Date().toISOString();
   const [{ error: logError }, { error: settingsError }] = await Promise.all([
-    supabase.from("weight_logs").insert({
-      chat_id: s.chatId,
+    db.from("weight_logs").insert({
+      account_id: current.accountId,
+      chat_id: current.chatId || null,
       weight_kg: weight,
-      measured_at: new Date().toISOString(),
+      measured_at: now,
     }),
-    supabase.from("client_settings").upsert(
+    db.from("client_settings").upsert(
       {
-        chat_id: s.chatId,
+        account_id: current.accountId,
+        chat_id: current.chatId || null,
         current_weight_kg: weight,
-        updated_at: new Date().toISOString(),
+        onboarding_source: current.chatId ? "telegram_web" : "web",
+        updated_at: now,
       },
-      { onConflict: "chat_id" },
+      { onConflict: "account_id" },
     ),
   ]);
 
   if (logError || settingsError) {
-    return NextResponse.redirect(new URL("/client/profile?error=weight", req.url));
+    console.error("Saving weight failed", { logError, settingsError });
+    return NextResponse.redirect(new URL("/client/profile?error=weight", request.url), 303);
   }
-
-  return NextResponse.redirect(new URL("/client/progress", req.url));
+  return NextResponse.redirect(new URL("/client/progress", request.url), 303);
 }
