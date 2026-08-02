@@ -1,6 +1,6 @@
 import Link from "next/link";
 import TelegramAvatar from "@/components/TelegramAvatar";
-import { CheckCircle2, Flame, Link2, RefreshCw, Scale, ShieldCheck, Target, UserRound } from "lucide-react";
+import { CheckCircle2, Flame, Link2, RefreshCw, Scale, Target, UserRound } from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { clientProfileAccountData } from "@/lib/account-data";
 import { fmt, goalKind } from "@/lib/data";
@@ -37,14 +37,13 @@ export default async function Page({
       <section className="clientProfileHero">
         <TelegramAvatar profile={data.profile} size="huge" />
         <div className="profileHeroCopy">
-          <h2>{data.profile?.first_name || currentUser.name || data.account?.login || "Клиент"}</h2>
-          <p>{telegramLinked ? (data.profile?.username ? `@${data.profile.username}` : `Telegram ${data.account?.telegram_id}`) : data.account?.email}</p>
+          <h2>{data.profile?.first_name || data.account?.display_name || currentUser.name || "Клиент"}</h2>
+          <p>{telegramLinked ? (data.profile?.username ? `@${data.profile.username}` : "Telegram привязан") : "Аккаунт TeddY"}</p>
           <div className="clientTags">
             <span><Target size={13} />{goalKind(data.settings?.goal)}</span>
             <span><Flame size={13} />{fmt(kcal)} ккал</span>
             {currentWeight > 0 ? <span><Scale size={13} />{fmt(currentWeight, 1)} кг</span> : null}
           </div>
-          <small className="telegramSyncMeta">Логин: {data.account?.login || "не задан"} · Email: {data.account?.email || currentUser.email}</small>
         </div>
         {telegramLinked ? (
           <form action="/api/profile/telegram-sync" method="post" className="telegramSyncForm">
@@ -54,18 +53,6 @@ export default async function Page({
         ) : (
           <Link className="secondaryBtn" href="/api/auth/telegram?mode=link"><Link2 size={15} />Привязать Telegram</Link>
         )}
-      </section>
-
-      <section className="card top accountSecurityCard">
-        <div className="sectionTitleRow">
-          <div><h2>Вход и безопасность</h2><span className="muted">Пароль хранится и проверяется только Supabase Auth.</span></div>
-          <ShieldCheck size={19} />
-        </div>
-        <div className="accountSecurityRows">
-          <div><span>Email</span><b>{data.account?.email || currentUser.email || "—"}</b></div>
-          <div><span>Логин</span><b>{data.account?.login || "—"}</b></div>
-          <div><span>Telegram</span><b>{telegramLinked ? "Привязан" : "Не привязан"}</b></div>
-        </div>
       </section>
 
       <div className="profileLayout top">
