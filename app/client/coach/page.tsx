@@ -1,23 +1,300 @@
 import Link from "next/link";
-import {Activity,BrainCircuit,CheckCircle2,Crown,Flame,HelpCircle,MessageCircleMore,ShoppingBasket,Sparkles,Store,Target,Timer,TrendingUp,UtensilsCrossed} from "lucide-react";
-import {requireClient} from "@/lib/auth";
-import {clientPremiumData,premiumIntelligence} from "@/lib/data";
-import {subscriptionAccess} from "@/lib/subscription-access";
-export const dynamic="force-dynamic";
-const clean=(v:any)=>String(v||"").replace(/\*\*(.*?)\*\*/g,"$1").replace(/\*(.*?)\*/g,"$1");
-export default async function Page({searchParams}:{searchParams:Promise<{saved?:string;feedback?:string;checkin?:string}>}){const a=await requireClient(),q=await searchParams,[d,intel,access]=await Promise.all([clientPremiumData(a.chatId!),premiumIntelligence(a.chatId!),subscriptionAccess(a.chatId!)]),premium=access.premium;if(!premium)return <><div className="pageHead"><div><p>Premium Coach</p><h1>Персональный нутрициолог</h1><span>Не просто фиксирует еду — помогает принимать решения каждый день.</span></div></div><section className="premiumLockHero"><Crown/><h2>TeddY Premium</h2><p>План дня, персональные рекомендации, недельная стратегия, умные подсказки и память твоего рациона.</p><Link className="primary" href="/client/plan">Посмотреть Premium</Link></section></>;
-const c:any=intel.context||{},quality=c.data_quality||{},today=c.today||{},e=today.eaten||{},rem=today.remaining||{},wt=c.weight_trend||{},st=c.settings||{},avg=c.averages||{},latest=intel.recommendations?.[0],check=intel.checkins?.[0];
-const pacing=dayPacing(Number(e.kcal||0),Number(st.kcal_target||0),today.pacing);const weightText=wt.delta==null?"Недостаточно измерений":`${Number(wt.delta)>0?"+":""}${wt.delta} кг по сглаженному тренду`;const focus=buildFocus(c,pacing);const starterPlan=buildStarterPlan(c,pacing);const weeklyFocusResult=buildWeeklyFocus(c);const weeklyFocusTitle=weeklyFocusResult?.title??"Начать с базового ритма";const weeklyFocusText=weeklyFocusResult?.text??"TeddY уже использует твои цели и текущие данные. Продолжай фиксировать питание — рекомендации будут становиться точнее.";const weeklyFocusNote=weeklyFocusResult?.note??"Premium работает с первого дня.";const activeDays=Number(quality.active_days_7??quality.active_days??0);
-return <><div className="pageHead"><div><p>Premium Coach</p><h1>Мой нутрициолог</h1><span>Один контекст для всех решений TeddY.</span></div><div className="coachHeadActions"><Link href="/client/onboarding" className="secondaryBtn">Настройки Coach</Link><span className="premiumStatus"><Crown size={14}/>{access.state==="trial"?"PREMIUM TRIAL":"PREMIUM"}</span></div></div>
-{(q.saved||q.feedback||q.checkin)&&<div className="successNotice"><CheckCircle2 size={16}/>Сохранено. TeddY учтёт это в следующих рекомендациях.</div>}
-<section className="coachNow"><div><small>СЕГОДНЯ</small><h2>{pacing.title}</h2><p>{Math.round(Number(rem.kcal||0))} ккал · {Math.round(Number(rem.protein||0))} г белка осталось</p></div><div><small>СЛЕДУЮЩЕЕ ДЕЙСТВИЕ</small><h2>{focus}</h2><p>{pacing.detail}</p></div><div><small>ВЕС</small><h2>{weightText}</h2><p>{wt.measurements||0} последних измерений</p></div><div><small>КАЧЕСТВО ДАННЫХ</small><h2>{quality.level==="high"?"Хорошее":quality.level==="medium"?"Среднее":"Пока мало данных"}</h2><p>{activeDays>=7?"Есть полноценная неделя данных":`${activeDays} дн. с питанием · точность растёт`}</p></div></section>
-<div className="premiumCoachGrid top"><section className="card premiumPlanHero"><div className="sectionTitleRow"><div><h2>План на сегодня</h2><span className="muted">Работает сразу и становится точнее по мере накопления данных</span></div><Sparkles/></div>{d.plan?<div className="premiumLongText">{clean(d.plan.content_md)}</div>:<div className="premiumLongText"><b>Стартовый план</b><p>{starterPlan}</p><small className="muted">Это адаптивный план по текущим целям и рациону. TeddY заменит его более персональным, когда накопит больше твоих данных.</small></div>}</section><section className="card"><div className="sectionTitleRow"><div><h2>{activeDays>=7?"Фокус недели":"Текущий фокус"}</h2><span className="muted">{activeDays>=7?"Главный приоритет на основе недели данных":"Главный приоритет уже сейчас — точность будет расти"}</span></div><Target/></div>{d.report?<div className="premiumLongText">{clean(d.report.content_md)}</div>:<div className="premiumLongText"><b>{weeklyFocusTitle}</b><p>{weeklyFocusText}</p><small className="muted">{weeklyFocusNote}</small></div>}</section></div>
-{latest&&<section className="card top recommendationReview"><div className="sectionTitleRow"><div><h2>Последняя рекомендация</h2><span className="muted">{latest.feature} · TeddY помнит, что советовал раньше</span></div><HelpCircle/></div><p>{clean(latest.recommendation_text)}</p>{latest.reason_text&&<details><summary>Почему?</summary><div>{clean(latest.reason_text)}</div></details>}{!latest.feedback&&<form action="/api/premium/feedback" method="post"><input type="hidden" name="id" value={latest.id}/><button name="feedback" value="useful" className="secondaryBtn">Полезно</button><select name="reason" defaultValue=""><option value="">Причина, если не подходит</option><option>Не люблю эти продукты</option><option>Слишком дорого</option><option>Нет времени готовить</option><option>Слишком большой объём</option><option>Другое</option></select><button name="feedback" value="not_fit" className="secondaryBtn">Не подходит</button></form>}</section>}
-{d.proposal&&<section className="strategyProposal top"><div><span>Предложение по стратегии</span><h2>{d.proposal.reason}</h2><p>{d.proposal.current_kcal&&d.proposal.proposed_kcal?`${d.proposal.current_kcal} → ${d.proposal.proposed_kcal} ккал`:"TeddY предлагает обновить дневные цели."}</p></div><form action="/api/premium/proposal" method="post"><input type="hidden" name="id" value={d.proposal.id}/><button className="primary" name="action" value="apply">Применить</button><button className="secondaryBtn" name="action" value="dismiss">Оставить</button></form></section>}
-<div className="premiumCoachGrid top"><section className="card"><div className="sectionTitleRow"><div><h2>Память о тебе</h2><span className="muted">Только подтверждённые предпочтения и устойчивые паттерны</span></div><BrainCircuit/></div><div className="memoryList">{intel.clientMemory.slice(0,8).map((x:any)=><div key={x.id}><span><b>{x.memory_value}</b><small>{x.memory_type} · источник: {x.source}</small></span><em>{Math.round(Number(x.confidence)*100)}%</em></div>)}{!intel.clientMemory.length&&<p className="muted">Оценивай рекомендации — память начнёт адаптироваться под тебя.</p>}</div></section><section className="card"><div className="sectionTitleRow"><div><h2>Недельный check-in</h2><span className="muted">Цифры не показывают голод, энергию и сложность соблюдения</span></div><Activity/></div><form className="checkinForm" action="/api/premium/checkin" method="post"><label>Голод<select name="hunger" defaultValue={check?.hunger||"normal"}><option value="low">Низкий</option><option value="normal">Нормальный</option><option value="high">Высокий</option></select></label><label>Энергия<select name="energy" defaultValue={check?.energy||"normal"}><option value="low">Низкая</option><option value="normal">Нормальная</option><option value="high">Высокая</option></select></label><label>Соблюдать питание<select name="adherence_ease" defaultValue={check?.adherence_ease||"normal"}><option value="easy">Легко</option><option value="normal">Нормально</option><option value="hard">Сложно</option></select></label><textarea name="note" placeholder="Комментарий — необязательно" defaultValue={check?.note||""}/><button className="primary">Сохранить check-in</button></form></section></div>
-<section className="card top"><div className="sectionTitleRow"><div><h2>Ситуации</h2><span className="muted">Команды остаются shortcuts — обычный /recommend сам учитывает время и контекст</span></div></div><div className="premiumScenarios"><Scenario icon={<UtensilsCrossed/>} cmd="/recommend" title="Что сейчас лучше" text="Центральная рекомендация."/><Scenario icon={<ShoppingBasket/>} cmd="/shop" title="Я в магазине" text="Корзина под остаток дня."/><Scenario icon={<Store/>} cmd="/restaurant" title="Я в ресторане" text="Что заказать."/><Scenario icon={<Timer/>} cmd="/quick" title="Нет времени" text="Быстрые варианты."/><Scenario icon={<Flame/>} cmd="/training" title="Тренировка" text="Питание под тренировочный день."/><Scenario icon={<MessageCircleMore/>} cmd="/sweet" title="Хочу сладкое" text="Встроить десерт в день."/><Scenario icon={<BrainCircuit/>} cmd="/overate" title="Переел" text="Спокойно скорректировать день."/><Scenario icon={<HelpCircle/>} cmd="/why" title="Почему?" text="Объяснить последнюю рекомендацию."/></div></section></>}
-function dayPacing(e:number,t:number,p?:any){if(!t)return{title:"Цель дня не задана",detail:"Заполни нормы в профиле."};const share=Number(p?.eaten_share??e/t),expected=Number(p?.expected_share??.5);if(Math.abs(share-expected)<.18)return{title:"День идёт по плану",detail:"Сейчас ничего специально корректировать не нужно."};if(share<expected)return{title:"Есть отставание по энергии",detail:"Лучше не оставлять слишком большой объём на поздний вечер."};return{title:"Темп выше обычного",detail:"Это не проблема само по себе — следующий приём можно сделать легче."}}
-function buildFocus(c:any,p:any){const r=c.today?.remaining||{},s=c.settings||{};if(p.title==="День идёт по плану")return"Продолжай без лишних корректировок";if(Number(s.protein_target||0)&&Number(r.protein||0)>Number(s.protein_target||0)*.45)return"Сделай белок основой следующего приёма";return"Ориентируйся на голод и остаток дня"}
-function Scenario({icon,cmd,title,text}:{icon:React.ReactNode;cmd:string;title:string;text:string}){return <div className="premiumScenario"><i>{icon}</i><span><code>{cmd}</code><b>{title}</b><small>{text}</small></span></div>}
-function buildStarterPlan(c:any,p:any){const r=c.today?.remaining||{},s=c.settings||{},foods=Array.isArray(c.today?.foods)?c.today.foods:[];const kcal=Math.max(0,Math.round(Number(r.kcal||0))),protein=Math.max(0,Math.round(Number(r.protein||0)));if(!Number(s.kcal_target||0))return"Заполни дневную цель по калориям в профиле — после этого TeddY сразу распределит остаток дня и даст конкретный следующий шаг.";if(!foods.length)return`Начни с полноценного приёма пищи. На день осталось около ${kcal} ккал${Number(s.protein_target||0)?` и ${protein} г белка`:""}. Сделай основу из белка, добавь углеводы под активность и овощи.`;if(p.title==="Есть отставание по энергии")return`Не откладывай питание на поздний вечер. На остаток дня около ${kcal} ккал${Number(s.protein_target||0)?` и ${protein} г белка`:""}. Следующий приём сделай полноценным, а оставшуюся часть распределяй спокойно.`;if(p.title==="Темп выше обычного")return`Темп калорий сегодня выше ожидаемого. Следующий приём сделай легче, но не урезай белок. Ориентир остатка — около ${kcal} ккал${Number(s.protein_target||0)?` и ${protein} г белка`:""}.`;return`Продолжай текущий темп. На остаток дня около ${kcal} ккал${Number(s.protein_target||0)?` и ${protein} г белка`:""}. Не нужно специально компенсировать или урезать питание.`}
-function buildWeeklyFocus(c:any):{title:string;text:string;note:string}{const q=c.data_quality||{},days=Number(q.active_days_7??q.active_days??0),r=c.today?.remaining||{},s=c.settings||{},avg=c.averages_7||c.averages||{};if(days<=0)return{title:"Собрать первый рабочий ритм",text:"Фиксируй обычное питание без попыток «есть идеально». TeddY уже использует профиль и текущие цели, а каждый новый приём делает рекомендации точнее.",note:"Функции Premium доступны уже сейчас; пока данных мало, советы будут осторожнее."};if(days<3)return{title:"Стабилизировать базовый режим",text:"Главная задача сейчас — получить несколько обычных дней питания и понять реальный ритм, а не менять всё сразу.",note:`Есть ${days} дн. данных. TeddY уже работает, но пока избегает жёстких выводов.`};if(days<7){const target=Number(s.kcal_target||0),ak=Number(avg.kcal||0);const diff=target&&ak?Math.round(ak-target):0;return{title:Math.abs(diff)>Math.max(150,target*.08)?(diff>0?"Сгладить систематический избыток":"Не допускать систематического недобора"):"Закрепить стабильность рациона",text:target&&ak?`По имеющимся дням среднее около ${Math.round(ak)} ккал при цели ${Math.round(target)}. Пока не делаем резких выводов — следим, повторяется ли этот паттерн.`:"Продолжай фиксировать питание и держать понятный ритм приёмов пищи. Уже можно корректировать отдельные решения, но не всю стратегию.",note:`Есть ${days} дн. данных. Это уже обучающий режим; полноценная недельная уверенность появится с 7 активных дней.`};}return{title:"Удерживать устойчивый недельный ритм",text:"Неделя данных уже есть. TeddY может увереннее сравнивать средние, соблюдение целей, вес и повторяющиеся привычки.",note:"Теперь недельный фокус опирается на полноценное окно данных и будет продолжать уточняться дальше."}}
+import {
+  Activity,
+  BrainCircuit,
+  CheckCircle2,
+  ChevronDown,
+  Crown,
+  Flame,
+  HelpCircle,
+  MessageCircleMore,
+  ShoppingBasket,
+  Sparkles,
+  Store,
+  Target,
+  Timer,
+  TrendingUp,
+  UtensilsCrossed,
+} from "lucide-react";
+import { requireClient } from "@/lib/auth";
+import {
+  clientPremiumAccountData,
+  premiumIntelligenceAccountData,
+} from "@/lib/account-data";
+import { subscriptionAccess } from "@/lib/subscription-access";
+import SimplifiedSections from "@/components/SimplifiedSections";
+
+export const dynamic = "force-dynamic";
+
+const clean = (value: unknown) => String(value || "")
+  .replace(/\*\*(.*?)\*\*/g, "$1")
+  .replace(/\*(.*?)\*/g, "$1");
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string; feedback?: string; checkin?: string }>;
+}) {
+  const current = await requireClient();
+  const query = await searchParams;
+  const access = await subscriptionAccess(current.accountId!);
+
+  if (!access.premium) {
+    return (
+      <>
+        <SimplifiedSections />
+        <div className="pageHead">
+          <div>
+            <p>Premium Coach</p>
+            <h1>Персональный нутрициолог</h1>
+            <span>Помогает принимать решения по питанию, а не просто показывает цифры.</span>
+          </div>
+        </div>
+
+        <section className="coachLockedCompact">
+          <div className="coachLockedLead">
+            <i><Crown size={25} /></i>
+            <div>
+              <small>TeddY Premium</small>
+              <h2>Один понятный следующий шаг</h2>
+              <p>План дня, объяснение динамики веса и корректировка питания на основе твоих данных.</p>
+            </div>
+            <Link className="primary" href="/client/plan">Посмотреть Premium</Link>
+          </div>
+          <div className="coachLockedBenefits">
+            <div><UtensilsCrossed size={17} /><span><b>Что поесть</b><small>С учётом остатка дня</small></span></div>
+            <div><TrendingUp size={17} /><span><b>Почему меняется вес</b><small>Связь рациона и результата</small></span></div>
+            <div><Target size={17} /><span><b>Что исправить</b><small>Один приоритет на неделю</small></span></div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  const [data, intelligence] = await Promise.all([
+    clientPremiumAccountData(current.accountId!),
+    premiumIntelligenceAccountData(current.accountId!),
+  ]);
+
+  const context: any = intelligence.context || {};
+  const quality = context.data_quality || {};
+  const today = context.today || {};
+  const eaten = today.eaten || {};
+  const remaining = today.remaining || {};
+  const weight = context.weight_trend || {};
+  const settings = context.settings || {};
+  const latest = intelligence.recommendations?.[0];
+  const checkin = intelligence.checkins?.[0];
+  const pacing = dayPacing(Number(eaten.kcal || 0), Number(settings.kcal_target || 0), today.pacing);
+  const weightText = weight.delta == null
+    ? "Недостаточно измерений"
+    : `${Number(weight.delta) > 0 ? "+" : ""}${Number(weight.delta).toFixed(1)} кг по тренду`;
+  const focus = buildFocus(context, pacing);
+  const starterPlan = buildStarterPlan(context, pacing);
+  const weeklyFocus = buildWeeklyFocus(context);
+  const activeDays = Number(quality.active_days_7 ?? quality.active_days ?? 0);
+
+  return (
+    <>
+      <SimplifiedSections />
+      <div className="pageHead">
+        <div>
+          <p>Premium Coach</p>
+          <h1>Мой нутрициолог</h1>
+          <span>Главное решение на сегодня и один приоритет на неделю.</span>
+        </div>
+        <div className="coachHeadActions">
+          <Link href="/client/onboarding" className="secondaryBtn">Настройки</Link>
+          <span className="premiumStatus"><Crown size={14} />{access.state === "trial" ? "PREMIUM TRIAL" : "PREMIUM"}</span>
+        </div>
+      </div>
+
+      {(query.saved || query.feedback || query.checkin) && (
+        <div className="successNotice"><CheckCircle2 size={16} />Сохранено. TeddY учтёт это дальше.</div>
+      )}
+
+      <section className="coachNow">
+        <div><small>СЕГОДНЯ</small><h2>{pacing.title}</h2><p>{Math.round(Number(remaining.kcal || 0))} ккал · {Math.round(Number(remaining.protein || 0))} г белка осталось</p></div>
+        <div><small>СЛЕДУЮЩИЙ ШАГ</small><h2>{focus}</h2><p>{pacing.detail}</p></div>
+        <div><small>ВЕС</small><h2>{weightText}</h2><p>{weight.measurements || 0} измерений</p></div>
+        <div><small>ДАННЫЕ</small><h2>{quality.level === "high" ? "Надёжные" : quality.level === "medium" ? "Уже полезные" : "Пока мало"}</h2><p>{activeDays} дн. с питанием за неделю</p></div>
+      </section>
+
+      <div className="premiumCoachGrid top">
+        <section className="card premiumPlanHero">
+          <div className="sectionTitleRow"><div><h2>План на сегодня</h2><span className="muted">Конкретно и без лишней теории</span></div><Sparkles /></div>
+          {data.plan
+            ? <div className="premiumLongText">{clean(data.plan.content_md)}</div>
+            : <div className="premiumLongText"><b>Стартовый план</b><p>{starterPlan}</p><small className="muted">План станет точнее по мере накопления данных.</small></div>}
+        </section>
+
+        <section className="card">
+          <div className="sectionTitleRow"><div><h2>{activeDays >= 7 ? "Фокус недели" : "Текущий фокус"}</h2><span className="muted">Один главный приоритет</span></div><Target /></div>
+          {data.report
+            ? <div className="premiumLongText">{clean(data.report.content_md)}</div>
+            : <div className="premiumLongText"><b>{weeklyFocus.title}</b><p>{weeklyFocus.text}</p><small className="muted">{weeklyFocus.note}</small></div>}
+        </section>
+      </div>
+
+      {latest && (
+        <section className="card top recommendationReview">
+          <div className="sectionTitleRow"><div><h2>Последняя рекомендация</h2><span className="muted">TeddY помнит предыдущий совет</span></div><HelpCircle /></div>
+          <p>{clean(latest.recommendation_text)}</p>
+          {latest.reason_text && <details><summary>Почему?</summary><div>{clean(latest.reason_text)}</div></details>}
+          {!latest.feedback && (
+            <form action="/api/premium/feedback" method="post">
+              <input type="hidden" name="id" value={latest.id} />
+              <button name="feedback" value="useful" className="secondaryBtn">Полезно</button>
+              <select name="reason" defaultValue="">
+                <option value="">Причина, если не подходит</option>
+                <option>Не люблю эти продукты</option>
+                <option>Слишком дорого</option>
+                <option>Нет времени готовить</option>
+                <option>Слишком большой объём</option>
+                <option>Другое</option>
+              </select>
+              <button name="feedback" value="not_fit" className="secondaryBtn">Не подходит</button>
+            </form>
+          )}
+        </section>
+      )}
+
+      {data.proposal && (
+        <section className="strategyProposal top">
+          <div>
+            <span>Предложение по стратегии</span>
+            <h2>{data.proposal.reason}</h2>
+            <p>{data.proposal.current_kcal && data.proposal.proposed_kcal
+              ? `${data.proposal.current_kcal} → ${data.proposal.proposed_kcal} ккал`
+              : "TeddY предлагает обновить дневные цели."}</p>
+          </div>
+          <form action="/api/premium/proposal" method="post">
+            <input type="hidden" name="id" value={data.proposal.id} />
+            <button className="primary" name="action" value="apply">Применить</button>
+            <button className="secondaryBtn" name="action" value="dismiss">Оставить</button>
+          </form>
+        </section>
+      )}
+
+      <details className="secondaryDisclosure coachExtras top">
+        <summary>
+          <span><b>Дополнительные настройки</b><small>Память, недельный check-in и быстрые ситуации</small></span>
+          <ChevronDown size={18} />
+        </summary>
+        <div className="disclosureBody">
+          <div className="premiumCoachGrid top">
+            <section className="card">
+              <div className="sectionTitleRow"><div><h2>Память о тебе</h2><span className="muted">Только устойчивые предпочтения</span></div><BrainCircuit /></div>
+              <div className="memoryList">
+                {intelligence.clientMemory.slice(0, 8).map((item: any) => (
+                  <div key={item.id}>
+                    <span><b>{item.memory_value}</b><small>{item.memory_type} · {item.source}</small></span>
+                    <em>{Math.round(Number(item.confidence) * 100)}%</em>
+                  </div>
+                ))}
+                {!intelligence.clientMemory.length && <p className="muted">Оценивай рекомендации — память будет адаптироваться.</p>}
+              </div>
+            </section>
+
+            <section className="card">
+              <div className="sectionTitleRow"><div><h2>Недельный check-in</h2><span className="muted">Голод, энергия и сложность соблюдения</span></div><Activity /></div>
+              <form className="checkinForm" action="/api/premium/checkin" method="post">
+                <label>Голод<select name="hunger" defaultValue={checkin?.hunger || "normal"}><option value="low">Низкий</option><option value="normal">Нормальный</option><option value="high">Высокий</option></select></label>
+                <label>Энергия<select name="energy" defaultValue={checkin?.energy || "normal"}><option value="low">Низкая</option><option value="normal">Нормальная</option><option value="high">Высокая</option></select></label>
+                <label>Соблюдать питание<select name="adherence_ease" defaultValue={checkin?.adherence_ease || "normal"}><option value="easy">Легко</option><option value="normal">Нормально</option><option value="hard">Сложно</option></select></label>
+                <textarea name="note" placeholder="Комментарий — необязательно" defaultValue={checkin?.note || ""} />
+                <button className="primary">Сохранить check-in</button>
+              </form>
+            </section>
+          </div>
+
+          <section className="card top">
+            <div className="sectionTitleRow"><div><h2>Быстрые ситуации</h2><span className="muted">Команды для Telegram</span></div></div>
+            <div className="premiumScenarios">
+              <Scenario icon={<UtensilsCrossed />} cmd="/recommend" title="Что лучше сейчас" text="Главная рекомендация." />
+              <Scenario icon={<ShoppingBasket />} cmd="/shop" title="Я в магазине" text="Корзина под остаток дня." />
+              <Scenario icon={<Store />} cmd="/restaurant" title="Я в ресторане" text="Что заказать." />
+              <Scenario icon={<Timer />} cmd="/quick" title="Нет времени" text="Быстрые варианты." />
+              <Scenario icon={<Flame />} cmd="/training" title="Тренировка" text="Питание под нагрузку." />
+              <Scenario icon={<MessageCircleMore />} cmd="/sweet" title="Хочу сладкое" text="Встроить десерт." />
+              <Scenario icon={<BrainCircuit />} cmd="/overate" title="Переел" text="Спокойно скорректировать день." />
+              <Scenario icon={<HelpCircle />} cmd="/why" title="Почему?" text="Объяснить совет." />
+            </div>
+          </section>
+        </div>
+      </details>
+    </>
+  );
+}
+
+function dayPacing(eaten: number, target: number, pacing?: any) {
+  if (!target) return { title: "Цель дня не задана", detail: "Заполни нормы в профиле." };
+  const share = Number(pacing?.eaten_share ?? eaten / target);
+  const expected = Number(pacing?.expected_share ?? 0.5);
+  if (Math.abs(share - expected) < 0.18) return { title: "День идёт по плану", detail: "Сейчас ничего специально корректировать не нужно." };
+  if (share < expected) return { title: "Есть отставание по энергии", detail: "Лучше не оставлять слишком большой объём на поздний вечер." };
+  return { title: "Темп выше обычного", detail: "Следующий приём можно сделать легче." };
+}
+
+function buildFocus(context: any, pacing: { title: string }) {
+  const remaining = context.today?.remaining || {};
+  const settings = context.settings || {};
+  if (pacing.title === "День идёт по плану") return "Продолжай без лишних корректировок";
+  if (Number(settings.protein_target || 0) && Number(remaining.protein || 0) > Number(settings.protein_target || 0) * 0.45) return "Сделай белок основой следующего приёма";
+  return "Ориентируйся на голод и остаток дня";
+}
+
+function Scenario({ icon, cmd, title, text }: { icon: React.ReactNode; cmd: string; title: string; text: string }) {
+  return <div className="premiumScenario"><i>{icon}</i><span><code>{cmd}</code><b>{title}</b><small>{text}</small></span></div>;
+}
+
+function buildStarterPlan(context: any, pacing: { title: string }) {
+  const remaining = context.today?.remaining || {};
+  const settings = context.settings || {};
+  const foods = Array.isArray(context.today?.foods) ? context.today.foods : [];
+  const kcal = Math.max(0, Math.round(Number(remaining.kcal || 0)));
+  const protein = Math.max(0, Math.round(Number(remaining.protein || 0)));
+
+  if (!Number(settings.kcal_target || 0)) return "Заполни дневную цель по калориям в профиле — после этого TeddY сразу распределит остаток дня.";
+  if (!foods.length) return `Начни с полноценного приёма пищи. На день осталось около ${kcal} ккал${Number(settings.protein_target || 0) ? ` и ${protein} г белка` : ""}.`;
+  if (pacing.title === "Есть отставание по энергии") return `Не откладывай питание на поздний вечер. На остаток дня около ${kcal} ккал${Number(settings.protein_target || 0) ? ` и ${protein} г белка` : ""}.`;
+  if (pacing.title === "Темп выше обычного") return `Следующий приём сделай легче, но не урезай белок. Остаток — около ${kcal} ккал${Number(settings.protein_target || 0) ? ` и ${protein} г белка` : ""}.`;
+  return `Продолжай текущий темп. На остаток дня около ${kcal} ккал${Number(settings.protein_target || 0) ? ` и ${protein} г белка` : ""}.`;
+}
+
+function buildWeeklyFocus(context: any): { title: string; text: string; note: string } {
+  const quality = context.data_quality || {};
+  const days = Number(quality.active_days_7 ?? quality.active_days ?? 0);
+  const settings = context.settings || {};
+  const averages = context.averages_7 || context.averages || {};
+
+  if (days <= 0) return {
+    title: "Собрать первый рабочий ритм",
+    text: "Фиксируй обычное питание без попыток есть идеально. Каждый новый день делает рекомендации точнее.",
+    note: "Premium работает уже сейчас, но пока делает осторожные выводы.",
+  };
+  if (days < 3) return {
+    title: "Стабилизировать базовый режим",
+    text: "Главная задача — получить несколько обычных дней питания и понять реальный ритм.",
+    note: `Есть ${days} дн. данных.`,
+  };
+  if (days < 7) {
+    const target = Number(settings.kcal_target || 0);
+    const averageKcal = Number(averages.kcal || 0);
+    const difference = target && averageKcal ? Math.round(averageKcal - target) : 0;
+    return {
+      title: Math.abs(difference) > Math.max(150, target * 0.08)
+        ? difference > 0 ? "Сгладить систематический избыток" : "Не допускать систематического недобора"
+        : "Закрепить стабильность рациона",
+      text: target && averageKcal
+        ? `По имеющимся дням среднее около ${Math.round(averageKcal)} ккал при цели ${Math.round(target)}.`
+        : "Продолжай фиксировать питание и держать понятный ритм приёмов пищи.",
+      note: `Есть ${days} дн. данных. Полная недельная уверенность появится с 7 активных дней.`,
+    };
+  }
+  return {
+    title: "Удерживать устойчивый недельный ритм",
+    text: "Неделя данных уже есть. TeddY может увереннее сравнивать питание, вес и повторяющиеся привычки.",
+    note: "Фокус опирается на полноценное недельное окно.",
+  };
+}

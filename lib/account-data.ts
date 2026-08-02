@@ -1,5 +1,5 @@
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { dayKey, type Meal } from "@/lib/data";
+import { dayKey, mealDay, sumMeals, type Meal } from "@/lib/data";
 
 export async function clientHomeAccountData(accountId: string) {
   const db = getSupabaseAdmin();
@@ -87,4 +87,107 @@ export async function clientPremiumAccountData(accountId: string) {
     db.from("premium_feature_events").select("feature,created_at").eq("account_id", accountId).order("created_at", { ascending: false }).limit(12),
   ]);
   return { subscription, preferences, plan, report, proposal, memory: memory || [], events: events || [] };
+}
+
+export async function premiumIntelligenceAccountData(accountId: string) {
+  const db = getSupabaseAdmin();
+  const today = dayKey();
+  const fromDate = new Date();
+  fromDate.setDate(fromDate.getDate() - 13);
+  const fromDay = dayKey(fromDate);
+  const sevenDate = new Date();
+  sevenDate.setDate(sevenDate.getDate() - 6);
+  const sevenDay = dayKey(sevenDate);
+
+  const [
+    { data: settings },
+    { data: meals },
+    { data: weights },
+    { data: recommendations },
+    { data: checkins },
+    { data: memory },
+  ] = await Promise.all([
+    db.from("client_settings").select("*").eq("account_id", accountId).maybeSingle(),
+    db.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted").eq("account_id", accountId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(1200),
+    db.from("weight_logs").select("id,weight_kg,measured_at").eq("account_id", accountId).order("measured_at", { ascending: false }).limit(12),
+    db.from("premium_recommendations").select("*").eq("account_id", accountId).order("created_at", { ascending: false }).limit(8),
+    db.from("premium_checkins").select("*").eq("account_id", accountId).order("week_end", { ascending: false }).limit(4),
+    db.from("client_memory").select("*").eq("account_id", accountId).order("confidence", { ascending: false }).limit(20),
+  ]);
+
+  const rows = (meals || []) as Meal[];
+  const todayRows = rows.filter((meal) => mealDay(meal) === today);
+  const eaten = sumMeals(todayRows);
+  const kcalTarget = Number(settings?.kcal_target || 0);
+  const proteinTarget = Number(settings?.protein_target || settings?.protein_target_g || 0);
+  const fatTarget = Number(settings?.fat_target || settings?.fat_target_g || 0);
+  const carbTarget = Number(settings?.carb_target || settings?.carb_target_g || 0);
+
+  const daily = new Map<string, Meal[]>();
+  for (const meal of rows) {
+    const day = mealDay(meal);
+    if (!daily.has(day)) daily.set(day, []);
+    daily.get(day)!.push(meal);
+  }
+  const activeTotals = [...daily.entries()]
+    .filter(([day]) => day >= sevenDay)
+    .map(([, dayMeals]) => sumMeals(dayMeals));
+  const activeDays = activeTotals.length;
+  const average = (key: "kcal" | "prot" | "fat" | "carb") => activeDays
+    ? activeTotals.reduce((sum, total) => sum + Number(total[key] || 0), 0) / activeDays
+    : 0;
+
+  const weightRows = weights || [];
+  const latestWeight = weightRows[0];
+  const oldestWeight = weightRows[weightRows.length - 1];
+  const weightDelta = latestWeight && oldestWeight && latestWeight.id !== oldestWeight.id
+    ? Number(latestWeight.weight_kg) - Number(oldestWeight.weight_kg)
+    : null;
+  const hour = Number(new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "Europe/Moscow",
+    hour: "2-digit",
+    hour12: false,
+  }).format(new Date()));
+  const expectedShare = Math.max(0.15, Math.min(1, (hour - 7) / 14));
+
+  const averages = {
+    kcal: average("kcal"),
+    protein: average("prot"),
+    fat: average("fat"),
+    carb: average("carb"),
+  };
+
+  return {
+    context: {
+      settings: settings || {},
+      today: {
+        eaten,
+        remaining: {
+          kcal: kcalTarget - eaten.kcal,
+          protein: proteinTarget - eaten.prot,
+          fat: fatTarget - eaten.fat,
+          carb: carbTarget - eaten.carb,
+        },
+        foods: todayRows.map((meal) => meal.dish),
+        pacing: {
+          eaten_share: kcalTarget > 0 ? eaten.kcal / kcalTarget : 0,
+          expected_share: expectedShare,
+        },
+      },
+      data_quality: {
+        active_days_7: activeDays,
+        active_days: activeDays,
+        level: activeDays >= 6 ? "high" : activeDays >= 3 ? "medium" : "low",
+      },
+      weight_trend: {
+        delta: weightDelta,
+        measurements: weightRows.length,
+      },
+      averages,
+      averages_7: averages,
+    },
+    recommendations: recommendations || [],
+    checkins: checkins || [],
+    clientMemory: memory || [],
+  };
 }

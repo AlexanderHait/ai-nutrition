@@ -114,9 +114,26 @@ export default function SimplifiedSections() {
       .progressKeyStat span{display:grid}
       .progressKeyStat small{font-size:9px;color:#777}
       .progressKeyStat b{font-size:15px;margin-top:2px}
-      .progressDetails>.disclosureBody{padding-top:15px}
-      .detailSection{margin-top:11px}
-      .detailSection:first-child{margin-top:0}
+      .progressDetails{
+        border:0;
+        background:transparent;
+        overflow:visible;
+      }
+      .progressDetails>summary{display:none}
+      .progressDetails:not([open])>.disclosureBody,
+      .progressDetails>.disclosureBody{
+        display:flex!important;
+        flex-direction:column;
+        padding:0;
+        border:0;
+        background:transparent;
+      }
+      .progressDetails .clientProgressGrid{
+        order:-20;
+        margin-top:10px;
+      }
+      .progressDetails .detailSection{margin-top:10px}
+      .progressDetails .clientProgressGrid.detailSection{margin-top:10px}
 
       .premiumOutcomeGrid{
         display:grid;
@@ -173,12 +190,68 @@ export default function SimplifiedSections() {
       .planCompareCard li{display:flex;gap:7px;color:#bfc1bd;font-size:10px}
       .planCompareCard li svg{flex:none;color:#cbb05e}
 
+      .coachLockedCompact{
+        max-width:930px;
+        margin:0 auto;
+        border:1px solid #413821;
+        border-radius:16px;
+        background:linear-gradient(120deg,#15140f,#101114);
+        overflow:hidden;
+      }
+      .coachLockedLead{
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        align-items:center;
+        gap:16px;
+        padding:22px;
+      }
+      .coachLockedLead>i{
+        width:48px;
+        height:48px;
+        display:grid;
+        place-items:center;
+        border-radius:14px;
+        background:#231f14;
+        color:var(--gold);
+      }
+      .coachLockedLead small{
+        color:#9c864d;
+        font-size:9px;
+        font-weight:800;
+        letter-spacing:.1em;
+        text-transform:uppercase;
+      }
+      .coachLockedLead h2{margin:3px 0 4px;font-size:21px}
+      .coachLockedLead p{margin:0;max-width:610px;color:#8b8e8a;font-size:11px;line-height:1.55}
+      .coachLockedLead .primary{white-space:nowrap}
+      .coachLockedBenefits{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        border-top:1px solid #2c2a22;
+      }
+      .coachLockedBenefits>div{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:14px 18px;
+        border-right:1px solid #292922;
+      }
+      .coachLockedBenefits>div:last-child{border-right:0}
+      .coachLockedBenefits svg{color:#c9aa57;flex:none}
+      .coachLockedBenefits span{display:grid}
+      .coachLockedBenefits b{font-size:11px}
+      .coachLockedBenefits small{font-size:9px;color:#777;margin-top:2px}
+      .coachExtras>.disclosureBody{padding-top:14px}
+
+      .adminApp .desktopNav .navSection:nth-child(n+2){display:none}
+      .adminApp .mobileDrawerNav section:nth-child(n+2){display:none}
       .adminPriorityGrid{
         display:grid;
-        grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);
+        grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);
         gap:10px;
         align-items:start;
       }
+      .adminKpisCompact{grid-template-columns:repeat(3,minmax(0,1fr))!important}
       .adminActionList{display:grid;gap:7px;margin-top:12px}
       .adminAction{
         display:grid;
@@ -203,16 +276,36 @@ export default function SimplifiedSections() {
       .adminAction b{font-size:11px}
       .adminAction small{font-size:9px;color:#777;margin-top:2px}
       .adminAction>strong{font-size:13px;color:#d5bc70}
-      .systemIssueList{display:grid;margin-top:10px}
-      .systemIssue{
+      .adminToolsGrid{
         display:grid;
-        gap:2px;
-        padding:9px 0;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:10px;
+      }
+      .adminToolGroup{padding:16px}
+      .adminToolGroup h2{margin:0 0 11px!important;font-size:14px!important}
+      .adminToolLinks{display:grid}
+      .adminToolLink{
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        gap:10px;
+        align-items:center;
+        padding:11px 0;
         border-bottom:1px solid #22242a;
       }
-      .systemIssue:last-child{border-bottom:0}
-      .systemIssue b{font-size:10px}
-      .systemIssue small{font-size:9px;color:#777}
+      .adminToolLink:last-child{border-bottom:0}
+      .adminToolLink>i{
+        width:30px;
+        height:30px;
+        display:grid;
+        place-items:center;
+        border:1px solid #2b2d32;
+        border-radius:9px;
+        color:var(--gold);
+      }
+      .adminToolLink span{display:grid}
+      .adminToolLink b{font-size:11px}
+      .adminToolLink small{font-size:9px;color:#777;margin-top:2px}
+      .adminToolLink>em{font-style:normal;color:#686b68;font-size:14px}
 
       .emptyGuidance{
         min-height:150px;
@@ -227,10 +320,15 @@ export default function SimplifiedSections() {
       .emptyGuidance b{color:#d7d8d4;font-size:14px}
       .emptyGuidance span{max-width:420px;font-size:10px;line-height:1.5}
 
+      @media(max-width:1000px){
+        .adminToolsGrid{grid-template-columns:1fr 1fr}
+      }
       @media(max-width:900px){
         .profileOverview{grid-template-columns:1fr 1fr}
         .premiumOutcomeGrid{grid-template-columns:1fr}
         .adminPriorityGrid{grid-template-columns:1fr}
+        .coachLockedLead{grid-template-columns:auto 1fr}
+        .coachLockedLead .primary{grid-column:2;justify-self:start}
       }
       @media(max-width:650px){
         .primaryFocus{grid-template-columns:auto 1fr;padding:14px}
@@ -239,6 +337,13 @@ export default function SimplifiedSections() {
         .premiumOffer{grid-template-columns:1fr}
         .premiumOffer form,.premiumOffer>a{min-width:0;width:100%}
         .planCompareGrid{grid-template-columns:1fr}
+        .coachLockedLead{grid-template-columns:1fr;text-align:left;padding:18px}
+        .coachLockedLead .primary{grid-column:1;width:100%;justify-content:center}
+        .coachLockedBenefits{grid-template-columns:1fr}
+        .coachLockedBenefits>div{border-right:0;border-bottom:1px solid #292922}
+        .coachLockedBenefits>div:last-child{border-bottom:0}
+        .adminKpisCompact{grid-template-columns:1fr!important}
+        .adminToolsGrid{grid-template-columns:1fr}
       }
       @media(max-width:430px){
         .profileOverview{grid-template-columns:1fr}
