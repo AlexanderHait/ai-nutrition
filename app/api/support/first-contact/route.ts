@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { session } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import {
-  FIRST_CONTACT_WEBHOOK,
-  postProtectedRailway,
-} from "@/lib/n8n-webhooks";
+import { deliverSupportMessage } from "@/lib/telegram-support";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -31,38 +28,45 @@ export async function POST(request: Request) {
     }
 
     const db = getSupabaseAdmin();
-    const { data: profile, error } = await db
-      .from("profiles")
-      .select("telegram_id")
-      .eq("telegram_id", chatId)
-      .maybeSingle();
-
-    if (error || !profile) {
-      return NextResponse.json({ ok: false, error: "Клиент не найден" }, { status: 404 });
+    const { data, error } = await (db as any).rpc("create_admin_support_message_v1", {
+      _chat_id: chatId,
+      _content: content,
+      _request_id: requestId,
+      _attachment_path: null,
+      _attachment_mime: null,
+      _attachment_name: null,
+      _attachment_size: null,
+    });
+    const result = Array.isArray(data) ? data[0] : data;
+    if (error || !result?.message_id) {
+      throw new Error(`support message RPC failed: ${error?.message || "no row returned"}`);
     }
 
-    const result = await postProtectedRailway<{
-      ok?: boolean;
-      duplicate?: boolean;
-      message?: Record<string, unknown>;
-    }>(FIRST_CONTACT_WEBHOOK, {
-      chat_id: chatId,
-      content,
-      request_id: requestId,
-    });
+    const delivery = await deliverSupportMessage(Number(result.message_id));
+    const message = {
+      id: Number(result.message_id),
+      chat_id: Number(result.chat_id),
+      sender: "admin",
+      content: String(result.content || ""),
+      created_at: result.created_at,
+      attachment_path: null,
+      attachment_mime: null,
+      attachment_name: null,
+      attachment_size: null,
+      delivered_to_client_at: delivery.deliveredAt || new Date().toISOString(),
+      delivery_error: null,
+    };
 
-    if (!result.ok || !result.message) {
-      throw new Error("Railway did not confirm the saved message");
-    }
-
-    return NextResponse.json(result, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(
+      { ok: true, duplicate: Boolean(result.duplicate), message },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     console.error("first contact failed", error);
-    return NextResponse.json(
-      { ok: false, error: "Не удалось отправить первое сообщение" },
-      { status: 502 },
-    );
+    const detail = error instanceof Error ? error.message : "Неизвестная ошибка";
+    const publicError = /chat not found|bot was blocked|user is deactivated|chat_id/i.test(detail)
+      ? "Telegram не принимает сообщения для этого клиента"
+      : "Не удалось отправить первое сообщение";
+    return NextResponse.json({ ok: false, error: publicError }, { status: 502 });
   }
 }
