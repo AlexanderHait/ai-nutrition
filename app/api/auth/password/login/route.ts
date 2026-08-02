@@ -30,7 +30,14 @@ export async function POST(request: Request) {
   const supabase = await getSupabaseServer();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    return NextResponse.redirect(new URL("/login?error=credentials", request.url), 303);
+    const authCode = (error as { code?: string }).code;
+    const isUnconfirmed =
+      authCode === "email_not_confirmed" ||
+      error.message.toLowerCase().includes("not confirmed");
+    const target = isUnconfirmed
+      ? `/login?error=email_unconfirmed&email=${encodeURIComponent(email)}`
+      : "/login?error=credentials";
+    return NextResponse.redirect(new URL(target, request.url), 303);
   }
   return NextResponse.redirect(new URL("/client/profile", request.url), 303);
 }
