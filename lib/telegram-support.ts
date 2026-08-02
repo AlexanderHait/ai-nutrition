@@ -1,7 +1,8 @@
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 type SupportMessage = {
-  id: number;
+  id?: number;
+  message_id?: number;
   chat_id: number;
   content: string;
   attachment_path?: string | null;
@@ -101,14 +102,14 @@ async function readMessage(messageId: number): Promise<SupportMessage | null> {
   return data as SupportMessage | null;
 }
 
-async function markDelivered(messageId: number) {
+async function markDelivered(messageId: number, deliveredAt: string) {
   const db = getSupabaseAdmin();
-  const { error } = await db.rpc("mark_support_reply_delivered_v20", { _message_id: messageId });
+  const { error } = await (db as any).rpc("mark_support_reply_delivered_v20", { _message_id: messageId });
   if (!error) return;
 
   const { error: fallbackError } = await db
     .from("support_messages")
-    .update({ delivered_to_client_at: new Date().toISOString(), delivery_error: null })
+    .update({ delivered_to_client_at: deliveredAt, delivery_error: null })
     .eq("id", messageId)
     .eq("sender", "admin");
   if (fallbackError) {
@@ -118,7 +119,7 @@ async function markDelivered(messageId: number) {
 
 async function markFailed(messageId: number, reason: string) {
   const db = getSupabaseAdmin();
-  const { error } = await db.rpc("mark_support_reply_failed_v20", {
+  const { error } = await (db as any).rpc("mark_support_reply_failed_v20", {
     _message_id: messageId,
     _error: reason.slice(0, 1000),
   });
@@ -127,7 +128,7 @@ async function markFailed(messageId: number, reason: string) {
 
 export async function deliverSupportMessage(messageId: number): Promise<DeliveryResult> {
   const db = getSupabaseAdmin();
-  const { data, error } = await db.rpc("claim_support_reply_v20", { _message_id: messageId });
+  const { data, error } = await (db as any).rpc("claim_support_reply_v20", { _message_id: messageId });
   if (error) throw new Error(`support delivery claim failed: ${error.message}`);
 
   const claimed = (Array.isArray(data) ? data[0] : data) as SupportMessage | undefined;
@@ -144,7 +145,7 @@ export async function deliverSupportMessage(messageId: number): Promise<Delivery
   }
 
   const message: SupportMessage = {
-    id: Number((claimed as any).message_id || claimed.id || messageId),
+    id: Number(claimed.message_id || claimed.id || messageId),
     chat_id: Number(claimed.chat_id),
     content: String(claimed.content || ""),
     attachment_path: claimed.attachment_path || null,
@@ -162,8 +163,8 @@ export async function deliverSupportMessage(messageId: number): Promise<Delivery
     } else {
       const isPdf = String(message.attachment_mime || "").toLowerCase() === "application/pdf"
         || String(message.attachment_name || "").toLowerCase().endsWith(".pdf");
-      const method = isPdf ? "sendDocument" : "sendPhoto";
-      const field = isPdf ? "document" : "photo";
+      const method: "sendDocument" | "sendPhoto" = isPdf ? "sendDocument" : "sendPhoto";
+      const field: "document" | "photo" = isPdf ? "document" : "photo";
       const caption = captionText(message.content);
       const { data: signed, error: signedError } = await db.storage
         .from("support-media")
@@ -194,16 +195,17 @@ export async function deliverSupportMessage(messageId: number): Promise<Delivery
       }
     }
 
-    await markDelivered(message.id);
+    const deliveredAt = new Date().toISOString();
+    await markDelivered(Number(message.id), deliveredAt);
     return {
       delivered: true,
       alreadyDelivered: false,
       telegramMessageId: Number(result?.message_id || 0) || undefined,
-      deliveredAt: new Date().toISOString(),
+      deliveredAt,
     };
   } catch (error) {
     const reason = error instanceof Error ? error.message : "Telegram delivery failed";
-    await markFailed(message.id, reason);
+    await markFailed(Number(message.id), reason);
     throw error;
   }
 }
