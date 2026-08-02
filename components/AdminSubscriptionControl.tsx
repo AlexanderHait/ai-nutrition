@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import TimelinePanel from "@/components/TimelinePanel";
 
 export type SubscriptionPlan = "none" | "basic" | "premium";
 
@@ -64,6 +65,7 @@ export default function AdminSubscriptionControl({
         })}
       </div>
       {error ? <div className="subscriptionControlError">{error}</div> : null}
+      {!compact ? <TimelinePanel chatId={Number(chatId)} embedded /> : null}
     </div>
   );
 }
