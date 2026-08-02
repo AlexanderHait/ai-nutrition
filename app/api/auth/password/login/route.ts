@@ -39,5 +39,5 @@ export async function POST(request: Request) {
       : "/login?error=credentials";
     return NextResponse.redirect(new URL(target, request.url), 303);
   }
-  return NextResponse.redirect(new URL("/client/profile", request.url), 303);
+  return NextResponse.redirect(new URL("/client", request.url), 303);
 }

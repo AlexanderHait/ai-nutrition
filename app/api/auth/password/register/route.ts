@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     password,
     options: {
       data: { display_name: name || login, login },
-      emailRedirectTo: `${origin}/auth/callback?next=/client/profile`,
+      emailRedirectTo: `${origin}/auth/callback?next=/client/setup`,
     },
   });
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.redirect(
-    new URL(data.session ? "/client/profile" : `/login?registered=1&email=${encodeURIComponent(email)}`, request.url),
+    new URL(data.session ? "/client/setup" : `/login?registered=1&email=${encodeURIComponent(email)}`, request.url),
     303,
   );
 }
