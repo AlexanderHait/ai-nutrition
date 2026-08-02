@@ -2,198 +2,112 @@ import AdminBadge from "@/components/AdminBadge";
 import TelegramAvatar from "@/components/TelegramAvatar";
 import {adminChatIds,fmt} from "@/lib/data";
 import {getSupabaseAdmin} from "@/lib/supabase-admin";
-import {Activity,BrainCircuit,Camera,CheckCircle2,Search,Timer,Zap} from "lucide-react";
+import {Activity,AlertTriangle,BrainCircuit,Camera,CheckCircle2,Database,Timer,Zap} from "lucide-react";
 
 export const dynamic="force-dynamic";
 
 type Profile={telegram_id:number;first_name?:string|null;username?:string|null;avatar_url?:string|null;avatar_file_id?:string|null;avatar_updated_at?:string|null};
-type Usage={chat_id:number|null;feature:string;request_type:string|null;provider:string|null;model:string|null;workflow:string|null;success:boolean|null;latency_ms:number|null;input_tokens:number|null;output_tokens:number|null;estimated_input_tokens:number|null;estimated_output_tokens:number|null;cost_usd:number|null;created_at:string};
-type BotEvent={chat_id:number;event_type:string;created_at:string};
-type Recognition={chat_id:number;confidence_food:number|null;confidence_portion:number|null;confidence_nutrition:number|null;needs_confirmation:boolean|null;latency_ms:number|null;created_at:string};
-type UsageKind="execution"|"ai_request"|"vision_request"|"web_search"|"other";
-
-const USAGE_ALIASES:Record<string,UsageKind>={
-  execution:"execution",n8n:"execution",
-  ai:"ai_request",llm:"ai_request",openai:"ai_request",completion:"ai_request",ai_request:"ai_request",
-  vision:"vision_request",image:"vision_request",photo:"vision_request",vision_request:"vision_request",
-  search:"web_search",internet:"web_search",web:"web_search",web_search:"web_search"
-};
-
-function confidence(r:Recognition){
-  return Math.round((Number(r.confidence_food||0)*.45+Number(r.confidence_portion||0)*.30+Number(r.confidence_nutrition||0)*.25)*100);
-}
-
-function avg(values:number[]){
-  return values.length?Math.round(values.reduce((a,b)=>a+b,0)/values.length):0;
-}
+type AiSummary={events:number;executions:number;ai_requests:number;vision_requests:number;web_searches:number;failures:number;tokens:number;cost_usd:number;last_event_at:string|null;with_workflow:number;with_model:number;with_tokens:number;with_cost:number;with_source_event_id:number};
+type Latency={samples:number;avg_ms:number|null;p50_ms:number|null;p95_ms:number|null;p99_ms:number|null};
+type Breakdown={model?:string;provider?:string;workflow?:string;events:number;failures:number;tokens:number;cost_usd:number;avg_ms:number|null;p95_ms:number|null;last_event_at:string|null};
+type ClientMetric={chat_id:number;bot_events:number;photos:number;saved:number;edited:number;cache_hits:number;recognitions:number;review_required:number;avg_confidence:number;recognition_avg_ms:number;ai:number;vision:number;web:number;failures:number;tokens:number;cost_usd:number;ai_avg_ms:number;ai_p95_ms:number;last_event_at:string|null;activity:number};
+type Metrics={generated_at:string;period_days:number;recognition_period_days:number;ai:{summary:AiSummary;latency:Latency;models:Breakdown[];workflows:Breakdown[];daily:Array<{day:string;events:number;failures:number;tokens:number;cost_usd:number}>};bot:{events:number;photos:number;saved:number;edited:number;cache_hits:number};recognition:{recognitions:number;review_required:number;avg_confidence:number;avg_ms:number|null;p50_ms:number|null;p95_ms:number|null;p99_ms:number|null};clients:ClientMetric[]};
 
 function planFor(subs:any[],chatId:number){
   const row=subs.find(x=>Number(x.chat_id)===chatId&&x.status==="active");
   return row?.plan||"basic";
 }
-
-function usageKind(row:Usage):UsageKind{
-  const raw=String(row.request_type||row.feature||"").trim().toLowerCase();
-  return USAGE_ALIASES[raw]||"other";
-}
-
-function usageTokens(row:Usage){
-  return Number(row.input_tokens??row.estimated_input_tokens??0)+Number(row.output_tokens??row.estimated_output_tokens??0);
-}
-
-function usd(value:number){
-  if(!value)return "—";
-  return `$${value.toFixed(value<.01?4:2)}`;
+function usd(value:number){return value?`$${value.toFixed(value<.01?4:2)}`:"—"}
+function ms(value:number|null|undefined){return value&&value>0?value>=1000?`${(value/1000).toFixed(1)} с`:`${value} мс`:"—"}
+function coverage(value:number,total:number){return total?Math.round(value/total*100):0}
+function ago(value:string|null){
+  if(!value)return "нет событий";
+  const hours=Math.max(0,Math.round((Date.now()-new Date(value).getTime())/3600000));
+  if(hours<1)return "меньше часа назад";
+  if(hours<24)return `${hours} ч назад`;
+  return `${Math.round(hours/24)} дн назад`;
 }
 
 export default async function Page(){
   const s=getSupabaseAdmin();
-  const fromIso=new Date(Date.now()-30*86400000).toISOString();
-  const from7Iso=new Date(Date.now()-7*86400000).toISOString();
-  const [adminIds,usageResult,botResult,recognitionResult,profilesResult,subsResult]=await Promise.all([
+  const [adminIds,metricsResult,profilesResult,subsResult]=await Promise.all([
     adminChatIds(),
-    s.from("ai_usage_events").select("chat_id,feature,request_type,provider,model,workflow,success,latency_ms,input_tokens,output_tokens,estimated_input_tokens,estimated_output_tokens,cost_usd,created_at").gte("created_at",fromIso).order("created_at",{ascending:false}).limit(20000),
-    s.from("bot_events").select("chat_id,event_type,created_at").gte("created_at",fromIso).order("created_at",{ascending:false}).limit(20000),
-    s.from("recognition_events").select("chat_id,confidence_food,confidence_portion,confidence_nutrition,needs_confirmation,latency_ms,created_at").gte("created_at",from7Iso).order("created_at",{ascending:false}).limit(8000),
+    s.rpc("admin_platform_metrics_v1",{_days:30,_recognition_days:7,_client_limit:80}),
     s.from("profiles").select("telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at"),
     s.from("subscriptions").select("chat_id,plan,status,created_at").order("created_at",{ascending:false})
   ]);
 
-  if(usageResult.error)console.error("admin AI telemetry query failed",{code:usageResult.error.code,message:usageResult.error.message});
-  if(botResult.error)console.error("admin bot events query failed",{code:botResult.error.code,message:botResult.error.message});
-  if(recognitionResult.error)console.error("admin recognition query failed",{code:recognitionResult.error.code,message:recognitionResult.error.message});
-
-  const usageRows=(usageResult.data||[]) as Usage[];
-  const botRows=(botResult.data||[]) as BotEvent[];
-  const recRows=(recognitionResult.data||[]) as Recognition[];
-  const profiles=profilesResult.data||[];
+  if(metricsResult.error)console.error("admin platform metrics failed",{code:metricsResult.error.code,message:metricsResult.error.message});
+  const metrics=(metricsResult.data||null) as Metrics|null;
+  const profiles=(profilesResult.data||[]) as Profile[];
   const subs=subsResult.data||[];
-  const profileMap=new Map(profiles.map((x:any)=>[Number(x.telegram_id),x as Profile]));
+  const profileMap=new Map(profiles.map(x=>[Number(x.telegram_id),x]));
 
-  const usageTotal=usageRows.reduce((a,x)=>{
-    const kind=usageKind(x);
-    return {
-      exec:a.exec+(kind==="execution"?1:0),
-      ai:a.ai+(kind==="ai_request"?1:0),
-      vision:a.vision+(kind==="vision_request"?1:0),
-      web:a.web+(kind==="web_search"?1:0),
-      tokens:a.tokens+usageTokens(x),
-      cost:a.cost+Number(x.cost_usd||0),
-      failed:a.failed+(x.success===false?1:0)
-    };
-  },{exec:0,ai:0,vision:0,web:0,tokens:0,cost:0,failed:0});
-
-  const botByType=new Map<string,number>();
-  for(const e of botRows)botByType.set(e.event_type,(botByType.get(e.event_type)||0)+1);
-  const saved=botByType.get("meal_saved")||0;
-  const edited=botByType.get("meal_edited")||0;
-  const photos=botByType.get("photo_analyzed")||0;
-  const cacheHits=botByType.get("photo_recognition_cache")||0;
-  const recScores=recRows.map(confidence).filter(Number.isFinite);
-  const recLat=recRows.map(x=>Number(x.latency_ms||0)).filter(x=>x>0);
-  const review=recRows.filter(x=>x.needs_confirmation).length;
-
-  const byClient=new Map<number,{events:number;photos:number;saved:number;edited:number;cache:number;recognitions:number;review:number;avgConfidence:number;avgMs:number;ai:number;vision:number;web:number;cost:number;failed:number}>();
-  const emptyClient=()=>({events:0,photos:0,saved:0,edited:0,cache:0,recognitions:0,review:0,avgConfidence:0,avgMs:0,ai:0,vision:0,web:0,cost:0,failed:0});
-
-  for(const e of botRows){
-    const id=Number(e.chat_id); if(!id)continue;
-    const v=byClient.get(id)||emptyClient();
-    v.events++;
-    if(e.event_type==="photo_analyzed")v.photos++;
-    if(e.event_type==="meal_saved")v.saved++;
-    if(e.event_type==="meal_edited")v.edited++;
-    if(e.event_type==="photo_recognition_cache")v.cache++;
-    byClient.set(id,v);
+  if(!metrics){
+    return <><div className="pageHead"><div><p>Инфраструктура</p><h1>n8n / Метрики</h1></div></div><section className="card top requestsHonestState"><AlertTriangle/><div><h2>Метрики временно недоступны</h2><p>Production-данные не изменены. Ошибка уже записана в журнал Vercel.</p></div></section></>;
   }
 
-  const recByClient=new Map<number,Recognition[]>();
-  for(const r of recRows){
-    const id=Number(r.chat_id); if(!id)continue;
-    if(!recByClient.has(id))recByClient.set(id,[]);
-    recByClient.get(id)!.push(r);
-  }
-  for(const [id,clientRows] of recByClient){
-    const v=byClient.get(id)||emptyClient();
-    v.recognitions=clientRows.length;
-    v.review=clientRows.filter(x=>x.needs_confirmation).length;
-    v.avgConfidence=avg(clientRows.map(confidence));
-    v.avgMs=avg(clientRows.map(x=>Number(x.latency_ms||0)).filter(x=>x>0));
-    byClient.set(id,v);
-  }
-
-  for(const e of usageRows){
-    const id=Number(e.chat_id); if(!id)continue;
-    const v=byClient.get(id)||emptyClient();
-    const kind=usageKind(e);
-    if(kind==="ai_request")v.ai++;
-    if(kind==="vision_request")v.vision++;
-    if(kind==="web_search")v.web++;
-    if(e.success===false)v.failed++;
-    v.cost+=Number(e.cost_usd||0);
-    byClient.set(id,v);
-  }
-
-  const rows=[...byClient.entries()].sort((a,b)=>b[1].events+b[1].recognitions-a[1].events-a[1].recognitions).slice(0,80);
-  const telemetryConnected=usageRows.length>0;
-  const telemetryFailed=Boolean(usageResult.error);
+  const ai=metrics.ai.summary;
+  const telemetryAge=ai.last_event_at?(Date.now()-new Date(ai.last_event_at).getTime())/3600000:Infinity;
+  const telemetryLive=ai.events>0&&telemetryAge<24;
+  const fieldCoverage=ai.events?Math.round((ai.with_workflow+ai.with_model+ai.with_source_event_id)/(ai.events*3)*100):0;
 
   return <>
-    <div className="pageHead">
-      <div>
-        <p>Инфраструктура</p>
-        <h1>n8n / Метрики</h1>
-        <span>Реальная активность бота и отдельный учёт AI-запросов, токенов и стоимости.</span>
-      </div>
-    </div>
+    <div className="pageHead"><div><p>Инфраструктура</p><h1>n8n / AI Analytics</h1><span>Реальные production-метрики без polling: активность, качество, скорость, модели, workflow, ошибки и стоимость.</span></div></div>
 
     <div className="adminKpis">
-      <K i={<Activity/>} l="Bot events · 30 дней" v={botRows.length} s={`${saved} сохранений · ${edited} правок`}/>
-      <K i={<Camera/>} l="Фото · 30 дней" v={photos} s={`${cacheHits} cache events`}/>
-      <K i={<CheckCircle2/>} l="Уверенность · 7 дней" v={`${avg(recScores)}%`} s={`${review}/${recRows.length} требуют проверки`}/>
-      <K i={<BrainCircuit/>} l="AI telemetry" v={usageTotal.ai+usageTotal.vision+usageTotal.web} s={telemetryConnected?`${fmt(usageTotal.tokens)} tokens · ${usd(usageTotal.cost)}`:telemetryFailed?"ошибка чтения":"ещё не поступает"}/>
+      <K i={<Activity/>} l="Bot events · 30 дней" v={metrics.bot.events} s={`${metrics.bot.saved} сохранений · ${metrics.bot.edited} правок`}/>
+      <K i={<Camera/>} l="Фото · 30 дней" v={metrics.bot.photos} s={`${metrics.bot.cache_hits} cache events`}/>
+      <K i={<CheckCircle2/>} l="Точность · 7 дней" v={`${metrics.recognition.avg_confidence||0}%`} s={`${metrics.recognition.review_required}/${metrics.recognition.recognitions} требуют проверки`}/>
+      <K i={<BrainCircuit/>} l="AI telemetry" v={ai.events} s={`${fmt(ai.tokens)} tokens · ${usd(ai.cost_usd)}`}/>
     </div>
 
-    {!telemetryConnected&&
-      <section className="card top requestsHonestState">
-        <Zap/>
-        <div>
-          <h2>{telemetryFailed?"AI telemetry временно недоступна":"AI telemetry пока не поступает"}</h2>
-          <p>{telemetryFailed?"Запрос к таблице AI-метрик завершился ошибкой. Остальные production-метрики ниже продолжают отображаться.":"Таблица AI-метрик готова. После подключения n8n к `/api/bot/usage` запросы, токены и стоимость появятся здесь без polling и дополнительных AI-вызовов."}</p>
-        </div>
-      </section>
-    }
+    <section className={`card top requestsHonestState ${telemetryLive?"":"warning"}`}>
+      {telemetryLive?<Zap/>:<AlertTriangle/>}
+      <div><h2>{telemetryLive?"AI telemetry поступает":"AI telemetry не покрывает production"}</h2><p>{telemetryLive?`Последнее событие: ${ago(ai.last_event_at)}. Полнота основных полей: ${fieldCoverage}%.`:`Последнее событие было ${ago(ai.last_event_at)}. В базе только ${ai.events} AI-события, поэтому стоимость и скорость пока не отражают весь production. Контур приёма и агрегации готов; требуется подключение отправки из всех AI-workflow.`}</p></div>
+    </section>
 
     <div className="metricGrid top">
-      <M icon={<Search/>} k="Web search" v={usageTotal.web} note={telemetryConnected?"из ai_usage_events":"нет входящих telemetry"}/>
-      <M icon={<BrainCircuit/>} k="AI requests" v={usageTotal.ai} note={telemetryConnected?`${usageTotal.failed} ошибок`:"нет входящих telemetry"}/>
-      <M icon={<Camera/>} k="Vision requests" v={usageTotal.vision} note={telemetryConnected?"из ai_usage_events":"нет входящих telemetry"}/>
-      <M icon={<Timer/>} k="Recognition avg" v={avg(recLat)?`${avg(recLat)} ms`:"—"} note="по последним 7 дням"/>
+      <M icon={<BrainCircuit/>} k="AI requests" v={ai.ai_requests} note={`${ai.failures} ошибок`}/>
+      <M icon={<Camera/>} k="Vision requests" v={ai.vision_requests} note={`${coverage(ai.with_model,ai.events)}% с моделью`}/>
+      <M icon={<Database/>} k="Tokens" v={fmt(ai.tokens)} note={`${coverage(ai.with_tokens,ai.events)}% событий с usage`}/>
+      <M icon={<Timer/>} k="AI P95" v={ms(metrics.ai.latency.p95_ms)} note={`P50 ${ms(metrics.ai.latency.p50_ms)} · P99 ${ms(metrics.ai.latency.p99_ms)}`}/>
+    </div>
+
+    <div className="metricGrid top">
+      <M icon={<Timer/>} k="Распознавание P50" v={ms(metrics.recognition.p50_ms)} note={`${metrics.recognition.recognitions} результатов`}/>
+      <M icon={<Timer/>} k="Распознавание P95" v={ms(metrics.recognition.p95_ms)} note={`среднее ${ms(metrics.recognition.avg_ms)}`}/>
+      <M icon={<AlertTriangle/>} k="Распознавание P99" v={ms(metrics.recognition.p99_ms)} note="худшие 1% запросов"/>
+      <M icon={<CheckCircle2/>} k="Без проверки" v={`${Math.max(0,metrics.recognition.recognitions-metrics.recognition.review_required)}`} note={`${metrics.recognition.review_required} требуют подтверждения`}/>
+    </div>
+
+    <div className="top" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:16}}>
+      <BreakdownTable title="По workflow" rows={metrics.ai.workflows} label={x=>x.workflow||"—"}/>
+      <BreakdownTable title="По моделям" rows={metrics.ai.models} label={x=>x.model||"—"}/>
     </div>
 
     <section className="card top tableCard">
-      <div className="tableHead n8nGrid"><span>Клиент</span><span>Тариф</span><span>Bot events</span><span>Фото</span><span>Сохранения</span><span>Качество</span><span>AI cost</span></div>
-      {rows.map(([id,v])=>{
-        const p=profileMap.get(id);
-        return <div className="tableRow n8nGrid" key={id}>
-          <div className="clientIdentity"><TelegramAvatar profile={p} size="small"/><span><b>{p?.first_name||p?.username||id}{adminIds.has(id)&&<AdminBadge/>}</b><small>{p?.username?`@${p.username}`:`ID ${id}`}</small></span></div>
-          <span className={`planPill ${planFor(subs,id)}`}>{String(planFor(subs,id)).toUpperCase()}</span>
-          <span><b>{fmt(v.events)}</b><small>{fmt(v.edited)} правок</small></span>
-          <span><b>{fmt(v.photos)}</b><small>{fmt(v.cache)} cache</small></span>
-          <span><b>{fmt(v.saved)}</b><small>meal_saved</small></span>
-          <span><b>{v.avgConfidence?`${v.avgConfidence}%`:"—"}</b><small>{v.review}/{v.recognitions} проверка</small></span>
-          <span><b>{usd(v.cost)}</b><small>{v.ai+v.vision+v.web||0} events · {v.failed} ошибок</small></span>
+      <div className="sectionTitleRow"><div><h2>По клиентам</h2><span className="muted">Bot · распознавание · AI · 30 дней</span></div></div>
+      <div className="tableHead n8nGrid"><span>Клиент</span><span>Тариф</span><span>Bot events</span><span>Фото</span><span>Сохранения</span><span>Качество</span><span>AI</span></div>
+      {metrics.clients.map(v=>{
+        const p=profileMap.get(Number(v.chat_id));
+        return <div className="tableRow n8nGrid" key={v.chat_id}>
+          <div className="clientIdentity"><TelegramAvatar profile={p} size="small"/><span><b>{p?.first_name||p?.username||v.chat_id}{adminIds.has(Number(v.chat_id))&&<AdminBadge/>}</b><small>{p?.username?`@${p.username}`:`ID ${v.chat_id}`}</small></span></div>
+          <span className={`planPill ${planFor(subs,Number(v.chat_id))}`}>{String(planFor(subs,Number(v.chat_id))).toUpperCase()}</span>
+          <span><b>{fmt(v.bot_events)}</b><small>{fmt(v.edited)} правок</small></span>
+          <span><b>{fmt(v.photos)}</b><small>{fmt(v.cache_hits)} cache</small></span>
+          <span><b>{fmt(v.saved)}</b><small>{v.recognitions} recognitions</small></span>
+          <span><b>{v.avg_confidence?`${v.avg_confidence}%`:"—"}</b><small>{v.review_required}/{v.recognitions} проверка</small></span>
+          <span><b>{v.ai+v.vision+v.web}</b><small>{usd(v.cost_usd)} · {v.failures} ошибок</small></span>
         </div>;
       })}
-      {!rows.length&&<p className="muted" style={{padding:18}}>Событий за период нет.</p>}
+      {!metrics.clients.length&&<p className="muted" style={{padding:18}}>Событий за период нет.</p>}
     </section>
   </>;
 }
 
-function K({i,l,v,s}:{i:React.ReactNode;l:string;v:number|string;s:string}){
-  return <div className="adminKpi"><i>{i}</i><div><span>{l}</span><b>{typeof v==="number"?fmt(v):v}</b><small>{s}</small></div></div>;
+function BreakdownTable({title,rows,label}:{title:string;rows:Breakdown[];label:(row:Breakdown)=>string}){
+  return <section className="card tableCard"><div className="sectionTitleRow"><div><h2>{title}</h2><span className="muted">30 дней</span></div></div><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",minWidth:520}}><thead><tr><th align="left">Название</th><th>Запросы</th><th>Ошибки</th><th>P95</th><th>Токены</th><th>Стоимость</th></tr></thead><tbody>{rows.map((row,index)=><tr key={`${label(row)}-${index}`}><td><b>{label(row)}</b>{row.provider&&<small style={{display:"block",opacity:.55}}>{row.provider}</small>}</td><td align="center">{fmt(row.events)}</td><td align="center">{fmt(row.failures)}</td><td align="center">{ms(row.p95_ms)}</td><td align="center">{fmt(row.tokens)}</td><td align="center">{usd(row.cost_usd)}</td></tr>)}</tbody></table>{!rows.length&&<p className="muted" style={{padding:18}}>Данных пока нет.</p>}</div></section>;
 }
-
-function M({icon,k,v,note}:{icon:React.ReactNode;k:string;v:string|number;note:string}){
-  return <div className="metricCard"><i>{icon}</i><span>{k}</span><b>{typeof v==="number"?fmt(v):v}</b><small>{note}</small></div>;
-}
+function K({i,l,v,s}:{i:React.ReactNode;l:string;v:number|string;s:string}){return <div className="adminKpi"><i>{i}</i><div><span>{l}</span><b>{typeof v==="number"?fmt(v):v}</b><small>{s}</small></div></div>}
+function M({icon,k,v,note}:{icon:React.ReactNode;k:string;v:string|number;note:string}){return <div className="metricCard"><i>{icon}</i><span>{k}</span><b>{typeof v==="number"?fmt(v):v}</b><small>{note}</small></div>}
