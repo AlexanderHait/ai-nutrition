@@ -1,1 +1,24 @@
-import{createClient}from"@supabase/supabase-js";export function createServiceClient(){const u=process.env.NEXT_PUBLIC_SUPABASE_URL,k=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!u||!k)throw new Error("Supabase env missing");return createClient(u,k,{auth:{persistSession:false}})}
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { supabasePublishableKey, supabaseUrl } from "@/lib/supabase/config";
+
+export async function getSupabaseServer() {
+  const cookieStore = await cookies();
+
+  return createServerClient(supabaseUrl, supabasePublishableKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options),
+          );
+        } catch {
+          // Server Components cannot write cookies. proxy.ts refreshes them.
+        }
+      },
+    },
+  });
+}
