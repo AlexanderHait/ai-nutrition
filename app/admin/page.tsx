@@ -1,20 +1,213 @@
 import TelegramAvatar from "@/components/TelegramAvatar";
 import Link from "next/link";
-import {AlertTriangle,Crown,MessageSquare,Target,Users,Activity,BarChart3} from "lucide-react";
-import {adminChatIds,adminDashboardData,fmt,goalKind,sumMeals} from "@/lib/data";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Crown,
+  MessageSquare,
+  Settings,
+  Target,
+} from "lucide-react";
+import { adminChatIds, adminDashboardData, dayKey, fmt, mealDay, sumMeals } from "@/lib/data";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import AdminBadge from "@/components/AdminBadge";
-export const dynamic="force-dynamic";
-type Attention={id:number;profile:any;name:string;username:string;score:number;reasons:string[]};
-export default async function Page(){
- const [{profiles,meals,logs,settings,subscriptions,support,weights},adminIds]=await Promise.all([adminDashboardData(),adminChatIds()]);const now=Date.now(),week=now-7*86400000;
- const settingsMap=new Map((settings as any[]).map(x=>[Number(x.chat_id),x])),latestSubs=new Map<number,any>(),lastWeight=new Map<number,any>(),activity=new Map<number,number>(),todayMeals=new Map<number,any[]>(),unread=new Map<number,number>();
- for(const x of subscriptions as any[])if(!latestSubs.has(Number(x.chat_id)))latestSubs.set(Number(x.chat_id),x);
- for(const w of weights as any[])if(!lastWeight.has(Number(w.chat_id)))lastWeight.set(Number(w.chat_id),w);
- for(const m of meals as any[]){const id=Number(m.chat_id),ts=new Date(m.eaten_at).getTime();activity.set(id,Math.max(activity.get(id)||0,ts));if(!todayMeals.has(id))todayMeals.set(id,[]);todayMeals.get(id)!.push(m)}
- for(const l of logs as any[]){const id=Number(l.chat_id),ts=new Date(l.created_at).getTime();activity.set(id,Math.max(activity.get(id)||0,ts))}
- for(const m of support as any[])if(m.sender==="client"&&!m.read_by_admin_at){const id=Number(m.chat_id);unread.set(id,(unread.get(id)||0)+1)}
- const active7=[...activity.values()].filter(x=>x>=week).length,totalUnread=[...unread.values()].reduce((a,b)=>a+b,0),premium=[...latestSubs.values()].filter(x=>x.plan==="premium"&&x.status==="active").length;
- const attention:Attention[]=profiles.map((p:any)=>{const id=Number(p.telegram_id),st:any=settingsMap.get(id),last=activity.get(id)||0,dayTotal=sumMeals((todayMeals.get(id)||[]) as any),target=Number(st?.kcal_target||0),reasons:string[]=[];const u=unread.get(id)||0;if(u)reasons.push(`${u} непрочит. сообщ.`);if(!last)reasons.push("нет активности");else if(now-last>3*86400000)reasons.push(`${Math.floor((now-last)/86400000)} дн. без активности`);if(target&&dayTotal.kcal>0&&dayTotal.kcal<target*.7)reasons.push("сегодня <70% калорий");if(!st?.goal)reasons.push("не заполнена цель");const w:any=lastWeight.get(id);if(!w)reasons.push("нет веса");return{id,profile:p,name:p.first_name||p.username||`Telegram ${id}`,username:p.username?`@${p.username}`:"",score:u*5+reasons.length,reasons}}).filter(x=>x.reasons.length).sort((a,b)=>b.score-a.score).slice(0,8);
- return <><header className="pageHead adminWelcome"><div><p>AI‑Nutrition / Админка</p><h1>Обзор</h1><span>Главное на сегодня. Детали вынесены в отдельные разделы, чтобы страница оставалась быстрой.</span></div><Link className="primary compactBtn" href="/admin/dialogs">Открыть диалоги</Link></header><div className="adminKpis"><K icon={<Users/>} l="Клиенты" v={fmt(profiles.length)} sub={`${active7} активны за 7 дней`}/><K icon={<MessageSquare/>} l="Непрочитанные" v={fmt(totalUnread)} sub={totalUnread?"нужен ответ":"всё разобрано"}/><K icon={<AlertTriangle/>} l="Сигналы" v={fmt(attention.length)} sub="приоритет на сегодня"/><K icon={<Crown/>} l="Premium" v={fmt(premium)} sub="активных"/></div><div className="dashboardMain top"><section className="card attentionCenter"><div className="sectionTitleRow"><div><h2>Центр внимания</h2><span className="muted">Показываем только тех, кому сейчас нужен взгляд</span></div><Link className="textLink" href="/admin/activity">Вся активность →</Link></div>{attention.length?<div className="attentionCards">{attention.map(x=><Link href={`/admin/clients/${x.id}`} className="attentionCard" key={x.id}><TelegramAvatar profile={x.profile} size="small"/><div><b>{x.name}{adminIds.has(x.id)&&<AdminBadge/>}</b><small>{x.username}</small><p>{x.reasons.slice(0,3).join(" · ")}</p></div><span>Открыть</span></Link>)}</div>:<div className="positiveEmpty"><Target/><b>На сегодня всё спокойно</b><span>Новых сигналов нет.</span></div>}</section><aside className="dashboardSide"><section className="card"><div className="sectionTitleRow"><div><h2>Разделы</h2><span className="muted">Детали не грузятся на главной</span></div></div><div className="quickAdmin vertical"><Link href="/admin/clients"><Users/><b>Клиенты</b><span>профили и рацион</span></Link><Link href="/admin/dialogs"><MessageSquare/><b>Диалоги</b><span>{totalUnread?`${totalUnread} непрочитанных`:"новых нет"}</span></Link><Link href="/admin/activity"><Activity/><b>Активность</b><span>кто выпал и кто вернулся</span></Link><Link href="/admin/analytics"><BarChart3/><b>Аналитика</b><span>воронка и бизнес</span></Link></div></section><section className="card recentCompact"><div className="sectionTitleRow"><div><h2>Новые клиенты</h2><span className="muted">Последние регистрации</span></div></div>{profiles.slice(0,5).map((p:any)=><Link className="recentClient" href={`/admin/clients/${p.telegram_id}`} key={p.id}><TelegramAvatar profile={p} size="small"/><span><b>{p.first_name||"Без имени"}{adminIds.has(Number(p.telegram_id))&&<AdminBadge/>}</b><small>{p.username?`@${p.username}`:p.telegram_id}</small></span></Link>)}</section></aside></div></>;
+import SimplifiedSections from "@/components/SimplifiedSections";
+
+export const dynamic = "force-dynamic";
+
+type Attention = {
+  id: number;
+  profile: any;
+  name: string;
+  username: string;
+  score: number;
+  reasons: string[];
+};
+
+export default async function Page() {
+  const db = getSupabaseAdmin();
+  const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const [
+    { profiles, meals, logs, settings, subscriptions, support },
+    adminIds,
+    systemResult,
+  ] = await Promise.all([
+    adminDashboardData(),
+    adminChatIds(),
+    db.from("system_events")
+      .select("id,event_type,severity,workflow,message,created_at")
+      .gte("created_at", since24h)
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
+
+  const now = Date.now();
+  const today = dayKey();
+  const hour = Number(new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "Europe/Moscow",
+    hour: "2-digit",
+    hour12: false,
+  }).format(new Date()));
+
+  const settingsMap = new Map((settings as any[]).map((item) => [Number(item.chat_id), item]));
+  const latestSubs = new Map<number, any>();
+  const activity = new Map<number, number>();
+  const todayMeals = new Map<number, any[]>();
+  const unread = new Map<number, number>();
+
+  for (const subscription of subscriptions as any[]) {
+    if (!latestSubs.has(Number(subscription.chat_id))) latestSubs.set(Number(subscription.chat_id), subscription);
+  }
+  for (const meal of meals as any[]) {
+    const id = Number(meal.chat_id);
+    const timestamp = new Date(meal.eaten_at).getTime();
+    activity.set(id, Math.max(activity.get(id) || 0, timestamp));
+    if (mealDay(meal) === today) {
+      if (!todayMeals.has(id)) todayMeals.set(id, []);
+      todayMeals.get(id)!.push(meal);
+    }
+  }
+  for (const log of logs as any[]) {
+    const id = Number(log.chat_id);
+    const timestamp = new Date(log.created_at).getTime();
+    activity.set(id, Math.max(activity.get(id) || 0, timestamp));
+  }
+  for (const message of support as any[]) {
+    if (message.sender === "client" && !message.read_by_admin_at) {
+      const id = Number(message.chat_id);
+      unread.set(id, (unread.get(id) || 0) + 1);
+    }
+  }
+
+  const totalUnread = [...unread.values()].reduce((sum, value) => sum + value, 0);
+  const premium = [...latestSubs.values()].filter((item) => item.plan === "premium" && item.status === "active").length;
+  const systemIssues = (systemResult.data || [])
+    .filter((issue: any) => ["warning", "error", "critical"].includes(String(issue.severity || "").toLowerCase()))
+    .slice(0, 10);
+
+  const attention: Attention[] = profiles.map((profile: any) => {
+    const id = Number(profile.telegram_id);
+    const clientSettings: any = settingsMap.get(id);
+    const last = activity.get(id) || 0;
+    const dayTotal = sumMeals((todayMeals.get(id) || []) as any);
+    const target = Number(clientSettings?.kcal_target || 0);
+    const reasons: string[] = [];
+    const unreadCount = unread.get(id) || 0;
+
+    if (unreadCount) reasons.push(`${unreadCount} непрочит. сообщ.`);
+    if (!last && profile.created_at && now - new Date(profile.created_at).getTime() > 3 * 86400000) reasons.push("нет активности");
+    if (last && now - last > 3 * 86400000) reasons.push(`${Math.floor((now - last) / 86400000)} дн. без активности`);
+    if (hour >= 18 && target > 0 && dayTotal.kcal > 0 && dayTotal.kcal < target * 0.7) reasons.push("сегодня меньше 70% калорий");
+
+    return {
+      id,
+      profile,
+      name: profile.first_name || profile.username || `Telegram ${id}`,
+      username: profile.username ? `@${profile.username}` : "",
+      score: unreadCount * 5 + reasons.length,
+      reasons,
+    };
+  }).filter((item) => item.reasons.length)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6);
+
+  return (
+    <>
+      <SimplifiedSections />
+      <header className="pageHead adminWelcome">
+        <div>
+          <p>Админка</p>
+          <h1>Что требует внимания</h1>
+          <span>{profiles.length} клиентов. На главной оставлены только сообщения, клиентские сигналы, система и подписки.</span>
+        </div>
+        <Link className="primary compactBtn" href="/admin/dialogs">Открыть диалоги</Link>
+      </header>
+
+      <div className="adminKpis">
+        <K icon={<MessageSquare />} label="Новые сообщения" value={fmt(totalUnread)} sub={totalUnread ? "нужно ответить" : "всё разобрано"} />
+        <K icon={<AlertTriangle />} label="Кому нужен взгляд" value={fmt(attention.length)} sub="актуальные сигналы" />
+        <K icon={systemIssues.length ? <AlertTriangle /> : <CheckCircle2 />} label="Система" value={fmt(systemIssues.length)} sub={systemIssues.length ? "за последние 24 часа" : "ошибок не зафиксировано"} />
+        <K icon={<Crown />} label="Premium" value={fmt(premium)} sub="активных подписок" />
+      </div>
+
+      <div className="adminPriorityGrid top">
+        <section className="card attentionCenter">
+          <div className="sectionTitleRow">
+            <div><h2>Клиенты, которым нужен взгляд</h2><span className="muted">Только реальные действия: сообщение, пауза или заметный недобор</span></div>
+            <Link className="textLink" href="/admin/activity">Вся активность →</Link>
+          </div>
+          {attention.length ? (
+            <div className="attentionCards">
+              {attention.map((item) => (
+                <Link href={`/admin/clients/${item.id}`} className="attentionCard" key={item.id}>
+                  <TelegramAvatar profile={item.profile} size="small" />
+                  <div>
+                    <b>{item.name}{adminIds.has(item.id) && <AdminBadge />}</b>
+                    <small>{item.username}</small>
+                    <p>{item.reasons.join(" · ")}</p>
+                  </div>
+                  <span>Открыть</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="positiveEmpty"><Target /><b>Сейчас всё спокойно</b><span>Новых клиентских сигналов нет.</span></div>
+          )}
+        </section>
+
+        <aside className="dashboardSide">
+          <section className="card">
+            <div className="sectionTitleRow"><div><h2>Следующие действия</h2><span className="muted">Без лишних разделов на главной</span></div></div>
+            <div className="adminActionList">
+              <Link className="adminAction" href="/admin/dialogs">
+                <i><MessageSquare size={16} /></i>
+                <span><b>Ответить клиентам</b><small>Новые сообщения поддержки</small></span>
+                <strong>{totalUnread}</strong>
+              </Link>
+              <Link className="adminAction" href="/admin/system">
+                <i><Settings size={16} /></i>
+                <span><b>Проверить систему</b><small>Ошибки и предупреждения за сутки</small></span>
+                <strong>{systemIssues.length}</strong>
+              </Link>
+              <Link className="adminAction" href="/admin/subscriptions">
+                <i><Crown size={16} /></i>
+                <span><b>Подписки</b><small>Управление Basic и Premium</small></span>
+                <strong>{premium}</strong>
+              </Link>
+            </div>
+          </section>
+
+          <section className="card">
+            <div className="sectionTitleRow"><div><h2>Состояние системы</h2><span className="muted">Последние 24 часа</span></div></div>
+            {systemIssues.length ? (
+              <div className="systemIssueList">
+                {systemIssues.slice(0, 4).map((issue: any) => (
+                  <div className="systemIssue" key={issue.id}>
+                    <b>{issue.workflow || issue.event_type || "Системное событие"}</b>
+                    <small>{issue.message || issue.severity} · {new Date(issue.created_at).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="positiveEmpty"><CheckCircle2 /><b>Система работает штатно</b><span>За последние сутки ошибок и предупреждений нет.</span></div>
+            )}
+          </section>
+        </aside>
+      </div>
+    </>
+  );
 }
-function K({icon,l,v,sub}:{icon:React.ReactNode;l:string;v:string;sub:string}){return <div className="adminKpi"><i>{icon}</i><div><span>{l}</span><b>{v}</b><small>{sub}</small></div></div>}
+
+function K({
+  icon,
+  label,
+  value,
+  sub,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+}) {
+  return <div className="adminKpi"><i>{icon}</i><div><span>{label}</span><b>{value}</b><small>{sub}</small></div></div>;
+}

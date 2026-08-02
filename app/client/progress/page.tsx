@@ -1,5 +1,15 @@
 import Link from "next/link";
-import { Activity, CalendarDays, Scale, Sparkles, Target, TrendingDown, TrendingUp, Utensils } from "lucide-react";
+import {
+  Activity,
+  CalendarDays,
+  ChevronDown,
+  Scale,
+  Sparkles,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Utensils,
+} from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import { clientProgressAccountData } from "@/lib/account-data";
 import { dayKey, fmt, mealDay, mealSessions, sumMeals } from "@/lib/data";
@@ -7,6 +17,7 @@ import { coachScore, type CoachScore } from "@/lib/coach-score";
 import { subscriptionAccess } from "@/lib/subscription-access";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import CoachScoreCard from "@/components/CoachScoreCard";
+import SimplifiedSections from "@/components/SimplifiedSections";
 
 export const dynamic = "force-dynamic";
 
@@ -46,15 +57,15 @@ function scoreProtein(value: number, target: number) {
 
 function qualityForDay(day: ProgressDay, settings: any) {
   const metrics = [
-    { value: day.total.kcal, target: Number(settings?.kcal_target || 0), weight: 45, score: scoreSymmetric(day.total.kcal, Number(settings?.kcal_target || 0), 0.1, 125) },
-    { value: day.total.prot, target: Number(settings?.protein_target || 0), weight: 35, score: scoreProtein(day.total.prot, Number(settings?.protein_target || 0)) },
-    { value: day.total.fat, target: Number(settings?.fat_target || 0), weight: 10, score: scoreSymmetric(day.total.fat, Number(settings?.fat_target || 0), 0.2, 100) },
-    { value: day.total.carb, target: Number(settings?.carb_target || 0), weight: 10, score: scoreSymmetric(day.total.carb, Number(settings?.carb_target || 0), 0.2, 100) },
+    { target: Number(settings?.kcal_target || 0), weight: 45, score: scoreSymmetric(day.total.kcal, Number(settings?.kcal_target || 0), 0.1, 125) },
+    { target: Number(settings?.protein_target || 0), weight: 35, score: scoreProtein(day.total.prot, Number(settings?.protein_target || 0)) },
+    { target: Number(settings?.fat_target || 0), weight: 10, score: scoreSymmetric(day.total.fat, Number(settings?.fat_target || 0), 0.2, 100) },
+    { target: Number(settings?.carb_target || 0), weight: 10, score: scoreSymmetric(day.total.carb, Number(settings?.carb_target || 0), 0.2, 100) },
   ].filter((metric) => metric.target > 0 && metric.score != null);
 
   if (!metrics.length) return null;
-  return metrics.reduce((sum, metric) => sum + Number(metric.score) * metric.weight, 0) /
-    metrics.reduce((sum, metric) => sum + metric.weight, 0);
+  return metrics.reduce((sum, metric) => sum + Number(metric.score) * metric.weight, 0)
+    / metrics.reduce((sum, metric) => sum + metric.weight, 0);
 }
 
 function stabilityForDays(days: ProgressDay[]) {
@@ -86,8 +97,7 @@ function localCoachScore(days: ProgressDay[], settings: any): CoachScore | null 
   const stability = stabilityForDays(current);
   const previousStability = stabilityForDays(previous);
   const score = quality == null || stability == null ? null : Math.round((quality * 50 + stability * 30) / 80);
-  const currentCore = score;
-  const previousCore = previousQuality == null || previousStability == null ? null : Math.round((previousQuality * 50 + previousStability * 30) / 80);
+  const previousScore = previousQuality == null || previousStability == null ? null : Math.round((previousQuality * 50 + previousStability * 30) / 80);
   const confidence = Math.round(Math.min(100, currentComplete.length / 7 * 60 + targetCount / 4 * 25));
 
   return {
@@ -100,7 +110,7 @@ function localCoachScore(days: ProgressDay[], settings: any): CoachScore | null 
     period_days: 7,
     recommendation_samples: 0,
     confidence,
-    trend: currentComplete.length >= 3 && previousComplete.length >= 3 && currentCore != null && previousCore != null ? currentCore - previousCore : null,
+    trend: currentComplete.length >= 3 && previousComplete.length >= 3 && score != null && previousScore != null ? score - previousScore : null,
     target_count: targetCount,
     data_status: targetCount === 0 ? "setup_required" : currentComplete.length < 3 ? "preliminary" : currentComplete.length < 5 ? "growing" : "reliable",
     calculated_at: new Date().toISOString(),
@@ -168,124 +178,200 @@ export default async function Page() {
   const measurementDelta = latest && previous ? Number(latest.weight_kg) - Number(previous.weight_kg) : null;
   const periodWeightDelta = latest && oldest && latest.id !== oldest.id ? Number(latest.weight_kg) - Number(oldest.weight_kg) : null;
   const maxKcal = Math.max(target, 1, ...days.map((day) => day.total.kcal));
-  const latestData = data.meals?.[0]?.eaten_at || data.weights?.[0]?.measured_at;
   const premium = access.premium;
   const weeklyReports = reportsResult.data || [];
-
   const calorieDelta = avgKcal && previousAvgKcal ? Math.round(avgKcal - previousAvgKcal) : null;
-  const missingDays = Math.max(0, 6 - currentComplete.length);
+  const missingDays = Math.max(0, 3 - currentComplete.length);
   const calorieGap = target > 0 && avgKcal ? Math.round(avgKcal - target) : null;
   const goal = String(settings?.goal || "");
 
   const narrative = !currentComplete.length
-    ? "Пока недостаточно данных для вывода. Запиши хотя бы три дня питания — появится первая полезная динамика."
-    : [
-        currentComplete.length >= 6
-          ? `Дневник заполнен хорошо: ${currentComplete.length} ${pluralDays(currentComplete.length)} из 7.`
-          : `Для надёжной картины не хватает ещё ${missingDays} ${pluralDays(missingDays)} с рационом.`,
-        calorieGap == null
-          ? "Задай цель по калориям, чтобы видеть отклонение от плана."
-          : Math.abs(calorieGap) <= target * 0.12
-            ? `Средняя калорийность держится рядом с целью: ${fmt(avgKcal)} из ${fmt(target)} ккал.`
-            : calorieGap < 0
-              ? `Средняя калорийность ниже цели примерно на ${fmt(Math.abs(calorieGap))} ккал в день.`
-              : `Средняя калорийность выше цели примерно на ${fmt(calorieGap)} ккал в день.`,
-        periodWeightDelta == null
-          ? "Добавь несколько измерений веса, чтобы увидеть направление результата."
-          : goal === "Набор массы"
-            ? periodWeightDelta > 0
-              ? `Вес движется в сторону цели: +${fmt(periodWeightDelta, 1)} кг за доступный период.`
-              : `Вес снизился на ${fmt(Math.abs(periodWeightDelta), 1)} кг — это идёт против цели набора массы.`
-            : goal === "Снижение веса"
-              ? periodWeightDelta < 0
-                ? `Вес движется в сторону цели: ${fmt(periodWeightDelta, 1)} кг за доступный период.`
-                : `Вес вырос на ${fmt(periodWeightDelta, 1)} кг — стоит проверить среднюю калорийность.`
-              : `Изменение веса за доступный период: ${periodWeightDelta > 0 ? "+" : ""}${fmt(periodWeightDelta, 1)} кг.`,
-      ].join(" ");
+    ? "Пока данных недостаточно. Запиши питание хотя бы за три дня — тогда TeddY сможет отделить случайный день от реальной тенденции."
+    : currentComplete.length < 3
+      ? `Есть только ${currentComplete.length} ${pluralDays(currentComplete.length)} с рационом. Добавь ещё ${missingDays} ${pluralDays(missingDays)}, чтобы вывод стал надёжнее.`
+      : [
+          calorieGap == null
+            ? "Задай цель по калориям, чтобы сравнить питание с планом."
+            : Math.abs(calorieGap) <= target * 0.12
+              ? `Средняя калорийность рядом с целью: ${fmt(avgKcal)} из ${fmt(target)} ккал.`
+              : calorieGap < 0
+                ? `Средняя калорийность ниже цели примерно на ${fmt(Math.abs(calorieGap))} ккал в день.`
+                : `Средняя калорийность выше цели примерно на ${fmt(calorieGap)} ккал в день.`,
+          periodWeightDelta == null
+            ? "Добавь ещё измерения веса, чтобы связать рацион с результатом."
+            : goal === "Набор массы"
+              ? periodWeightDelta > 0
+                ? `Вес движется в сторону цели: +${fmt(periodWeightDelta, 1)} кг.`
+                : `Вес снизился на ${fmt(Math.abs(periodWeightDelta), 1)} кг — это против цели набора.`
+              : goal === "Снижение веса"
+                ? periodWeightDelta < 0
+                  ? `Вес движется в сторону цели: ${fmt(periodWeightDelta, 1)} кг.`
+                  : `Вес вырос на ${fmt(periodWeightDelta, 1)} кг — стоит проверить средние калории.`
+                : `Изменение веса: ${periodWeightDelta > 0 ? "+" : ""}${fmt(periodWeightDelta, 1)} кг.`,
+        ].join(" ");
 
   return (
     <>
-      <div className="pageHead"><div><p>Динамика</p><h1>Прогресс</h1><span>Результат недели, КБЖУ и изменение веса — без сухой статистики.</span></div></div>
+      <SimplifiedSections />
+      <div className="pageHead"><div><p>Прогресс</p><h1>Что изменилось</h1><span>Сверху только вес, калории, белок и понятный вывод. Подробные графики — ниже.</span></div></div>
 
-      <div className="dataFreshnessBar"><span>Актуальность данных</span><b>{latestData ? new Date(latestData).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Moscow" }) : "нет данных"}</b></div>
-
-      <section className="card" style={{ padding: 22, background: "radial-gradient(circle at 92% 10%,rgba(224,190,104,.12),transparent 34%),linear-gradient(180deg,rgba(18,19,23,.98),rgba(13,14,17,.98))" }}>
-        <div className="sectionTitleRow">
-          <div><h2>Что изменилось</h2><span className="muted">Главный вывод по текущей неделе</span></div>
-          {calorieDelta != null && calorieDelta !== 0 ? calorieDelta > 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} /> : <Activity size={20} />}
+      <section className="primaryFocus">
+        <i>{calorieDelta != null && calorieDelta > 0 ? <TrendingUp size={19} /> : calorieDelta != null && calorieDelta < 0 ? <TrendingDown size={19} /> : <Activity size={19} />}</i>
+        <div>
+          <small>Вывод нутрициолога</small>
+          <b>{currentComplete.length >= 3 ? "Картина недели" : "Нужно немного больше данных"}</b>
+          <p>{narrative}</p>
         </div>
-        <p style={{ margin: "16px 0 0", fontSize: 15, lineHeight: 1.65, maxWidth: 980 }}>{narrative}</p>
-        {calorieDelta != null ? <div style={{ marginTop: 14, color: "var(--muted)", fontSize: 12 }}>Средняя калорийность к прошлой неделе: <b style={{ color: "var(--text)" }}>{calorieDelta > 0 ? "+" : ""}{fmt(calorieDelta)} ккал/день</b></div> : null}
+        <Link href="/client/profile">Записать вес</Link>
       </section>
 
-      <div className="progressHeroStats top">
-        <Metric icon={<Activity />} label="Средние калории" value={avgKcal ? `${fmt(avgKcal)} ккал` : "—"} sub={target ? `цель ${fmt(target)} ккал` : "цель не задана"} />
-        <Metric icon={<CalendarDays />} label="Дней с рационом" value={`${currentComplete.length} / 7`} sub={previousComplete.length ? `прошлая неделя: ${previousComplete.length}` : "за последние 7 дней"} />
-        <Metric icon={measurementDelta !== null && measurementDelta <= 0 ? <TrendingDown /> : <TrendingUp />} label="Последнее изменение веса" value={measurementDelta !== null ? `${measurementDelta > 0 ? "+" : ""}${fmt(measurementDelta, 1)} кг` : "—"} sub="к предыдущему измерению" />
-        <Metric icon={<Target />} label="Попадание в калории" value={currentComplete.length && target ? `${adherence}%` : "—"} sub="дни в диапазоне ±12%" />
+      <div className="progressKeyStats">
+        <KeyMetric
+          icon={<Scale size={17} />}
+          label="Вес"
+          value={latest ? `${fmt(latest.weight_kg, 1)} кг` : "—"}
+          sub={measurementDelta != null ? `${measurementDelta > 0 ? "+" : ""}${fmt(measurementDelta, 1)} кг к прошлому` : "добавь измерение"}
+        />
+        <KeyMetric
+          icon={<Activity size={17} />}
+          label="Средние калории"
+          value={avgKcal ? `${fmt(avgKcal)} ккал` : "—"}
+          sub={target ? `цель ${fmt(target)} ккал` : "цель не задана"}
+        />
+        <KeyMetric
+          icon={<Utensils size={17} />}
+          label="Средний белок"
+          value={avgProtein ? `${fmt(avgProtein, 1)} г` : "—"}
+          sub={proteinTarget ? `${Math.round(avgProtein / proteinTarget * 100)}% от цели ${fmt(proteinTarget, 1)} г` : "цель не задана"}
+        />
       </div>
 
-      <section className="card top">
-        <div className="sectionTitleRow"><div><h2>Средние КБЖУ за неделю</h2><span className="muted">Значения выше цели не обрезаются</span></div><Utensils size={19} /></div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 12, marginTop: 16 }}>
-          <MacroCard label="Белок" actual={avgProtein} target={proteinTarget} unit="г" />
-          <MacroCard label="Жиры" actual={avgFat} target={fatTarget} unit="г" />
-          <MacroCard label="Углеводы" actual={avgCarb} target={carbTarget} unit="г" />
-          <MacroCard label="Калории" actual={avgKcal} target={target} unit="ккал" />
-        </div>
-      </section>
+      <details className="secondaryDisclosure progressDetails top">
+        <summary>
+          <span><b>Подробная статистика</b><small>КБЖУ, Coach Score, графики и недельные разборы</small></span>
+          <ChevronDown size={18} />
+        </summary>
+        <div className="disclosureBody">
+          <section className="detailSection">
+            <div className="progressHeroStats">
+              <Metric icon={<CalendarDays />} label="Дней с рационом" value={`${currentComplete.length} / 7`} sub={previousComplete.length ? `прошлая неделя: ${previousComplete.length}` : "за последние 7 дней"} />
+              <Metric icon={<Target />} label="Попадание в калории" value={currentComplete.length && target ? `${adherence}%` : "—"} sub="дни в диапазоне ±12%" />
+              <Metric icon={measurementDelta !== null && measurementDelta <= 0 ? <TrendingDown /> : <TrendingUp />} label="Последнее изменение веса" value={measurementDelta !== null ? `${measurementDelta > 0 ? "+" : ""}${fmt(measurementDelta, 1)} кг` : "—"} sub="к предыдущему измерению" />
+            </div>
+          </section>
 
-      <div className="top"><CoachScoreCard score={score} /></div>
+          <section className="card detailSection">
+            <div className="sectionTitleRow"><div><h2>Средние КБЖУ за неделю</h2><span className="muted">Превышение цели показывается полностью</span></div><Utensils size={19} /></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 10, marginTop: 14 }}>
+              <MacroCard label="Белок" actual={avgProtein} target={proteinTarget} unit="г" />
+              <MacroCard label="Жиры" actual={avgFat} target={fatTarget} unit="г" />
+              <MacroCard label="Углеводы" actual={avgCarb} target={carbTarget} unit="г" />
+              <MacroCard label="Калории" actual={avgKcal} target={target} unit="ккал" />
+            </div>
+          </section>
 
-      <div className="clientProgressGrid top">
-        <section className="card progressChartCard">
-          <div className="sectionTitleRow"><div><h2>Калории · 14 дней</h2><span className="muted">Золотой — около цели, красный — заметное отклонение. Нажми на день.</span></div><b className="chartAverage">Ø {avgKcal ? fmt(avgKcal) : "—"}</b></div>
-          <div className="client14Chart">
-            {days.map((day) => {
-              const deviation = target > 0 && day.total.kcal > 0 ? Math.abs(day.total.kcal - target) / target : null;
-              const background = deviation == null
-                ? "linear-gradient(180deg,#777,#444)"
-                : deviation <= 0.12
-                  ? "linear-gradient(180deg,#efd47f,#a78235)"
-                  : deviation <= 0.25
-                    ? "linear-gradient(180deg,#d6a768,#8f6331)"
-                    : "linear-gradient(180deg,#d17a7a,#713d45)";
-              return <Link href={`/client/nutrition?day=${day.day}#day-${day.day}`} className="client14Col" key={day.day}>
-                <span>{day.total.kcal ? fmt(day.total.kcal) : ""}</span>
-                <div><i style={{ height: `${Math.max(3, day.total.kcal / maxKcal * 100)}%`, background }} />{target > 0 && <em style={{ bottom: `${Math.min(100, target / maxKcal * 100)}%` }} />}</div>
-                <small>{new Date(day.day + "T12:00:00").toLocaleDateString("ru-RU", { day: "2-digit" })}</small>
-              </Link>;
-            })}
+          <div className="detailSection">
+            {score ? <CoachScoreCard score={score} /> : (
+              <div className="card emptyGuidance"><Sparkles /><b>Coach Score ещё формируется</b><span>Нужно минимум три дня питания и заполненные цели.</span></div>
+            )}
           </div>
-        </section>
 
-        <section className="card weightProgressCard">
-          <div className="sectionTitleRow"><div><h2>Вес</h2><span className="muted">Тренд по измерениям, а не по одному дню</span></div><Scale size={19} /></div>
-          {latest ? <>
-            <div className="weightBig"><b>{fmt(latest.weight_kg, 1)}</b><span>кг</span></div>
-            <WeightChart weights={weights} target={targetWeight} />
-            {targetWeight > 0 && <div className="weightGoalLine"><span>До цели</span><b>{fmt(Math.abs(Number(latest.weight_kg) - targetWeight), 1)} кг</b></div>}
-            <div className="weightHistory modern">{weights.slice(0, 6).map((weight: any, index: number) => <div className="row" key={weight.id}><span>{new Date(weight.measured_at).toLocaleDateString("ru-RU", { day: "2-digit", month: "short" })}</span><b>{fmt(weight.weight_kg, 1)} кг</b>{index === 0 && <em>сейчас</em>}</div>)}</div>
-          </> : <div className="clientEmptyNice compact"><Scale /><b>Нет измерений</b><span>Добавь вес в профиле — здесь появится динамика.</span></div>}
-        </section>
-      </div>
+          <div className="clientProgressGrid detailSection">
+            <section className="card progressChartCard">
+              <div className="sectionTitleRow"><div><h2>Калории · 14 дней</h2><span className="muted">Нажми на столбец, чтобы открыть день</span></div><b className="chartAverage">Ø {avgKcal ? fmt(avgKcal) : "—"}</b></div>
+              <div className="client14Chart">
+                {days.map((day) => {
+                  const deviation = target > 0 && day.total.kcal > 0 ? Math.abs(day.total.kcal - target) / target : null;
+                  const background = deviation == null
+                    ? "linear-gradient(180deg,#777,#444)"
+                    : deviation <= 0.12
+                      ? "linear-gradient(180deg,#efd47f,#a78235)"
+                      : deviation <= 0.25
+                        ? "linear-gradient(180deg,#d6a768,#8f6331)"
+                        : "linear-gradient(180deg,#d17a7a,#713d45)";
+                  return (
+                    <Link href={`/client/nutrition?day=${day.day}#day-${day.day}`} className="client14Col" key={day.day}>
+                      <span>{day.total.kcal ? fmt(day.total.kcal) : ""}</span>
+                      <div>
+                        <i style={{ height: `${Math.max(3, day.total.kcal / maxKcal * 100)}%`, background }} />
+                        {target > 0 && <em style={{ bottom: `${Math.min(100, target / maxKcal * 100)}%` }} />}
+                      </div>
+                      <small>{new Date(day.day + "T12:00:00").toLocaleDateString("ru-RU", { day: "2-digit" })}</small>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
 
-      {premium ? <section className="card top">
-        <div className="sectionTitleRow"><div><h2>Разборы нутрициолога</h2><span className="muted">Живое объяснение результатов и план следующей недели</span></div><Sparkles size={19} /></div>
-        <div className="digestTimeline">
-          {weeklyReports.map((report: any) => <details className="digestItem modern" key={`weekly-${report.id}`}>
-            <summary><div><b>Неделя до {new Date(report.week_end + "T12:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</b><small>Недельный разбор</small></div><span>Открыть</span></summary>
-            <div className="digest">{clean(report.content_md)}</div>
-          </details>)}
-          {!weeklyReports.length && data.digests.slice(0, 8).map((digest: any) => <details className="digestItem modern" key={`digest-${digest.id}`}>
-            <summary><div><b>{new Date(digest.for_date + "T12:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</b><small>{fmt(digest.kcal)} ккал</small></div><span>Открыть</span></summary>
-            <div className="digest">{clean(digest.summary_md)}</div>
-          </details>)}
+            <section className="card weightProgressCard">
+              <div className="sectionTitleRow"><div><h2>Вес</h2><span className="muted">Тренд по измерениям</span></div><Scale size={19} /></div>
+              {latest ? (
+                <>
+                  <div className="weightBig"><b>{fmt(latest.weight_kg, 1)}</b><span>кг</span></div>
+                  <WeightChart weights={weights} target={targetWeight} />
+                  {targetWeight > 0 && <div className="weightGoalLine"><span>До цели</span><b>{fmt(Math.abs(Number(latest.weight_kg) - targetWeight), 1)} кг</b></div>}
+                  <div className="weightHistory modern">
+                    {weights.slice(0, 6).map((weight: any, index: number) => (
+                      <div className="row" key={weight.id}>
+                        <span>{new Date(weight.measured_at).toLocaleDateString("ru-RU", { day: "2-digit", month: "short" })}</span>
+                        <b>{fmt(weight.weight_kg, 1)} кг</b>
+                        {index === 0 && <em>сейчас</em>}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="emptyGuidance"><Scale /><b>Добавь первое измерение</b><span>После двух измерений появится линия, после нескольких — направление тренда.</span></div>
+              )}
+            </section>
+          </div>
+
+          {premium ? (
+            <section className="card detailSection">
+              <div className="sectionTitleRow"><div><h2>Разборы нутрициолога</h2><span className="muted">Объяснение результатов и план следующей недели</span></div><Sparkles size={19} /></div>
+              <div className="digestTimeline">
+                {weeklyReports.map((report: any) => (
+                  <details className="digestItem modern" key={`weekly-${report.id}`}>
+                    <summary><div><b>Неделя до {new Date(report.week_end + "T12:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</b><small>Недельный разбор</small></div><span>Открыть</span></summary>
+                    <div className="digest">{clean(report.content_md)}</div>
+                  </details>
+                ))}
+                {!weeklyReports.length && data.digests.slice(0, 8).map((digest: any) => (
+                  <details className="digestItem modern" key={`digest-${digest.id}`}>
+                    <summary><div><b>{new Date(digest.for_date + "T12:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</b><small>{fmt(digest.kcal)} ккал</small></div><span>Открыть</span></summary>
+                    <div className="digest">{clean(digest.summary_md)}</div>
+                  </details>
+                ))}
+              </div>
+              {!weeklyReports.length && !data.digests.length && (
+                <div className="emptyGuidance"><Sparkles /><b>Первый разбор ещё формируется</b><span>Веди питание минимум три дня — появится первый содержательный вывод.</span></div>
+              )}
+            </section>
+          ) : (
+            <Link href="/client/plan" className="premiumProgressTeaser detailSection">
+              <Sparkles />
+              <span><b>Premium объясняет причины изменений</b><small>Недельная стратегия и конкретный план действий.</small></span>
+              <strong>Узнать больше →</strong>
+            </Link>
+          )}
         </div>
-        {!weeklyReports.length && !data.digests.length && <div className="clientEmptyNice compact"><Sparkles /><b>Разборов пока нет</b><span>Они появятся после накопления данных.</span></div>}
-      </section> : <Link href="/client/plan" className="premiumProgressTeaser"><Sparkles /><span><b>Premium объясняет, почему результат меняется</b><small>Недельная стратегия, динамика веса и конкретный план действий.</small></span><strong>Узнать больше →</strong></Link>}
+      </details>
     </>
   );
+}
+
+function KeyMetric({
+  icon,
+  label,
+  value,
+  sub,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+}) {
+  return <div className="progressKeyStat"><i>{icon}</i><span><small>{label}</small><b>{value}</b><small>{sub}</small></span></div>;
 }
 
 function Metric({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub: string }) {
@@ -303,16 +389,28 @@ function MacroCard({ label, actual, target, unit }: { label: string; actual: num
         ? "рядом с целью"
         : `выше цели на ${percentage - 100}%`;
 
-  return <div style={{ padding: 15, border: "1px solid #292b30", borderRadius: 14, background: "#0e0f12" }}>
-    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}><span style={{ color: "var(--muted)", fontSize: 11 }}>{label}</span><b>{percentage == null ? "—" : `${percentage}%`}</b></div>
-    <div style={{ marginTop: 8, fontSize: 19, fontWeight: 800 }}>{actual > 0 ? `${fmt(actual, 1)} ${unit}` : "—"}{target > 0 ? <small style={{ fontSize: 10, color: "var(--muted)", fontWeight: 400 }}> из {fmt(target, 1)} {unit}</small> : null}</div>
-    <div style={{ height: 6, borderRadius: 999, background: "#25272c", overflow: "hidden", marginTop: 11 }}><i style={{ display: "block", width: `${width}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#d2aa50,#ecd17d)" }} /></div>
-    <small style={{ display: "block", color: "var(--muted)", marginTop: 7 }}>{status}</small>
-  </div>;
+  return (
+    <div style={{ padding: 14, border: "1px solid #292b30", borderRadius: 12, background: "#0e0f12" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
+        <span style={{ color: "var(--muted)", fontSize: 10 }}>{label}</span>
+        <b>{percentage == null ? "—" : `${percentage}%`}</b>
+      </div>
+      <div style={{ marginTop: 7, fontSize: 18, fontWeight: 800 }}>
+        {actual > 0 ? `${fmt(actual, 1)} ${unit}` : "—"}
+        {target > 0 ? <small style={{ fontSize: 10, color: "var(--muted)", fontWeight: 400 }}> из {fmt(target, 1)} {unit}</small> : null}
+      </div>
+      <div style={{ height: 5, borderRadius: 999, background: "#25272c", overflow: "hidden", marginTop: 10 }}>
+        <i style={{ display: "block", width: `${width}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#d2aa50,#ecd17d)" }} />
+      </div>
+      <small style={{ display: "block", color: "var(--muted)", marginTop: 6 }}>{status}</small>
+    </div>
+  );
 }
 
 function WeightChart({ weights, target }: { weights: any[]; target: number }) {
-  if (weights.length < 2) return <div style={{ color: "var(--muted)", fontSize: 11, marginBottom: 14 }}>Добавь ещё одно измерение — появится линия тренда.</div>;
+  if (weights.length < 2) {
+    return <div style={{ color: "var(--muted)", fontSize: 11, marginBottom: 14 }}>Добавь ещё одно измерение — появится линия тренда.</div>;
+  }
 
   const points = [...weights].reverse();
   const values = points.map((point) => Number(point.weight_kg));
@@ -325,11 +423,26 @@ function WeightChart({ weights, target }: { weights: any[]; target: number }) {
   const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${x(index).toFixed(1)} ${y(Number(point.weight_kg)).toFixed(1)}`).join(" ");
   const targetY = target > 0 ? y(target) : null;
 
-  return <div style={{ margin: "6px 0 16px" }}>
-    <svg viewBox="0 0 300 92" role="img" aria-label="График изменения веса" style={{ display: "block", width: "100%", height: 120 }}>
-      {targetY != null ? <><line x1="6" x2="294" y1={targetY} y2={targetY} stroke="rgba(224,190,104,.45)" strokeDasharray="5 5" /><text x="292" y={Math.max(10, targetY - 4)} textAnchor="end" fill="#8e908f" fontSize="8">цель {fmt(target, 1)}</text></> : null}
-      <path d={path} fill="none" stroke="#e0be68" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      {points.map((point, index) => <circle key={point.id} cx={x(index)} cy={y(Number(point.weight_kg))} r={index === points.length - 1 ? 4 : 3} fill={index === points.length - 1 ? "#f7f6f1" : "#e0be68"} />)}
-    </svg>
-  </div>;
+  return (
+    <div style={{ margin: "6px 0 16px" }}>
+      <svg viewBox="0 0 300 92" role="img" aria-label="График изменения веса" style={{ display: "block", width: "100%", height: 120 }}>
+        {targetY != null ? (
+          <>
+            <line x1="6" x2="294" y1={targetY} y2={targetY} stroke="rgba(224,190,104,.45)" strokeDasharray="5 5" />
+            <text x="292" y={Math.max(10, targetY - 4)} textAnchor="end" fill="#8e908f" fontSize="8">цель {fmt(target, 1)}</text>
+          </>
+        ) : null}
+        <path d={path} fill="none" stroke="#e0be68" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        {points.map((point, index) => (
+          <circle
+            key={point.id}
+            cx={x(index)}
+            cy={y(Number(point.weight_kg))}
+            r={index === points.length - 1 ? 4 : 3}
+            fill={index === points.length - 1 ? "#f7f6f1" : "#e0be68"}
+          />
+        ))}
+      </svg>
+    </div>
+  );
 }
