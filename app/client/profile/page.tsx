@@ -37,7 +37,7 @@ export default async function Page({
       <section className="clientProfileHero">
         <TelegramAvatar profile={data.profile} size="huge" />
         <div className="profileHeroCopy">
-          <h2>{data.profile?.first_name || data.account?.display_name || currentUser.name || "Клиент"}</h2>
+          <h2>{data.profile?.first_name || currentUser.name || "Клиент"}</h2>
           <p>{telegramLinked ? (data.profile?.username ? `@${data.profile.username}` : "Telegram привязан") : "Аккаунт TeddY"}</p>
           <div className="clientTags">
             <span><Target size={13} />{goalKind(data.settings?.goal)}</span>
