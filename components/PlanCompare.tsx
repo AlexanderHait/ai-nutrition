@@ -4,7 +4,7 @@ export type TierKey = "free" | "basic" | "premium";
 
 export const TIERS: Record<TierKey, { name: string; promise: string }> = {
   free: { name: "Бесплатно", promise: "Ведёшь дневник и видишь КБЖУ" },
-  basic: { name: "Basic", promise: "Полный дневник без оглядки на лимиты" },
+  basic: { name: "Basic", promise: "Дневник без экономии: 40 фото в месяц" },
   premium: { name: "Premium", promise: "Личный нутрициолог, который ведёт тебя к цели" },
 };
 
@@ -33,7 +33,7 @@ const ROWS: readonly Row[] = [
     label: "Фото-анализы в месяц",
     hint: "Распознавание блюда по снимку",
     free: [1, "3"],
-    basic: [2, "10"],
+    basic: [3, "40"],
     premium: [3, "Без лимита"],
   },
   {
