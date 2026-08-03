@@ -761,3 +761,64 @@ table{font-variant-numeric:tabular-nums}
 @media(max-width:700px){.clientsGridV4{grid-template-columns:minmax(0,1fr) 100px}.clientsGridV4>*:nth-child(3),.clientsGridV4>*:nth-child(4),.clientsGridV4>*:nth-child(5){display:none}.adminClientControlGrid,.clientOpsStrip{grid-template-columns:1fr}.subscriptionManageRow{grid-template-columns:1fr}.subscriptionManageRow>*:nth-child(3),.subscriptionManageRow>*:nth-child(4){grid-column:auto}.subscriptionManageRow .subscriptionControlButtons{display:grid;grid-template-columns:1fr 1fr 1fr;width:100%}.subscriptionManageRow button{width:100%}}
 
 .subscriptionControl{display:grid;gap:8px}.subscriptionControlLabel{font-size:13px;opacity:.65}.subscriptionControlButtons{display:flex;gap:8px;flex-wrap:wrap}.subscriptionControl button{padding:8px 14px;border-radius:12px;border:1px solid #9995;background:transparent;color:inherit;font-weight:500;cursor:pointer}.subscriptionControl button.active{border:2px solid currentColor;font-weight:700}.subscriptionControl button:disabled{cursor:wait;opacity:.7}.subscriptionControlError{color:#ef7777;font-size:12px}
+
+/* ── Живость: переливание главных кнопок ─────────────────────────────── */
+.shimmer{position:relative;overflow:hidden;isolation:isolate}
+.shimmer::after{
+  content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;z-index:1;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);
+  transform:skewX(-18deg);animation:shimmerMove 3.6s ease-in-out infinite;pointer-events:none;
+}
+@keyframes shimmerMove{0%{left:-60%}55%{left:125%}100%{left:125%}}
+
+/* Вход: большие кнопки живут, а не лежат */
+.login .primary,
+.login .telegramLoginButton{position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease}
+.login .primary:hover,
+.login .telegramLoginButton:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(216,184,95,.16)}
+.login .primary:active,
+.login .telegramLoginButton:active{transform:translateY(0)}
+.login .primary::after,
+.login .telegramLoginButton::after{
+  content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);
+  transform:skewX(-18deg);animation:shimmerMove 3.9s ease-in-out infinite;pointer-events:none;
+}
+.login .telegramLoginButton::after{animation-delay:.8s}
+.logoMark{animation:logoBreath 5.5s ease-in-out infinite}
+@keyframes logoBreath{0%,100%{box-shadow:0 0 0 0 rgba(216,184,95,.24)}50%{box-shadow:0 0 22px 3px rgba(216,184,95,.16)}}
+
+/* ── Цвет: не только золото ──────────────────────────────────────────── */
+:root{
+  --acc-prot:#6aa9e0;   /* белок  */
+  --acc-fat:#e0a86a;    /* жиры   */
+  --acc-carb:#7fc9a4;   /* углеводы */
+  --acc-good:#63b98a;
+  --acc-warn:#d8a05c;
+  --acc-bad:#cf7a6b;
+  --acc-info:#5cb0c4;
+}
+.macroProt,.macro-prot{color:var(--acc-prot)!important}
+.macroFat,.macro-fat{color:var(--acc-fat)!important}
+.macroCarb,.macro-carb{color:var(--acc-carb)!important}
+.heroMacroRow:nth-of-type(1)>i>span,.macroBar.prot>span{background:var(--acc-prot)}
+.heroMacroRow:nth-of-type(2)>i>span,.macroBar.fat>span{background:var(--acc-fat)}
+.heroMacroRow:nth-of-type(3)>i>span,.macroBar.carb>span{background:var(--acc-carb)}
+.statusGood{color:var(--acc-good)!important}
+.statusWarn{color:var(--acc-warn)!important}
+.statusBad{color:var(--acc-bad)!important}
+
+/* Карточки оживают при наведении */
+.card,.adminKpi,.clientMetricCard,.premiumOutcome{transition:border-color .2s ease,transform .2s ease}
+.card:hover,.adminKpi:hover,.premiumOutcome:hover{border-color:#33363d}
+
+@media (prefers-reduced-motion:reduce){
+  .shimmer::after,.login .primary::after,.login .telegramLoginButton::after{animation:none;display:none}
+  .logoMark{animation:none}
+  .card,.adminKpi,.clientMetricCard,.premiumOutcome{transition:none}
+}
+
+/* Боковое меню: список не обрезается на невысоких экранах */
+.side .desktopNav{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.side .desktopNav::-webkit-scrollbar{width:5px}
+.side .desktopNav::-webkit-scrollbar-thumb{background:#26282d;border-radius:99px}

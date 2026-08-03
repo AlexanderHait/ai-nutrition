@@ -125,7 +125,7 @@ export async function POST(request: Request) {
 
   const siteUrl = publicSiteUrl(request.url);
   const amountValue = rublesToYooValue(Number(order.amount_rub));
-  const description = `${product.title} — доступ на ${Number(product.period_days)} дней`;
+  const description = `AI-Nutrition · ${product.title} — доступ на ${Number(product.period_days)} дней`;
   const metadata: Record<string, string> = {
     order_id: String(order.id),
     account_id: String(order.account_id),
