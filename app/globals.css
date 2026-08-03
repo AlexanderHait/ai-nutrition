@@ -857,7 +857,7 @@ table{font-variant-numeric:tabular-nums}
 .adminClientControlGrid .sectionTitleRow{margin-bottom:6px}
 .adminClientControlGrid .sectionTitleRow .muted{display:block;margin-top:5px;font-size:12px;line-height:1.5;color:#9a9d99!important}
 .adminClientControlGrid .subscriptionControl,
-.adminClientControlGrid .adminRoleControl{margin-top:auto;padding-top:16px}
+.adminClientControlGrid .adminRoleControl{margin-top:14px}
 
 /* ── История рассылок: раскрывается и показывает отправленный текст ──── */
 .mailHistory{max-height:min(58vh,460px);overflow-y:auto;overscroll-behavior:contain;display:grid;gap:7px}
@@ -887,3 +887,39 @@ details.mailRow[open] .mailRowChevron{transform:rotate(180deg)}
   details.mailRow>summary{grid-template-columns:auto minmax(0,1fr) auto}
   .mailRowChevron{display:none}
 }
+
+/* ── Вход: воздух между кнопками и ссылками ─────────────────────────── */
+.loginBlock{display:grid;gap:11px;padding:17px 0}
+.loginBlock h3{margin:0}
+.loginBlock p{margin:0}
+.loginBlock input{margin:0}
+.loginBlock .primary{width:100%;min-height:46px;font-size:13.5px}
+.loginBlock .secondaryBtn{width:100%;min-height:44px}
+.loginBlock>.textLink{justify-self:center;padding:2px 4px}
+.loginInlineLinks{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 20px}
+.loginInlineLinks .textLink{padding:2px 4px}
+.login .divider{margin:14px 0}
+.login .notice,.login .successNotice{margin-bottom:4px}
+
+/* Вход администратора — заметная, но спокойная строка */
+.adminLoginDetails{margin-top:16px;padding-top:15px;border-top:1px solid #22242a}
+.adminLoginDetails>summary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:0 15px;border:1px solid #2c2e34;border-radius:12px;
+  background:#101116;color:#b6b8b3;font-size:12.5px;font-weight:700;
+  cursor:pointer;list-style:none;transition:border-color .18s ease,color .18s ease,background .18s ease;
+}
+.adminLoginDetails>summary::-webkit-details-marker{display:none}
+.adminLoginDetails>summary::before{content:"⌘";opacity:.6;font-size:12px}
+.adminLoginDetails>summary:hover{border-color:#4a422a;background:#14140f;color:#e8d9a6}
+.adminLoginDetails[open]>summary{border-color:#4a422a;color:#e8d9a6}
+
+/* ── Роль на сайте: компактнее ───────────────────────────────────────── */
+.adminRoleControl{gap:10px!important}
+.adminRoleControl button{min-height:38px;padding:0 14px;font-size:12.5px;border-radius:10px}
+.adminRoleControl span,.adminRoleControl small{font-size:12px}
+
+/* ── История TeddY внутри карточки: прокрутка, а не бесконечная лента ── */
+.timelineEvents{max-height:min(50vh,400px);overflow-y:auto;overscroll-behavior:contain;padding-right:6px}
+.timelineEvents::-webkit-scrollbar{width:6px}
+.timelineEvents::-webkit-scrollbar-thumb{background:#2a2c31;border-radius:99px}

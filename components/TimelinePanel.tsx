@@ -173,7 +173,7 @@ export default function TimelinePanel({
       ) : null}
       {!loading && !error && !events.length ? <p className="muted">Событий по этому фильтру пока нет.</p> : null}
 
-      <div style={{ display: "grid", gap: 20, marginTop: 10 }}>
+      <div className="timelineEvents" style={{ display: "grid", gap: 20, marginTop: 10 }}>
         {groups.map(([day, rows]) => (
           <section key={day}>
             <h3 style={{ margin: "0 0 9px", fontSize: 14, opacity: 0.72, textTransform: "capitalize" }}>
