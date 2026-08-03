@@ -243,8 +243,6 @@ export default function SimplifiedSections() {
       .coachLockedBenefits small{font-size:9px;color:#777;margin-top:2px}
       .coachExtras>.disclosureBody{padding-top:14px}
 
-      .adminApp .desktopNav .navSection:nth-child(n+2){display:none}
-      .adminApp .mobileDrawerNav section:nth-child(n+2){display:none}
       .adminPriorityGrid{
         display:grid;
         grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);

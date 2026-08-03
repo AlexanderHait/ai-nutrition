@@ -27,7 +27,7 @@ export async function allData(){
     {data:payments,error:payE},
     {data:catalog,error:catE}
   ]=await Promise.all([
-    s.from('profiles').select('*').order('created_at',{ascending:false}),
+    s.from('profiles').select('*').is('deleted_at',null).order('created_at',{ascending:false}),
     s.from('meals').select('*').eq('deleted',false).order('eaten_at',{ascending:false}),
     s.from('chat_logs').select('*').order('created_at',{ascending:false}).limit(4000),
     s.from('digests').select('*').order('for_date',{ascending:false}).limit(2500),
@@ -179,7 +179,7 @@ export async function adminClientsData(){
   const [
     {data:profiles,error:pe},{data:settings},{data:subscriptions},{data:meals,error:me},{data:logs}
   ]=await Promise.all([
-    s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').order('created_at',{ascending:false}),
+    s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').is('deleted_at',null).order('created_at',{ascending:false}),
     s.from('client_settings').select('chat_id,goal,kcal_target,protein_target,protein_target_g,fat_target,fat_target_g,carb_target,carb_target_g,current_weight_kg,target_weight_kg'),
     s.from('subscriptions').select('chat_id,plan,status,created_at,ends_at').order('created_at',{ascending:false}),
     s.from('meals').select('id,chat_id,dish,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(6000),
@@ -263,7 +263,7 @@ export async function adminDashboardData(){
   const weekIso=new Date(Date.now()-7*86400000).toISOString();
   const today=dayKey();
   const [{data:profiles},{data:settings},{data:subscriptions},{data:meals},{data:logs},{data:weights},{data:support}]=await Promise.all([
-    s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').order('created_at',{ascending:false}).limit(500),
+    s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').is('deleted_at',null).order('created_at',{ascending:false}).limit(500),
     s.from('client_settings').select('chat_id,goal,kcal_target'),
     s.from('subscriptions').select('chat_id,plan,status,ends_at,created_at').order('created_at',{ascending:false}),
     s.from('meals').select('chat_id,kcal,eaten_at,eaten_day').eq('deleted',false).gte('eaten_day',today).limit(3000),
@@ -278,7 +278,7 @@ export async function analyticsData(){
   const s=getSupabaseAdmin();
   const d30=new Date();d30.setDate(d30.getDate()-29);const fromDay=dayKey(d30);const fromIso=new Date(Date.now()-30*86400000).toISOString();
   const [{data:profiles},{data:meals},{data:settings},{data:subscriptions},{data:payments}]=await Promise.all([
-    s.from('profiles').select('telegram_id,created_at'),
+    s.from('profiles').select('telegram_id,created_at').is('deleted_at',null),
     s.from('meals').select('chat_id,eaten_at,eaten_day').eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(12000),
     s.from('client_settings').select('chat_id,goal'),
     s.from('subscriptions').select('chat_id,plan,status,ends_at,created_at').order('created_at',{ascending:false}),
