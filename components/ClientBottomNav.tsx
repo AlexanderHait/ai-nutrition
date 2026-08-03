@@ -2,17 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, TrendingUp, UserRound, Utensils } from "lucide-react";
+import { BrainCircuit, Home, TrendingUp, UserRound, Utensils } from "lucide-react";
 
 const items = [
   { href: "/client", label: "Сегодня", icon: Home },
   { href: "/client/nutrition", label: "Питание", icon: Utensils },
+  { href: "/client/coach", label: "Coach", icon: BrainCircuit },
   { href: "/client/progress", label: "Прогресс", icon: TrendingUp },
   { href: "/client/profile", label: "Профиль", icon: UserRound },
 ];
 
 function active(pathname: string, href: string) {
-  if (href === "/client") return pathname === href || pathname.startsWith("/client/coach");
+  if (href === "/client") return pathname === href;
   if (href === "/client/nutrition") return pathname.startsWith("/client/nutrition") || pathname.startsWith("/client/history");
   if (href === "/client/profile") {
     return pathname.startsWith("/client/profile")
@@ -56,9 +57,9 @@ export default function ClientBottomNav() {
             right:10px;
             bottom:max(8px,env(safe-area-inset-bottom));
             display:grid;
-            grid-template-columns:repeat(4,minmax(0,1fr));
+            grid-template-columns:repeat(5,minmax(0,1fr));
             min-height:62px;
-            padding:6px;
+            padding:6px 4px;
             border:1px solid #292b30;
             border-radius:17px;
             background:rgba(14,15,18,.96);

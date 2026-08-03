@@ -20,6 +20,10 @@ const calmUiCss = String.raw`
 .calmUi .side{padding:20px 12px;border-color:#202226;background:#0c0d0f;backdrop-filter:none}
 .calmUi .brand{padding:5px 9px 24px;font-size:18px}
 .calmUi .brand span{width:31px;height:31px;border-radius:9px;margin-right:8px;box-shadow:none}
+.calmUi .desktopNav{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#26282d transparent}
+.calmUi .desktopNav::-webkit-scrollbar{width:5px}
+.calmUi .desktopNav::-webkit-scrollbar-thumb{background:#26282d;border-radius:99px}
+.calmUi .sideBottom{padding-top:10px;border-top:1px solid #1c1e22}
 .calmUi .navSection{gap:3px;margin-bottom:12px}
 .calmUi .navSectionLabel{padding:0 11px 5px;color:#55585a;font-size:8px;letter-spacing:.12em}
 .calmUi .desktopNav a{min-height:41px;padding:10px 11px;border-radius:10px;color:#9a9d99;font-size:12px}
@@ -115,25 +119,62 @@ export default async function Shell({
   role: "admin" | "client";
   isPremium?: boolean;
 }) {
-  const adminGroups: readonly NavGroup[] = [{
-    label: "Основное",
-    items: [
-      ["/admin", "Сегодня", "home"],
-      ["/admin/dialogs", "Диалоги", "dialogs"],
-      ["/admin/clients", "Клиенты", "clients"],
-      ["/admin/system", "Система", "settings"],
-    ],
-  }];
+  const adminGroups: readonly NavGroup[] = [
+    {
+      label: "Каждый день",
+      items: [
+        ["/admin", "Сегодня", "home"],
+        ["/admin/dialogs", "Диалоги", "dialogs"],
+        ["/admin/clients", "Клиенты", "clients"],
+        ["/admin/activity", "Активность", "activity"],
+      ],
+    },
+    {
+      label: "Аналитика",
+      items: [
+        ["/admin/analytics", "Аналитика", "analytics"],
+        ["/admin/premium-health", "Premium", "plan"],
+      ],
+    },
+    {
+      label: "Ведение базы",
+      items: [
+        ["/admin/catalog", "Продукты", "catalog"],
+        ["/admin/knowledge", "База знаний", "coach"],
+        ["/admin/mailings", "Рассылки", "mailings"],
+        ["/admin/subscriptions", "Подписки", "subscriptions"],
+      ],
+    },
+    {
+      label: "Служебное",
+      items: [
+        ["/admin/system", "Система", "settings"],
+        ["/admin/n8n", "n8n", "n8n"],
+        ["/admin/replay", "Повтор обработки", "history"],
+      ],
+    },
+  ];
 
-  const clientGroups: readonly NavGroup[] = [{
-    label: "Личный кабинет",
-    items: [
-      ["/client", "Сегодня", "home"],
-      ["/client/nutrition", "Питание", "nutrition"],
-      ["/client/progress", "Прогресс", "progress"],
-      ["/client/profile", "Профиль", "profile"],
-    ],
-  }];
+  const clientGroups: readonly NavGroup[] = [
+    {
+      label: "Основное",
+      items: [
+        ["/client", "Сегодня", "home"],
+        ["/client/nutrition", "Питание", "nutrition"],
+        ["/client/progress", "Прогресс", "progress"],
+        ["/client/coach", "TeddY Coach", "coach", { premium: true }],
+      ],
+    },
+    {
+      label: "Ещё",
+      items: [
+        ["/client/history", "История", "history"],
+        ["/client/profile", "Профиль", "profile"],
+        ["/client/plan", "Подписка", "plan"],
+        ["/client/support", "Поддержка", "support"],
+      ],
+    },
+  ];
 
   let unreadDialogs = 0;
   if (role === "admin") {
