@@ -34,7 +34,7 @@ export default async function Page() {
   const [premiumData, adminIds, profilesResult, paymentsResult, lifecycleResult] = await Promise.all([
     adminPremiumData(),
     adminChatIds(),
-    db.from("profiles").select("telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at"),
+    db.from("profiles").select("telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at").is("deleted_at",null),
     db.from("payment_events").select("chat_id,amount_rub,status,created_at").gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString()).limit(3000),
     db.from("subscription_lifecycle").select("chat_id,plan,state,trial_ends_at,current_period_end,grace_ends_at,provider"),
   ]);

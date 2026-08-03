@@ -25,7 +25,7 @@ export default async function Page({searchParams}:{searchParams:SP}){
   const p=await searchParams;
   const db=getSupabaseAdmin();
   const [{data:profiles,error:profileError},{data:messages,error:messageError},adminIds]=await Promise.all([
-    db.from("profiles").select("telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at").order("created_at",{ascending:false}),
+    db.from("profiles").select("telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at").is("deleted_at",null).order("created_at",{ascending:false}),
     db.from("support_messages").select("id,chat_id,sender,content,created_at,read_by_admin_at,attachment_path,attachment_name,attachment_mime").order("created_at",{ascending:false}).limit(5000),
     adminChatIds(),
   ]);

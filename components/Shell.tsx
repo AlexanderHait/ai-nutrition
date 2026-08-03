@@ -25,7 +25,7 @@ const calmUiCss = String.raw`
 .calmUi .desktopNav::-webkit-scrollbar-thumb{background:#26282d;border-radius:99px}
 .calmUi .sideBottom{padding-top:10px;border-top:1px solid #1c1e22}
 .calmUi .navSection{gap:3px;margin-bottom:12px}
-.calmUi .navSectionLabel{padding:0 11px 5px;color:#55585a;font-size:8px;letter-spacing:.12em}
+.calmUi .navSectionLabel{padding:0 11px 5px;color:#55585a;font-size:10.5px;letter-spacing:.12em}
 .calmUi .desktopNav a{min-height:41px;padding:10px 11px;border-radius:10px;color:#9a9d99;font-size:12px}
 .calmUi .desktopNav a:hover{background:#14161a;color:#e8e8e4}
 .calmUi .desktopNav a.active,
@@ -34,7 +34,7 @@ const calmUiCss = String.raw`
 .calmUi .content{max-width:1180px;padding:32px clamp(22px,3.2vw,42px) 64px}
 .calmUi .pageHead{margin-bottom:19px;gap:16px}
 .calmUi .pageHead>div{max-width:720px}
-.calmUi .pageHead p{margin-bottom:6px;font-size:8px;letter-spacing:.12em}
+.calmUi .pageHead p{margin-bottom:6px;font-size:10.5px;letter-spacing:.12em}
 .calmUi .pageHead h1{font-size:clamp(28px,2.7vw,36px);line-height:1.04;letter-spacing:-1px;margin-bottom:6px}
 .calmUi .pageHead span{max-width:670px;color:#949793;font-size:12px;line-height:1.48}
 .calmUi .card,
@@ -46,7 +46,7 @@ const calmUiCss = String.raw`
 .calmUi .card h2{font-size:15px;margin-bottom:13px}
 .calmUi .top{margin-top:11px}
 .calmUi .sectionTitleRow{gap:12px}
-.calmUi .sectionTitleRow .muted{font-size:10px;color:#777a77!important}
+.calmUi .sectionTitleRow .muted{font-size:11.5px;color:#777a77!important}
 .calmUi .sectionTitleRow>svg{opacity:.5;color:#8a8d89}
 .calmUi .muted{color:var(--calm-muted)!important}
 .calmUi .textLink{font-size:11px;font-weight:650;color:#b8bab6}

@@ -24,7 +24,7 @@ export default function SimplifiedSections() {
       .primaryFocus>div{display:grid;min-width:0}
       .primaryFocus small{
         color:#8f7c49;
-        font-size:9px;
+        font-size:11px;
         font-weight:800;
         letter-spacing:.09em;
         text-transform:uppercase;
@@ -61,7 +61,7 @@ export default function SimplifiedSections() {
       .secondaryDisclosure>summary::-webkit-details-marker{display:none}
       .secondaryDisclosure>summary>span{display:grid;min-width:0}
       .secondaryDisclosure>summary b{font-size:13px}
-      .secondaryDisclosure>summary small{color:#737673;font-size:9px;margin-top:2px}
+      .secondaryDisclosure>summary small{color:#737673;font-size:11px;margin-top:2px}
       .secondaryDisclosure>summary svg{color:#777;transition:transform .18s}
       .secondaryDisclosure[open]>summary svg{transform:rotate(180deg)}
       .secondaryDisclosure>.disclosureBody{
@@ -81,7 +81,7 @@ export default function SimplifiedSections() {
         border-radius:12px;
         background:#0e0f12;
       }
-      .profileOverviewItem span{display:block;color:#777;font-size:9px}
+      .profileOverviewItem span{display:block;color:#777;font-size:11px}
       .profileOverviewItem b{display:block;margin-top:5px;font-size:14px}
       .profileEditor>summary{padding:15px 17px}
       .profileEditor .profileForm{margin-top:16px}
@@ -112,7 +112,7 @@ export default function SimplifiedSections() {
         color:var(--gold);
       }
       .progressKeyStat span{display:grid}
-      .progressKeyStat small{font-size:9px;color:#777}
+      .progressKeyStat small{font-size:11px;color:#777}
       .progressKeyStat b{font-size:15px;margin-top:2px}
       .progressDetails{
         border:0;
@@ -159,7 +159,7 @@ export default function SimplifiedSections() {
         color:var(--gold);
       }
       .premiumOutcome b{font-size:13px}
-      .premiumOutcome p{margin:0;color:#858885;font-size:10px;line-height:1.5}
+      .premiumOutcome p{margin:0;color:#858885;font-size:11.5px;line-height:1.5}
       .premiumOffer{
         display:grid;
         grid-template-columns:minmax(0,1fr) auto;
@@ -185,9 +185,9 @@ export default function SimplifiedSections() {
         background:#101115;
       }
       .planCompareCard h3{margin:0;font-size:16px}
-      .planCompareCard>p{margin:4px 0 12px;color:#777;font-size:10px}
+      .planCompareCard>p{margin:4px 0 12px;color:#777;font-size:11.5px}
       .planCompareCard ul{display:grid;gap:7px;margin:0;padding:0;list-style:none}
-      .planCompareCard li{display:flex;gap:7px;color:#bfc1bd;font-size:10px}
+      .planCompareCard li{display:flex;gap:7px;color:#bfc1bd;font-size:11.5px}
       .planCompareCard li svg{flex:none;color:#cbb05e}
 
       .coachLockedCompact{
@@ -216,7 +216,7 @@ export default function SimplifiedSections() {
       }
       .coachLockedLead small{
         color:#9c864d;
-        font-size:9px;
+        font-size:11px;
         font-weight:800;
         letter-spacing:.1em;
         text-transform:uppercase;
@@ -240,7 +240,7 @@ export default function SimplifiedSections() {
       .coachLockedBenefits svg{color:#c9aa57;flex:none}
       .coachLockedBenefits span{display:grid}
       .coachLockedBenefits b{font-size:11px}
-      .coachLockedBenefits small{font-size:9px;color:#777;margin-top:2px}
+      .coachLockedBenefits small{font-size:11px;color:#777;margin-top:2px}
       .coachExtras>.disclosureBody{padding-top:14px}
 
       .adminPriorityGrid{
@@ -272,7 +272,7 @@ export default function SimplifiedSections() {
       }
       .adminAction span{display:grid}
       .adminAction b{font-size:11px}
-      .adminAction small{font-size:9px;color:#777;margin-top:2px}
+      .adminAction small{font-size:11px;color:#777;margin-top:2px}
       .adminAction>strong{font-size:13px;color:#d5bc70}
       .adminToolsGrid{
         display:grid;
@@ -302,7 +302,7 @@ export default function SimplifiedSections() {
       }
       .adminToolLink span{display:grid}
       .adminToolLink b{font-size:11px}
-      .adminToolLink small{font-size:9px;color:#777;margin-top:2px}
+      .adminToolLink small{font-size:11px;color:#777;margin-top:2px}
       .adminToolLink>em{font-style:normal;color:#686b68;font-size:14px}
 
       .emptyGuidance{
@@ -316,7 +316,7 @@ export default function SimplifiedSections() {
       }
       .emptyGuidance svg{color:var(--gold)}
       .emptyGuidance b{color:#d7d8d4;font-size:14px}
-      .emptyGuidance span{max-width:420px;font-size:10px;line-height:1.5}
+      .emptyGuidance span{max-width:420px;font-size:11.5px;line-height:1.5}
 
       @media(max-width:1000px){
         .adminToolsGrid{grid-template-columns:1fr 1fr}

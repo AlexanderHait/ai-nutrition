@@ -1,4 +1,4 @@
-import {Clock3,Send,Users} from 'lucide-react';
+import {ChevronDown,Clock3,Send,Users} from 'lucide-react';
 import {getSupabaseAdmin} from '@/lib/supabase-admin';
 import MailingComposer from '@/components/MailingComposer';
 export const dynamic='force-dynamic';
@@ -38,12 +38,29 @@ export default async function Page({searchParams}:{searchParams?:Promise<Record<
         <MailingComposer/>
       </section>
       <section className="card">
-        <div className="sectionTitleRow"><div><h2>История</h2><span className="muted">Последние рассылки</span></div></div>
-        <div className="mailHistory">{(data||[]).length?(data||[]).map((x:any)=><div className="mailRow" key={x.id}>
-          <i>{x.status==='sent'?<Send/>:<Clock3/>}</i>
-          <div><b>{x.title}</b><span>{segmentName[x.segment]||x.segment} · {x.status==='sent'?'Отправлено':'Запланировано'}{x.media_kind?` · ${x.media_kind==='pdf'?'PDF':'фото'}`:''}</span></div>
-          <strong><Users size={13}/>{x.status==='sent'?x.sent_count:x.recipient_count}</strong>
-        </div>):<p className="muted">Рассылок пока нет.</p>}</div>
+        <div className="sectionTitleRow"><div><h2>История</h2><span className="muted">Нажми на рассылку — покажу текст, который ушёл в бота</span></div></div>
+        <div className="mailHistory">{(data||[]).length?(data||[]).map((x:any)=>{
+          const when=x.sent_at||x.scheduled_at||x.created_at;
+          const failed=x.status==='sent'?Math.max(0,Number(x.recipient_count||0)-Number(x.sent_count||0)):0;
+          return <details className="mailRow" key={x.id}>
+            <summary>
+              <i>{x.status==='sent'?<Send/>:<Clock3/>}</i>
+              <div><b>{x.title}</b><span>{segmentName[x.segment]||x.segment} · {x.status==='sent'?'Отправлено':'Запланировано'} · {when?new Date(when).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'}):'—'}</span></div>
+              <strong><Users size={13}/>{x.status==='sent'?x.sent_count:x.recipient_count}</strong>
+              <ChevronDown size={16} className="mailRowChevron"/>
+            </summary>
+            <div className="mailRowBody">
+              <div className="mailRowStats">
+                <span><small>Получателей</small><b>{x.recipient_count??'—'}</b></span>
+                <span><small>Доставлено</small><b>{x.status==='sent'?(x.sent_count??0):'—'}</b></span>
+                <span><small>Не дошло</small><b className={failed?'statusBad':undefined}>{x.status==='sent'?failed:'—'}</b></span>
+                <span><small>Создана</small><b>{x.created_at?new Date(x.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'}):'—'}</b></span>
+              </div>
+              <p className="mailRowLabel">Что ушло в бота</p>
+              <pre className="mailRowText">{x.content||'Текст не сохранён.'}</pre>
+            </div>
+          </details>;
+        }):<p className="muted">Рассылок пока нет.</p>}</div>
       </section>
     </div>
   </>;

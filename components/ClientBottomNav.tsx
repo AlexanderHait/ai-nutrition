@@ -74,7 +74,7 @@ export default function ClientBottomNav() {
             min-width:0;
             border-radius:12px;
             color:#797c79;
-            font-size:9px;
+            font-size:11px;
             font-weight:650;
           }
           .clientBottomNav a.active{background:#1a1a15;color:#e4c86f}

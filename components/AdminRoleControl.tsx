@@ -25,7 +25,7 @@ export default function AdminRoleControl({chatId,current=false}:{chatId:number|s
     }finally{setSaving(false)}
   }
 
-  return <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+  return <div className="adminRoleControl" style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
     <button
       type="button"
       onClick={toggle}

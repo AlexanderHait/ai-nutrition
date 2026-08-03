@@ -33,7 +33,7 @@ export default async function Page(){
   const [adminIds,metricsResult,profilesResult,subsResult]=await Promise.all([
     adminChatIds(),
     s.rpc("admin_platform_metrics_v2",{_days:30,_recognition_days:7,_client_limit:80}),
-    s.from("profiles").select("telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at"),
+    s.from("profiles").select("telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at").is("deleted_at",null),
     s.from("subscriptions").select("chat_id,plan,status,created_at").order("created_at",{ascending:false})
   ]);
 
