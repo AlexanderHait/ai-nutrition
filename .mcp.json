@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=asgcofyqfflpvchhgtph"
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com/"
+    },
+    "n8n": {
+      "type": "http",
+      "url": "https://n8n-config-production.up.railway.app/mcp-server/http"
+    }
+  }
+}
