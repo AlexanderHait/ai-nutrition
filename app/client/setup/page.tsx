@@ -27,23 +27,23 @@ export default async function Page({
         .setupIntro h1{margin:0;font-size:clamp(30px,5vw,48px);letter-spacing:-1.5px;line-height:1.02}
         .setupIntro span{display:block;margin-top:10px;color:var(--muted);max-width:600px}
         .setupProgress{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0}
-        .setupProgress div{padding:12px;border:1px solid var(--line);border-radius:13px;background:#101114;display:flex;gap:10px;align-items:center}
-        .setupProgress i{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:#18170f;color:var(--gold);font-style:normal;font-weight:900}
+        .setupProgress div{padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--bg);display:flex;gap:10px;align-items:center}
+        .setupProgress i{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--gold);font-style:normal;font-weight:900}
         .setupProgress b{display:block;font-size:13px}.setupProgress small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
         .setupForm{display:grid;gap:12px}
-        .setupStep{padding:19px;border:1px solid var(--line);border-radius:16px;background:#101114}
+        .setupStep{padding:19px;border:1px solid var(--line);border-radius:16px;background:var(--bg)}
         .setupStepHead{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
-        .setupStepHead i{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:#18170f;color:var(--gold)}
+        .setupStepHead i{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--gold)}
         .setupStepHead h2{margin:0;font-size:17px}.setupStepHead p{margin:4px 0 0;color:var(--muted);font-size:13px}
         .setupGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-        .setupForm label{display:grid;gap:7px;color:#bbbdb9;font-size:13px}
+        .setupForm label{display:grid;gap:7px;color:var(--muted);font-size:13px}
         .setupGoal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
         .setupGoal label{position:relative}.setupGoal input{position:absolute;opacity:0;pointer-events:none}
-        .setupGoal span{display:block;padding:14px 12px;border:1px solid var(--line2);border-radius:12px;background:#0d0e11;text-align:center;font-weight:750;cursor:pointer}
-        .setupGoal input:checked+span{border-color:#88743d;background:#17150f;color:#efd47c}
-        .setupResult{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:center;padding:15px;border:1px solid #323024;border-radius:13px;background:#14130f}
-        .setupResult i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#1d1a10;color:var(--gold)}
-        .setupResult b{display:block}.setupResult span{display:block;color:#a6a79f;font-size:13px;margin-top:3px}
+        .setupGoal span{display:block;padding:14px 12px;border:1px solid var(--line2);border-radius:12px;background:var(--bg);text-align:center;font-weight:750;cursor:pointer}
+        .setupGoal input:checked+span{border-color:var(--gold);background:var(--accent-soft);color:var(--gold)}
+        .setupResult{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:center;padding:15px;border:1px solid var(--gold2);border-radius:13px;background:var(--bg)}
+        .setupResult i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--gold)}
+        .setupResult b{display:block}.setupResult span{display:block;color:var(--muted);font-size:13px;margin-top:3px}
         .setupSubmit{display:flex;justify-content:flex-end;margin-top:3px}.setupSubmit button{min-width:240px}
         @media(max-width:650px){.setupProgress,.setupGoal,.setupGrid{grid-template-columns:1fr}.setupProgress{gap:6px}.setupSubmit button{width:100%}}
       `}</style>

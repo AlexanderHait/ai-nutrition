@@ -173,7 +173,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold)!important;box-s
   .mobileTopbar{height:68px!important;padding:0 16px!important}
   .mobileMenuButton{width:42px!important;height:42px!important;border-radius:13px!important}
   .mobileBrand span{width:36px!important;height:36px!important;border-radius:12px!important}
-  .themeToggle{top:max(13px,env(safe-area-inset-top));right:16px}
+  .themeToggle{
+    z-index:110;
+    top:calc(env(safe-area-inset-top) + 11px);
+    right:60px;
+    width:40px;
+    height:40px;
+    box-shadow:none;
+  }
   .clientBottomNav{left:14px!important;right:14px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;min-height:64px!important;padding:6px!important;border-radius:20px!important}
   .clientBottomNav a{font-size:12.5px!important;border-radius:14px!important;gap:4px!important}
   .clientBottomNav a svg{width:20px!important;height:20px!important}

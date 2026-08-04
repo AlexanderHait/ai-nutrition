@@ -118,7 +118,7 @@ export default async function Page({
         .coachPrimaryCard>p{position:relative;z-index:1;margin:0;color:var(--muted);font-size:14px;line-height:1.55}
         .coachPrimaryActions{position:relative;z-index:1;display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
         .coachPrimaryActions a{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 15px;border-radius:13px;font-size:13px;font-weight:800}
-        .coachPrimaryActions a:first-child{background:linear-gradient(135deg,#e6ca73,#cfa748);color:#16201d}
+        .coachPrimaryActions a:first-child{background:linear-gradient(135deg,var(--gold),var(--gold));color:var(--green)}
         .coachPrimaryActions a:last-child{border:1px solid var(--line2);background:var(--surface);color:var(--text)}
         .coachMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
         .coachMetric{padding:15px;border-radius:17px}
@@ -127,7 +127,7 @@ export default async function Page({
         .coachMetric strong{display:block;margin-top:9px;color:var(--text);font-size:20px;line-height:1.15}
         .coachMetric small{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}
         .coachProgress{height:6px;margin-top:12px;overflow:hidden;border-radius:99px;background:var(--surface-soft)}
-        .coachProgress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#d2aa50,#ead17d)}
+        .coachProgress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--gold),var(--gold))}
         .coachDashboard{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(280px,.88fr);gap:10px;align-items:start}
         .coachColumn{display:grid;gap:10px}
         .coachContentCard{padding:18px;border-radius:19px}
@@ -139,7 +139,7 @@ export default async function Page({
         .coachRisk{display:grid;grid-template-columns:38px minmax(0,1fr);gap:11px;align-items:start;padding:13px;border-radius:14px;background:var(--surface-soft)}
         .coachRisk i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--gold2)}
         .coachRisk b{display:block;color:var(--text);font-size:13px}.coachRisk span{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.45}
-        .coachRisk.warning i{color:#d39a4e}.coachRisk.good i{color:#71aa88}
+        .coachRisk.warning i{color:#d39a4e}.coachRisk.good i{color:var(--green)}
         .coachQuickGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
         .coachQuickLink{display:grid;grid-template-columns:38px minmax(0,1fr) 16px;gap:10px;align-items:center;padding:13px;border-radius:15px}
         .coachQuickLink i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--surface-soft);color:var(--gold2)}
