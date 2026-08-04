@@ -1,12 +1,12 @@
 export default function ClientDesignV3() {
   return (
     <style>{`
-      /* TeddY client design v3.4 */
+      /* TeddY client design v3.5 */
       .clientApp{--client-radius-lg:20px;--client-radius-md:14px}
       :root[data-theme="light"] .clientApp{
         --surface:#ffffff;--surface-soft:#f2f6f3;--panel:#f7faf8;
         --line:#cedbd4;--line2:#b9cbc2;--text:#173a32;
-        --muted:#526a63;--muted2:#657a73;--accent-soft:#f6eedb;
+        --muted:#465f58;--muted2:#5c716a;--accent-soft:#f6eedb;
         --chart-empty:#e4ebe7;--chart-line:#a88a35;
         --shadow:0 10px 26px rgba(28,55,47,.08)
       }
@@ -70,18 +70,40 @@ export default function ClientDesignV3() {
       /* Progress charts */
       .clientApp .progressCharts{grid-template-columns:1fr!important;gap:14px!important}
       .clientApp .progressChartCard,.clientApp .weightProgressCard{overflow:hidden!important}
-      .clientApp .weightProgressCard .sectionTitleRow>svg{width:18px!important;height:18px!important;max-width:18px!important;max-height:18px!important;opacity:.65}
-      .clientApp .weightChart svg,.clientApp .weightTrendChart svg{width:100%!important;max-width:100%!important;height:auto!important;max-height:190px!important}
+      .clientApp .weightProgressCard .sectionTitleRow>svg{width:18px!important;height:18px!important;max-width:18px!important;max-height:18px!important;opacity:.7}
       .clientApp .weightHistory{margin-top:8px!important}
-      .clientApp .periodBarChart{display:flex!important;width:100%!important;min-width:0!important;height:166px!important;gap:3px!important;overflow:hidden!important}
-      .clientApp .periodBar{flex:1 1 0!important;min-width:0!important;height:154px!important;grid-template-rows:14px 1fr 17px!important}
-      .clientApp .periodBar>div{height:118px!important;background:var(--chart-empty)!important;border-radius:8px!important;overflow:hidden!important}
-      .clientApp .periodBar>div i{width:64%!important;max-width:16px!important;border-radius:6px 6px 3px 3px!important}
-      .clientApp .periodBar>div em{border-color:var(--chart-line)!important;opacity:.75!important}
-      .clientApp .periodBar>span{display:none!important}
-      .clientApp .periodBar>small{color:var(--muted)!important;font-size:9px!important;white-space:nowrap!important;overflow:hidden!important}
       .clientApp .macroSummaryGrid{grid-template-columns:1fr!important}
       .clientApp .macroSummaryCard{padding:16px!important;border-radius:14px!important}
+
+      .clientApp .calorieMobileChart{
+        display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;
+        align-items:end!important;gap:8px!important;width:100%!important;
+        min-height:190px!important;margin-top:18px!important;overflow:hidden!important
+      }
+      .clientApp .calorieMobileBar{
+        display:grid!important;grid-template-rows:22px 132px auto!important;
+        gap:8px!important;min-width:0!important;text-align:center!important;color:var(--muted)!important
+      }
+      .clientApp .calorieMobileBar>span{font-size:11px!important;font-weight:700!important;color:var(--text)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+      .clientApp .calorieMobileBar>i{position:relative!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;height:132px!important;border-radius:12px!important;background:var(--chart-empty)!important;overflow:hidden!important}
+      .clientApp .calorieMobileBar>i>em{display:block!important;width:62%!important;max-width:28px!important;border-radius:8px 8px 4px 4px!important;background:#d6b34f!important;min-height:5px!important}
+      .clientApp .calorieMobileBar>i>em.good{background:#86a88e!important}
+      .clientApp .calorieMobileBar>i>em.medium{background:#b59a63!important}
+      .clientApp .calorieMobileBar>i>em.far{background:#a46e6b!important}
+      .clientApp .calorieMobileBar>i>em.empty{background:transparent!important}
+      .clientApp .calorieMobileBar>i>b{position:absolute!important;left:0!important;right:0!important;height:1px!important;border-top:1px dashed color-mix(in srgb,var(--chart-line) 75%,transparent)!important}
+      .clientApp .calorieMobileBar>small{font-size:11px!important;line-height:1.2!important;color:var(--muted)!important;white-space:normal!important}
+      .clientApp .calorieTargetLegend{display:flex!important;align-items:center!important;gap:8px!important;margin-top:14px!important;font-size:12px!important;color:var(--muted)!important}
+      .clientApp .calorieTargetLegend>i{width:22px!important;border-top:1px dashed var(--chart-line)!important}
+      .clientApp .period30.calorieMobileChart,.clientApp .period90.calorieMobileChart{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+
+      .clientApp .weightChartCompact{margin:8px 0 12px!important;height:132px!important}
+      .clientApp .weightChartCompact svg{display:block!important;width:100%!important;height:132px!important;overflow:visible!important}
+      .clientApp .weightTrendLine{fill:none!important;stroke:#d4b45d!important;stroke-width:3!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+      .clientApp .weightChartCompact circle{fill:#d4b45d!important;stroke:var(--surface)!important;stroke-width:2!important}
+      .clientApp .weightChartCompact circle.latest{fill:var(--text)!important}
+      .clientApp .weightTargetLine{stroke:color-mix(in srgb,#d4b45d 58%,transparent)!important;stroke-width:1!important;stroke-dasharray:5 5!important}
+      .clientApp .weightTargetText{fill:var(--muted)!important;font-size:9px!important}
 
       /* Calorie ring + weekly chart */
       .clientApp .calorieRing,.clientApp .clientCalorieRing{
@@ -109,21 +131,22 @@ export default function ClientDesignV3() {
         .clientApp .planCol,.clientApp .planGroup,.clientApp .planStatus{padding:18px!important;border-radius:18px!important}
         .clientApp .profileOverview{grid-template-columns:1fr 1fr!important;gap:8px!important}
         .clientApp .progressKeyStats{grid-template-columns:1fr!important}
-        .clientApp .periodBarChart{height:144px!important;gap:2px!important}
-        .clientApp .periodBar{height:134px!important;grid-template-rows:10px 1fr 16px!important}
-        .clientApp .periodBar>div{height:104px!important}
-        .clientApp .periodBar>div i{max-width:13px!important}
-        .clientApp .weightChart svg,.clientApp .weightTrendChart svg{max-height:165px!important}
+        .clientApp .calorieMobileChart{gap:5px!important;min-height:164px!important}
+        .clientApp .calorieMobileBar{grid-template-rows:18px 108px auto!important;gap:6px!important}
+        .clientApp .calorieMobileBar>i{height:108px!important;border-radius:10px!important}
+        .clientApp .calorieMobileBar>span{font-size:10px!important}
+        .clientApp .calorieMobileBar>small{font-size:10px!important}
+        .clientApp .weightChartCompact,.clientApp .weightChartCompact svg{height:112px!important}
         .clientApp .clientBottomNav{left:12px!important;right:12px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;min-height:58px!important;border-radius:19px!important;padding:5px!important}
         .clientApp .clientBottomNav a{font-size:11.5px!important;border-radius:14px!important}
       }
       @media(max-width:430px){
         .clientApp .content{padding-left:13px!important;padding-right:13px!important}
         .clientApp .pageHead h1,.clientApp .clientWelcome h1{font-size:27px!important}
-        .clientApp .periodBarChart{height:132px!important}
-        .clientApp .periodBar{height:122px!important}
-        .clientApp .periodBar>div{height:93px!important}
-        .clientApp .periodBar>small{font-size:8px!important}
+        .clientApp .calorieMobileChart{gap:4px!important}
+        .clientApp .calorieMobileBar{grid-template-rows:16px 96px auto!important}
+        .clientApp .calorieMobileBar>i{height:96px!important}
+        .clientApp .calorieMobileBar>span,.clientApp .calorieMobileBar>small{font-size:9px!important}
       }
     `}</style>
   );
