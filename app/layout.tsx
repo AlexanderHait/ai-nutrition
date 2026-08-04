@@ -2,7 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "TeddY", template: "%s · TeddY" },
+  title: {
+    default: "TeddY",
+    template: "%s · TeddY",
+  },
   description: "Личный AI-диетолог: питание, КБЖУ, прогресс и поддержка.",
   applicationName: "TeddY",
   icons: {
@@ -33,7 +36,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#eef3f0" },
+    { media: "(prefers-color-scheme: light)", color: "#f2f5f2" },
     { media: "(prefers-color-scheme: dark)", color: "#0d1716" },
   ],
 };
@@ -81,102 +84,141 @@ const themeControls = `
 
 const themeCss = `
 :root[data-theme="dark"]{
-  --bg:#0d1716;--panel:#121d1c;--panel2:#172321;--line:#263633;--line2:#344945;
-  --text:#f3f7f5;--muted:#9aa9a5;--muted2:#6f817c;--gold:#e7c96b;--gold2:#c7a94f;
-  --green:#60c7a4;--red:#df8585;--shadow:0 18px 48px rgba(0,0,0,.28);
-  --surface:#121d1c;--surface-raised:#172321;--surface-soft:#1b2927;--nav-bg:rgba(14,23,22,.9);
+  --bg:#0d1716;
+  --panel:#131f1e;
+  --panel2:#172624;
+  --surface:#182825;
+  --surface-soft:#111c1b;
+  --line:#263936;
+  --line2:#334a46;
+  --text:#f1f5f3;
+  --muted:#98a8a3;
+  --muted2:#6f817c;
+  --gold:#d9bd68;
+  --gold2:#b99442;
+  --green:#73c6a1;
+  --red:#df8585;
+  --shadow:0 18px 46px rgba(2,12,11,.28);
+  --nav:rgba(15,25,24,.94);
+  --accent-soft:#20261e;
 }
 :root[data-theme="light"]{
-  --bg:#eef3f0;--panel:#f9f8f3;--panel2:#f2f6f3;--line:#d9e1dc;--line2:#c7d2cc;
-  --text:#17322e;--muted:#647872;--muted2:#879792;--gold:#9c7623;--gold2:#7e5e18;
-  --green:#16866d;--red:#b95757;--shadow:0 14px 36px rgba(31,58,51,.09);
-  --surface:#f9f8f3;--surface-raised:#ffffff;--surface-soft:#f0f4f1;--nav-bg:rgba(250,250,247,.91);
+  --bg:#f2f5f2;
+  --panel:#ffffff;
+  --panel2:#f7f8f5;
+  --surface:#ffffff;
+  --surface-soft:#f4f6f3;
+  --line:#dde4df;
+  --line2:#cbd6cf;
+  --text:#19342f;
+  --muted:#6d7d78;
+  --muted2:#8e9b97;
+  --gold:#a97e21;
+  --gold2:#805d13;
+  --green:#2f8f70;
+  --red:#b95353;
+  --shadow:0 12px 32px rgba(38,61,54,.08);
+  --nav:rgba(250,251,248,.95);
+  --accent-soft:#f5efe0;
 }
-*{scrollbar-color:var(--line2) transparent}
-html,body{transition:background-color .2s ease,color .2s ease}
-body{background:var(--bg)!important;color:var(--text)!important}
-:root[data-theme="dark"] body{background:radial-gradient(800px 420px at 50% -180px,rgba(48,139,116,.11),transparent 62%),var(--bg)!important}
-:root[data-theme="light"] body{background:radial-gradient(800px 420px at 50% -180px,rgba(61,143,122,.08),transparent 62%),var(--bg)!important}
+*{transition-property:background-color,border-color,color,box-shadow;transition-duration:.16s;transition-timing-function:ease}
+html,body{background:var(--bg)!important;color:var(--text)!important}
+body{background-image:none!important}
+.calmUi.app{background:var(--bg)!important;color:var(--text)!important}
+.calmUi{--calm-bg:var(--bg)!important;--calm-surface:var(--surface)!important;--calm-surface-soft:var(--surface-soft)!important;--calm-line:var(--line)!important;--calm-text:var(--text)!important;--calm-muted:var(--muted)!important}
+.calmUi .content{background:transparent!important}
+.calmUi .side{background:var(--panel)!important;border-color:var(--line)!important}
+.calmUi .brand,.calmUi .mobileBrand{color:var(--text)!important}
+.calmUi .brand strong,.calmUi .mobileBrand strong{font-size:0!important}
+.calmUi .brand strong::after,.calmUi .mobileBrand strong::after{content:"TeddY";font-size:18px;font-weight:800;letter-spacing:-.35px}
+.calmUi .brand span,.calmUi .mobileBrand span{background:linear-gradient(145deg,#e8cd78,#cda749)!important;color:#17201e!important;box-shadow:none!important}
+.calmUi .desktopNav a{color:var(--muted)!important}
+.calmUi .desktopNav a:hover{background:var(--surface-soft)!important;color:var(--text)!important}
+.calmUi .desktopNav a.active,.calmUi .desktopNav a[aria-current="page"]{background:var(--accent-soft)!important;color:var(--gold2)!important;box-shadow:none!important}
+.calmUi .navSectionLabel{color:var(--muted2)!important}
+.calmUi .sideBottom{border-color:var(--line)!important}
+.calmUi .sideLogout{color:var(--muted)!important}
+.calmUi .sideLogout:hover{background:var(--surface-soft)!important;color:var(--text)!important}
 
-.side,.mobileTopbar,.mobileNav{background:var(--nav-bg)!important;border-color:var(--line)!important;backdrop-filter:blur(24px) saturate(140%)!important}
-.mobileTopbar{box-shadow:0 1px 0 var(--line),0 8px 28px rgba(0,0,0,.04)!important}
-.brand span,.mobileBrand span{background:linear-gradient(145deg,#f2d987,#d2af50)!important;color:#17201d!important;box-shadow:none!important}
-.brand strong,.mobileBrand strong{letter-spacing:-.45px}
-.desktopNav a,.sideLogout{color:var(--muted)!important}
-.desktopNav a:hover,.sideLogout:hover{background:var(--surface-soft)!important;color:var(--text)!important}
-
-.card,.stat,.heroKcal,.clientTodayHero,.progressSummaryCard,.clientMacroCard,.conversation,.dialogsList,.planCard,.subscriptionCard,.todayNutritionCard,.clientDashboardHero,.clientActionCard,.clientInsightCard,.clientWeeklyCard,.clientCoachCard,.clientImportantCard,.premiumPlanHero,.premiumLockHero,.strategyProposal,.currentPlanStrip,.planTeaser,.attentionCard,.visualMealSession,.formSection,.miniStat,.clientFact{
-  background:var(--surface)!important;border:1px solid var(--line)!important;box-shadow:var(--shadow)!important;border-radius:20px!important;
+.card,.stat,.heroKcal,.clientTodayHero,.clientMacroCard,.progressSummaryCard,.clientDashboardHero,.clientInsightCard,.clientProfileHero,.clientWeekCard,.clientCoachCard,.planCard,.premiumLockHero,.premiumPlanHero,.currentPlanStrip,.planTeaser,.subscriptionCard,.todayNutritionCard,.attentionCard,.miniStat,.clientFact,.funnelStep,.visualMealSession,.smartMealCard,.conversation,.dialogsList,.formSection,.clientQuickStat,.clientNextMeal,.clientTimelineCard,.clientMealList,.clientCoachSummary,.clientCoachPanel,.clientPremiumCard{
+  background:var(--surface)!important;
+  border:1px solid var(--line)!important;
+  box-shadow:var(--shadow)!important;
 }
-:root[data-theme="light"] .card,:root[data-theme="light"] .stat,:root[data-theme="light"] .heroKcal,:root[data-theme="light"] .clientTodayHero,:root[data-theme="light"] .progressSummaryCard,:root[data-theme="light"] .clientMacroCard,:root[data-theme="light"] .conversation,:root[data-theme="light"] .dialogsList,:root[data-theme="light"] .planCard,:root[data-theme="light"] .subscriptionCard,:root[data-theme="light"] .todayNutritionCard,:root[data-theme="light"] .clientDashboardHero,:root[data-theme="light"] .clientActionCard,:root[data-theme="light"] .clientInsightCard,:root[data-theme="light"] .clientWeeklyCard,:root[data-theme="light"] .clientCoachCard,:root[data-theme="light"] .clientImportantCard{background:var(--surface-raised)!important}
-.card{padding:22px!important}
-.card+.card{margin-top:14px}
-.pageHead,.clientWelcome{margin-bottom:22px!important}
-.pageHead h1,.clientWelcome h1{letter-spacing:-1.15px!important;color:var(--text)!important}
-.pageHead p,.clientWelcome p{color:var(--green)!important}
+.card,.clientDashboardHero,.planCard,.premiumLockHero,.premiumPlanHero,.currentPlanStrip,.subscriptionCard,.clientCoachPanel,.clientPremiumCard{border-radius:18px!important}
+.clientInsightCard,.clientQuickStat,.clientNextMeal,.miniStat,.clientFact,.funnelStep,.visualMealSession,.smartMealCard{border-radius:14px!important}
+.card .card,.clientCoachCard .card,.premiumPlanHero .card,.todayNutritionCard .card{background:var(--surface-soft)!important;box-shadow:none!important}
 
-input,select,textarea{background:var(--surface-raised)!important;color:var(--text)!important;border-color:var(--line2)!important;box-shadow:none!important}
-input:focus,select:focus,textarea:focus{border-color:var(--green)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 14%,transparent)!important}
-.tableHead,.conversationHead{background:var(--surface-soft)!important;border-color:var(--line)!important;color:var(--muted)!important}
-.tableRow,.row,.meal,.health,.dialogPerson,.messageBubble,.visualMealItem,.recentClient{border-color:var(--line)!important}
+:root[data-theme="light"] .clientDashboardHero,
+:root[data-theme="light"] .clientTodayHero,
+:root[data-theme="light"] .todayNutritionCard,
+:root[data-theme="light"] .premiumPlanHero,
+:root[data-theme="light"] .planCard.premium{
+  background:var(--surface)!important;
+}
+:root[data-theme="dark"] .clientDashboardHero,
+:root[data-theme="dark"] .clientTodayHero,
+:root[data-theme="dark"] .todayNutritionCard,
+:root[data-theme="dark"] .premiumPlanHero,
+:root[data-theme="dark"] .planCard.premium{
+  background:var(--surface)!important;
+}
+
+.clientWelcome h1,.pageHead h1,.clientWelcome p,.pageHead p,.sectionTitleRow h2,.card h2,.clientCoachCard h2,.planCard h2{color:var(--text)!important}
+.clientWelcome>div>span,.pageHead span,.muted,.clientHeroCopy>span,.clientHeroCopy p,.sectionSub,.clientQuickStat span,.clientQuickStat small,.clientMealList small,.planCard p,.planFeatures div,.premiumLongText{color:var(--muted)!important}
+.textLink,.clientMealList a,.clientCoachCard a{color:var(--gold2)!important}
+
+input,select,textarea,.calmUi input,.calmUi select,.calmUi textarea{background:var(--surface-soft)!important;color:var(--text)!important;border-color:var(--line2)!important;box-shadow:none!important}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 16%,transparent)!important}
+.primary{background:linear-gradient(135deg,#e3c76f,#c9a24a)!important;color:#17201e!important;border:0!important;box-shadow:none!important}
+.secondaryBtn,.compactBtn,.planCta{background:var(--surface-soft)!important;color:var(--text)!important;border-color:var(--line2)!important}
+
+.tableHead,.conversationHead,.visualMealSession>header{background:var(--surface-soft)!important;color:var(--muted)!important;border-color:var(--line)!important}
+.tableRow,.row,.meal,.health,.visualMealItem,.recentClient,.subscriptionRow{border-color:var(--line)!important}
 .tableRow:hover,.dialogPerson:hover,.dialogPerson.active{background:var(--surface-soft)!important}
-.messageBubble,.chat{background:var(--surface-soft)!important;border-color:var(--line)!important}
-.messageBubble.assistant,.chat.assistant{background:color-mix(in srgb,var(--green) 9%,var(--surface))!important;border-color:color-mix(in srgb,var(--green) 28%,var(--line))!important}
-.messageBubble p,.digest,.premiumLongText{color:var(--text)!important}
+.messageBubble,.chat,.telegramPreview>div,.premiumScenario,.aiObservations p{background:var(--surface-soft)!important;border-color:var(--line)!important;color:var(--text)!important}
+.messageBubble.assistant,.chat.assistant{background:var(--accent-soft)!important;border-color:var(--line2)!important}
+.messageBubble p,.chat p,.digest,.premiumLongText{color:var(--text)!important}
 
-.primary{background:linear-gradient(135deg,#edd173,#d8b54c)!important;color:#19201d!important;border:0!important;box-shadow:0 9px 22px rgba(188,151,52,.18)!important;border-radius:13px!important}
-.secondaryBtn,.commandTrigger{background:var(--surface-raised)!important;color:var(--text)!important;border-color:var(--line2)!important}
-.progress,.goalProgress,.macroProgress,.macroRow>i,.heroMacroRow>i,.stackedBar{background:var(--line)!important}
-.progress i,.goalProgress i,.macroProgress i,.heroMacroRow em{background:linear-gradient(90deg,var(--green),#8bd5bd)!important}
-
-.clientDashboardHero{background:var(--surface)!important;box-shadow:none!important}
-.clientCalorieRing:after,.kcalRing:after{background:var(--surface)!important}
+.progress,.goalProgress,.macroProgress,.macroRow>i,.heroMacroRow>i,.stackedBar,.funnelStep>i{background:color-mix(in srgb,var(--line) 72%,transparent)!important}
+.progress i,.goalProgress i,.macroProgress i,.heroMacroRow em,.funnelStep em{background:linear-gradient(90deg,#c69f42,#e4c96f)!important}
 .clientCalorieRing{background:conic-gradient(var(--gold) var(--progress),var(--line) 0)!important}
-.clientActionCard,.clientInsightCard,.clientWeeklyCard,.clientCoachCard,.clientImportantCard{overflow:hidden}
-.clientWeeklyCard,.clientImportantCard,.clientCoachCard{background:var(--surface)!important}
-.weekBar.empty{background:var(--line)!important}
-.weekCol small,.weekCol em,.trendMeta{color:var(--muted)!important}
+.clientCalorieRing:after,.kcalRing:after{background:var(--surface)!important}
 
-#teddy-theme-toggle{position:fixed;top:max(13px,env(safe-area-inset-top));right:16px;z-index:9999;width:42px;height:42px;border:1px solid var(--line2);border-radius:14px;background:var(--surface-raised);color:var(--gold);display:grid;place-items:center;font-size:23px;font-weight:500;line-height:1;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.12);transition:transform .15s ease,background .2s ease,border-color .2s ease}
+.mobileTopbar{background:var(--nav)!important;border-color:var(--line)!important;box-shadow:0 1px 0 var(--line)!important}
+.mobileMenuButton{background:transparent!important;border:1px solid var(--line)!important;color:var(--text)!important;box-shadow:none!important}
+.mobileDrawer{background:var(--panel)!important;border-color:var(--line)!important}
+.mobileDrawerHead,.mobileDrawerBottom{border-color:var(--line)!important}
+.mobileDrawerNav a{color:var(--muted)!important}
+.mobileDrawerNav a.active,.mobileDrawerNav a[aria-current="page"]{background:var(--accent-soft)!important;color:var(--gold2)!important}
+
+.clientBottomNav{background:var(--nav)!important;border-color:var(--line)!important;box-shadow:0 12px 32px rgba(8,20,18,.16)!important}
+.clientBottomNav a{color:var(--muted)!important}
+.clientBottomNav a.active{background:var(--accent-soft)!important;color:var(--gold2)!important}
+
+#teddy-theme-toggle{position:fixed;top:max(12px,env(safe-area-inset-top));right:16px;z-index:9999;width:42px;height:42px;border:1px solid var(--line);border-radius:13px;background:var(--panel);color:var(--gold2);display:grid;place-items:center;font-size:21px;line-height:1;cursor:pointer;box-shadow:none;transition:transform .14s ease,background .16s ease,border-color .16s ease}
 #teddy-theme-toggle:hover{transform:translateY(-1px)}
 #teddy-theme-toggle:active{transform:scale(.96)}
 
 @media(max-width:900px){
-  .content{padding:24px 15px calc(104px + env(safe-area-inset-bottom))!important}
-  .mobileTopbar{min-height:72px!important;padding:10px 16px!important}
-  .mobileBrand{margin:auto!important}
-  .mobileBrand span{width:40px!important;height:40px!important;border-radius:12px!important}
-  .mobileBrand strong{font-size:18px!important}
-  #teddy-theme-toggle{top:max(14px,env(safe-area-inset-top));right:16px;width:42px;height:42px;border-radius:14px;font-size:22px}
-  .mobileMenuButton{width:42px!important;height:42px!important;border-radius:14px!important;background:var(--surface-raised)!important;border-color:var(--line2)!important;box-shadow:0 8px 24px rgba(0,0,0,.08)!important}
-  .clientWelcome{margin:6px 0 22px!important}
-  .clientWelcome h1{font-size:30px!important;line-height:1.08!important}
-  .clientWelcome>div>span{font-size:14px!important;margin-top:8px!important}
-  .clientDashboardHero{display:grid!important;grid-template-columns:1fr!important;gap:22px!important;padding:22px!important;border-radius:22px!important}
-  .clientCalorieRing{width:152px!important;height:152px!important;margin:auto!important}
-  .clientHeroCopy{text-align:center!important}
-  .clientHeroActions{justify-content:center!important}
-  .clientHeroMacro{margin-top:2px!important}
-  .clientQuickStats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
-  .clientQuickStat{min-height:74px!important;padding:14px!important;background:var(--surface)!important;border-color:var(--line)!important;border-radius:16px!important}
-  .card{padding:20px!important;border-radius:20px!important}
-  .todayNutritionCard{grid-template-columns:1fr!important;padding:20px!important;gap:20px!important}
-  .weekChart{gap:7px!important}
-  .weekCol{min-width:0!important}
-  .weekBarTrack{border-radius:9px!important;overflow:hidden!important}
-  .clientCoachCard,.clientImportantCard,.clientWeeklyCard{margin-top:14px!important}
-  .clientBottomNav{left:12px!important;right:12px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;min-height:68px!important;padding:7px 6px!important;border:1px solid color-mix(in srgb,var(--line2) 75%,transparent)!important;border-radius:22px!important;background:color-mix(in srgb,var(--nav-bg) 94%,transparent)!important;box-shadow:0 18px 44px rgba(0,0,0,.22)!important;backdrop-filter:blur(24px) saturate(150%)!important}
-  .clientBottomNav a{gap:4px!important;border-radius:16px!important;color:var(--muted)!important;font-size:11.5px!important;font-weight:720!important;transition:.18s ease!important}
-  .clientBottomNav a svg{width:21px!important;height:21px!important}
-  .clientBottomNav a.active{background:color-mix(in srgb,var(--gold) 13%,var(--surface))!important;color:var(--gold)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 18%,transparent)!important}
-  .clientBottomNav a:active{transform:scale(.95)}
+  .calmUi.app{padding-top:68px!important;background:var(--bg)!important}
+  .calmUi .content{padding:20px 16px 96px!important;max-width:760px!important}
+  .mobileTopbar{height:68px!important;padding:0 16px!important}
+  .mobileMenuButton{width:42px!important;height:42px!important;border-radius:13px!important}
+  .mobileBrand span{width:36px!important;height:36px!important;border-radius:12px!important}
+  #teddy-theme-toggle{top:max(13px,env(safe-area-inset-top));right:16px;width:42px;height:42px;border-radius:13px}
+  .clientBottomNav{left:14px!important;right:14px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;min-height:64px!important;padding:6px!important;border-radius:20px!important}
+  .clientBottomNav a{font-size:12px!important;border-radius:14px!important;gap:4px!important}
+  .clientBottomNav a svg{width:20px!important;height:20px!important}
+  .card,.clientDashboardHero,.clientTodayHero,.todayNutritionCard,.planCard,.premiumPlanHero,.clientCoachPanel,.clientPremiumCard{border-radius:18px!important}
+  .clientWelcome{margin-bottom:18px!important}
+  .clientWelcome h1{font-size:28px!important;line-height:1.08!important;letter-spacing:-.7px!important}
+  .clientWelcome p{font-size:12px!important;letter-spacing:.1em!important}
 }
-
-@media(max-width:430px){
-  .content{padding-left:14px!important;padding-right:14px!important}
+@media(max-width:520px){
+  .calmUi .content{padding-left:14px!important;padding-right:14px!important}
   .card{padding:18px!important}
   .clientBottomNav{left:10px!important;right:10px!important}
-  .clientBottomNav a{font-size:10.5px!important}
 }
 `;
 
