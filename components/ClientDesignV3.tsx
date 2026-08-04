@@ -1,26 +1,39 @@
 export default function ClientDesignV3() {
   return (
     <style>{`
-      /* TeddY client design v3.5 */
+      /* TeddY client design v3.6 — exact component theming */
       .clientApp{--client-radius-lg:20px;--client-radius-md:14px}
       :root[data-theme="light"] .clientApp{
         --surface:#ffffff;--surface-soft:#f2f6f3;--panel:#f7faf8;
-        --line:#cedbd4;--line2:#b9cbc2;--text:#173a32;
-        --muted:#465f58;--muted2:#5c716a;--accent-soft:#f6eedb;
-        --chart-empty:#e4ebe7;--chart-line:#a88a35;
+        --line:#c8d6cf;--line2:#b4c7bd;--text:#173a32;
+        --body:#294b43;--muted:#48645c;--muted2:#60766f;
+        --accent-soft:#f6eedb;--chart-empty:#e5ece8;--chart-line:#9b7b22;
         --shadow:0 10px 26px rgba(28,55,47,.08)
       }
       :root[data-theme="dark"] .clientApp{
         --surface:#111a18;--surface-soft:#16211f;--panel:#0d1614;
         --line:#293936;--line2:#3a4c48;--text:#f0f4f2;
-        --muted:#a6b5b0;--muted2:#8fa19b;--accent-soft:#242117;
-        --chart-empty:#202a28;--chart-line:#d6b34f;
+        --body:#d8e1de;--muted:#a6b5b0;--muted2:#8fa19b;
+        --accent-soft:#242117;--chart-empty:#202a28;--chart-line:#d6b34f;
         --shadow:0 12px 30px rgba(0,0,0,.24)
       }
 
       .clientApp .content{display:block;max-width:980px!important}
-      .clientApp .pageHead h1,.clientApp .clientWelcome h1{color:var(--text)!important;font-weight:790;letter-spacing:-1px;line-height:1.07}
-      .clientApp .pageHead span,.clientApp .clientWelcome span,.clientApp .muted{color:var(--muted)!important}
+      .clientApp h1,.clientApp h2,.clientApp h3,.clientApp b,.clientApp strong{
+        color:var(--text)!important
+      }
+      .clientApp p,.clientApp label,.clientApp li,.clientApp .bodyText{
+        color:var(--body)!important;opacity:1!important
+      }
+      .clientApp small,.clientApp .muted,.clientApp .pageHead span,
+      .clientApp .clientWelcome span,.clientApp .profileOverviewItem span,
+      .clientApp .profileHub small,.clientApp .sessionTitle small,
+      .clientApp .sessionTotal small,.clientApp .nutritionDayHead span{
+        color:var(--muted)!important;opacity:1!important
+      }
+      .clientApp .pageHead h1,.clientApp .clientWelcome h1{
+        color:var(--text)!important;font-weight:790;letter-spacing:-1px;line-height:1.07
+      }
 
       .clientApp .card,.clientApp .primaryFocus,.clientApp .todayNutritionCard,
       .clientApp .nextMealCard,.clientApp .coachHome,.clientApp .recentMealsCompact,
@@ -31,22 +44,63 @@ export default function ClientDesignV3() {
       .clientApp .coachSituations>a,.clientApp .visualMealSession,.clientApp .visualMealItem,
       .clientApp .smartMealCard,.clientApp .clientMealList,.clientApp .clientTimelineCard,
       .clientApp .clientCoachSummary,.clientApp .clientCoachPanel,.clientApp .periodSwitch,
-      .clientApp .planCol,.clientApp .planGroup,.clientApp .clientMealDay,.clientApp .mealDayCard{
+      .clientApp .planCol,.clientApp .planGroup,.clientApp .nutritionDay,
+      .clientApp .clientSessionCard,.clientApp .sessionFoodRow{
         background:var(--surface)!important;border:1px solid var(--line)!important;
         color:var(--text)!important;box-shadow:var(--shadow)!important
       }
+
       .clientApp .visualMealItem,.clientApp .mealSessionCard,.clientApp .mealRow,
-      .clientApp .coachHomeGrid article,.clientApp .clientMealDay article{
+      .clientApp .coachHomeGrid article,.clientApp .sessionItems,
+      .clientApp .clientSessionCard>summary,.clientApp .nutritionDayHead{
         background:var(--surface-soft)!important;border-color:var(--line)!important
       }
-      .clientApp h1,.clientApp h2,.clientApp h3,.clientApp b,.clientApp strong{color:var(--text)!important}
-      .clientApp p,.clientApp small,.clientApp label,.clientApp .planRowName small,
-      .clientApp .lvl span,.clientApp .profileOverviewItem span,.clientApp .profileHub small,
-      .clientApp .coachHomeGrid p,.clientApp .coachDecision p,.clientApp .clientCoachPanel p,
-      .clientApp .clientCoachSummary p{color:var(--muted)!important;opacity:1!important}
+
+      /* Exact light-theme cleanup for legacy dark blocks */
+      :root[data-theme="light"] .clientApp .nutritionDay,
+      :root[data-theme="light"] .clientApp .clientSessionCard,
+      :root[data-theme="light"] .clientApp .clientSessionCard>summary,
+      :root[data-theme="light"] .clientApp .sessionItems,
+      :root[data-theme="light"] .clientApp .sessionFoodRow,
+      :root[data-theme="light"] .clientApp .visualMealHistory,
+      :root[data-theme="light"] .clientApp .coachHomeGrid article,
+      :root[data-theme="light"] .clientApp .clientCoachPanel,
+      :root[data-theme="light"] .clientApp .clientCoachSummary{
+        background:var(--surface)!important;color:var(--text)!important
+      }
+      :root[data-theme="light"] .clientApp .nutritionDay{
+        border-color:var(--line)!important;overflow:hidden!important
+      }
+      :root[data-theme="light"] .clientApp .nutritionDayHead{
+        background:#f7faf8!important;border-bottom:1px solid var(--line)!important
+      }
+      :root[data-theme="light"] .clientApp .clientSessionCard{
+        box-shadow:none!important;border-color:var(--line)!important
+      }
+      :root[data-theme="light"] .clientApp .clientSessionCard>summary{
+        background:#ffffff!important
+      }
+      :root[data-theme="light"] .clientApp .sessionFoodRow{
+        background:#f7faf8!important;border-color:var(--line)!important;box-shadow:none!important
+      }
+      :root[data-theme="light"] .clientApp .sessionTitle b,
+      :root[data-theme="light"] .clientApp .sessionTotal b,
+      :root[data-theme="light"] .clientApp .nutritionDayHead h2,
+      :root[data-theme="light"] .clientApp .nutritionDayTotal b{
+        color:var(--text)!important
+      }
+      :root[data-theme="light"] .clientApp .sessionTitle small,
+      :root[data-theme="light"] .clientApp .sessionFoodRow small,
+      :root[data-theme="light"] .clientApp .nutritionDayHead span,
+      :root[data-theme="light"] .clientApp .nutritionDayTotal small{
+        color:var(--muted)!important
+      }
+
       :root[data-theme="light"] .clientApp input,
       :root[data-theme="light"] .clientApp textarea,
-      :root[data-theme="light"] .clientApp select{color:#244941!important;background:#f8fbf9!important;border-color:var(--line)!important}
+      :root[data-theme="light"] .clientApp select{
+        color:#244941!important;background:#f8fbf9!important;border-color:var(--line)!important
+      }
 
       /* Subscription */
       .clientApp .planCompare{background:transparent!important;border:0!important;box-shadow:none!important;display:grid!important;gap:14px!important}
@@ -105,7 +159,7 @@ export default function ClientDesignV3() {
       .clientApp .weightTargetLine{stroke:color-mix(in srgb,#d4b45d 58%,transparent)!important;stroke-width:1!important;stroke-dasharray:5 5!important}
       .clientApp .weightTargetText{fill:var(--muted)!important;font-size:9px!important}
 
-      /* Calorie ring + weekly chart */
+      /* Home calorie ring and week chart */
       .clientApp .calorieRing,.clientApp .clientCalorieRing{
         filter:none!important;transform:scale(.84)!important;
         background:conic-gradient(#d6b34f var(--progress,0%),var(--chart-empty) 0)!important;
@@ -114,10 +168,14 @@ export default function ClientDesignV3() {
       .clientApp .calorieRing::after,.clientApp .clientCalorieRing::after{background:var(--surface)!important}
       .clientApp .weekCaloriesChart,.clientApp .weeklyCalories{overflow:hidden!important}
       .clientApp .weekCaloriesChart>* ,.clientApp .weeklyCalories>*{min-width:0!important}
-      :root[data-theme="light"] .clientApp .weekCaloriesChart [class*="empty"],
-      :root[data-theme="light"] .clientApp .weeklyCalories [class*="empty"]{background:var(--chart-empty)!important}
       :root[data-theme="light"] .clientApp .weekCaloriesChart [class*="bar"],
-      :root[data-theme="light"] .clientApp .weeklyCalories [class*="bar"]{border-color:var(--line)!important}
+      :root[data-theme="light"] .clientApp .weeklyCalories [class*="bar"]{
+        background:var(--chart-empty)!important;border-color:var(--line)!important
+      }
+      :root[data-theme="light"] .clientApp .weekCaloriesChart [class*="fill"],
+      :root[data-theme="light"] .clientApp .weeklyCalories [class*="fill"]{
+        background:linear-gradient(180deg,#e2c465,#b79543)!important
+      }
 
       /* Navigation */
       .clientApp .mobileTopbar{box-shadow:none!important}
