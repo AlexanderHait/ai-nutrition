@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { sessionCookie } from "@/lib/auth";
 
 const LOGIN_RE = /^[a-z0-9][a-z0-9._-]{2,31}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,8 +48,10 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/login?mode=register&error=email_taken", request.url), 303);
   }
 
-  return NextResponse.redirect(
+  const response = NextResponse.redirect(
     new URL(data.session ? "/client/setup" : `/login?registered=1&email=${encodeURIComponent(email)}`, request.url),
     303,
   );
+  if (data.session) response.cookies.delete(sessionCookie);
+  return response;
 }

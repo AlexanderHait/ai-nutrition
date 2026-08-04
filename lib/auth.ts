@@ -154,7 +154,9 @@ export async function requireAdmin() {
 
 export async function requireClient() {
   const value = await session();
-  if (value?.role === "admin" && value.chatId) redirect("/admin");
+  // Сессия администратора не должна молча возвращать на форму входа:
+  // человек жмёт «Войти», попадает обратно на вход и не понимает, почему.
+  if (value?.role === "admin") redirect("/admin");
   if (value?.role !== "client" || !value.accountId) redirect("/login");
   return value;
 }

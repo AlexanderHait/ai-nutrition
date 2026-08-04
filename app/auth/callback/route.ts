@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { sessionCookie } from "@/lib/auth";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -8,7 +9,11 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await getSupabaseServer();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(next, request.url));
+    if (!error) {
+      const response = NextResponse.redirect(new URL(next, request.url));
+      response.cookies.delete(sessionCookie);
+      return response;
+    }
   }
   return NextResponse.redirect(new URL("/login?error=auth_callback", request.url));
 }

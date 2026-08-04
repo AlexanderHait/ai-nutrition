@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { sessionCookie } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -39,5 +40,9 @@ export async function POST(request: Request) {
       : "/login?error=credentials";
     return NextResponse.redirect(new URL(target, request.url), 303);
   }
-  return NextResponse.redirect(new URL("/client", request.url), 303);
+  // Если в этом браузере осталась сессия администратора, она перебивает
+  // клиентскую в session() и выбрасывает обратно на вход. Гасим её.
+  const response = NextResponse.redirect(new URL("/client", request.url), 303);
+  response.cookies.delete(sessionCookie);
+  return response;
 }
