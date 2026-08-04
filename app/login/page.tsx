@@ -41,7 +41,7 @@ export default async function Login({
   return (
     <main className="login loginV2">
       <style>{`
-        .loginV2{--login-bg:#081311;--login-panel:#10201c;--login-panel-soft:#142721;--login-border:#294039;--login-text:#f5f7f4;--login-muted:#b9c7c2;--login-muted-strong:#d6dfdc;--login-gold:#e3c568;min-height:100svh;padding:28px 16px 48px;background:radial-gradient(700px 360px at 50% -120px,rgba(227,197,104,.15),transparent 62%),linear-gradient(180deg,#0a1714,#07110f);color:var(--login-text);display:grid;place-items:center}
+        .loginV2{--bg:#081311;--surface:#10201c;--surface-soft:#142721;--panel:#10201c;--line:#294039;--line2:#365047;--text:#f5f7f4;--muted:#b9c7c2;--muted2:#98a8a3;--gold:#e3c568;--gold2:#e3c568;--accent-soft:#1b2a24;--login-bg:#081311;--login-panel:#10201c;--login-panel-soft:#142721;--login-border:#294039;--login-text:#f5f7f4;--login-muted:#b9c7c2;--login-muted-strong:#d6dfdc;--login-gold:#e3c568;min-height:100svh;padding:28px 16px 48px;background:radial-gradient(700px 360px at 50% -120px,rgba(227,197,104,.15),transparent 62%),linear-gradient(180deg,#0a1714,#07110f);color:var(--login-text);display:grid;place-items:center}
         .loginV2 .loginCard{width:min(520px,100%);padding:30px;border:1px solid var(--login-border);border-radius:24px;background:linear-gradient(180deg,rgba(18,36,31,.98),rgba(11,25,22,.99));box-shadow:0 28px 80px rgba(0,0,0,.34)}
         .loginV2 .logoMark{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#efd47c,#cfa647);color:#13201c;font-weight:900;font-size:17px}
         .loginV2 h1{margin:0;text-align:center;font-size:36px;letter-spacing:-1px;color:var(--login-text)}

@@ -95,8 +95,8 @@ const themeCss = `
   --line:#dde4df;
   --line2:#cbd6cf;
   --text:#19342f;
-  --muted:#6d7d78;
-  --muted2:#8e9b97;
+  --muted:#5c6d68;
+  --muted2:#78877f;
   --gold:#a97e21;
   --gold2:#805d13;
   --green:#2f8f70;
