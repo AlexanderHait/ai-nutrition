@@ -16,6 +16,12 @@ const errors: Record<string, string> = {
   telegram_verify: "Не удалось проверить ответ Telegram. Попробуй ещё раз.",
   telegram_callback: "Telegram вернул неполный ответ. Попробуй ещё раз.",
   telegram: "Не удалось войти через Telegram. Попробуй ещё раз.",
+  telegram_code_identifier: "Укажи email или логин аккаунта TeddY.",
+  telegram_code_invalid: "Код неверный. Проверь сообщение от бота и попробуй ещё раз.",
+  telegram_code_expired: "Код истёк или использован. Запроси новый.",
+  telegram_code_rate: "Слишком много запросов. Подожди 15 минут и попробуй снова.",
+  telegram_code_delivery: "Бот не смог отправить код. Открой TeddY в Telegram, нажми /start и повтори.",
+  telegram_code_unavailable: "Вход по коду временно недоступен. Попробуй вход по паролю.",
   admin: "Неверный пароль администратора.",
 };
 
@@ -28,6 +34,8 @@ export default async function Login({
   const mode = typeof query.mode === "string" ? query.mode : "login";
   const error = typeof query.error === "string" ? query.error : "";
   const email = typeof query.email === "string" ? query.email : "";
+  const identifier = typeof query.identifier === "string" ? query.identifier : "";
+  const telegramCodeSent = query.telegram_code === "sent";
 
   return (
     <main className="login">
@@ -69,23 +77,68 @@ export default async function Login({
           </form>
         ) : (
           <>
+            <section className="loginBlock">
+              <h3>Вход кодом из Telegram</h3>
+              <p>Работает без VPN и без открытия Telegram OAuth в браузере.</p>
+
+              {telegramCodeSent ? (
+                <>
+                  <div className="successNotice">Код отправлен ботом TeddY. Он действует 10 минут.</div>
+                  <form action="/api/auth/telegram/code/verify" method="post" className="loginBlock">
+                    <input type="hidden" name="identifier" value={identifier} />
+                    <input
+                      name="code"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="[0-9]{6}"
+                      maxLength={6}
+                      placeholder="6-значный код"
+                      required
+                      autoFocus
+                    />
+                    <button className="primary">Войти в TeddY</button>
+                  </form>
+                  <form action="/api/auth/telegram/code/request" method="post">
+                    <input type="hidden" name="identifier" value={identifier} />
+                    <button className="secondaryBtn">Отправить новый код</button>
+                  </form>
+                </>
+              ) : (
+                <form action="/api/auth/telegram/code/request" method="post" className="loginBlock">
+                  <input
+                    name="identifier"
+                    type="text"
+                    autoComplete="username"
+                    defaultValue={identifier}
+                    placeholder="Email или логин"
+                    required
+                  />
+                  <button className="primary">Получить код в Telegram</button>
+                </form>
+              )}
+            </section>
+
+            <div className="divider">или</div>
+
             <form action="/api/auth/password/login" method="post" className="loginBlock">
               <h3>Вход по паролю</h3>
               <input name="identifier" type="text" autoComplete="username" placeholder="Email или логин" required />
               <input name="password" type="password" autoComplete="current-password" placeholder="Пароль" required />
-              <button className="primary">Войти</button>
+              <button className="secondaryBtn">Войти по паролю</button>
               <div className="loginInlineLinks">
                 <Link className="textLink" href="/login?mode=register">Регистрация</Link>
                 <Link className="textLink" href="/login?mode=reset">Забыли пароль?</Link>
               </div>
             </form>
 
-            <div className="divider">или</div>
-            <div className="loginBlock">
-              <h3>Вход через Telegram</h3>
-              <p>Для клиентов, которые уже пользуются ботом.</p>
-              <TelegramLogin />
-            </div>
+            <details className="adminLoginDetails">
+              <summary>Другой способ входа через Telegram</summary>
+              <div className="loginBlock">
+                <p>Открывает официальный Telegram OAuth. В некоторых сетях может потребоваться VPN.</p>
+                <TelegramLogin />
+              </div>
+            </details>
           </>
         )}
 
