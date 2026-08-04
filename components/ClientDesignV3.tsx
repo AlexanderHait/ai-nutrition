@@ -1,18 +1,20 @@
 export default function ClientDesignV3() {
   return (
     <style>{`
-      /* TeddY client design v3.3 — final unified client layer */
+      /* TeddY client design v3.4 */
       .clientApp{--client-radius-lg:20px;--client-radius-md:14px}
       :root[data-theme="light"] .clientApp{
-        --surface:#fff;--surface-soft:#f3f6f3;--panel:#f8faf8;
-        --line:#d5dfd9;--line2:#c4d1ca;--text:#183a33;
-        --muted:#657a73;--muted2:#7b8c86;--accent-soft:#f6eedb;
+        --surface:#ffffff;--surface-soft:#f2f6f3;--panel:#f7faf8;
+        --line:#cedbd4;--line2:#b9cbc2;--text:#173a32;
+        --muted:#526a63;--muted2:#657a73;--accent-soft:#f6eedb;
+        --chart-empty:#e4ebe7;--chart-line:#a88a35;
         --shadow:0 10px 26px rgba(28,55,47,.08)
       }
       :root[data-theme="dark"] .clientApp{
         --surface:#111a18;--surface-soft:#16211f;--panel:#0d1614;
         --line:#293936;--line2:#3a4c48;--text:#f0f4f2;
-        --muted:#9baca6;--muted2:#82948e;--accent-soft:#242117;
+        --muted:#a6b5b0;--muted2:#8fa19b;--accent-soft:#242117;
+        --chart-empty:#202a28;--chart-line:#d6b34f;
         --shadow:0 12px 30px rgba(0,0,0,.24)
       }
 
@@ -29,20 +31,24 @@ export default function ClientDesignV3() {
       .clientApp .coachSituations>a,.clientApp .visualMealSession,.clientApp .visualMealItem,
       .clientApp .smartMealCard,.clientApp .clientMealList,.clientApp .clientTimelineCard,
       .clientApp .clientCoachSummary,.clientApp .clientCoachPanel,.clientApp .periodSwitch,
-      .clientApp .planCol,.clientApp .planGroup{
+      .clientApp .planCol,.clientApp .planGroup,.clientApp .clientMealDay,.clientApp .mealDayCard{
         background:var(--surface)!important;border:1px solid var(--line)!important;
         color:var(--text)!important;box-shadow:var(--shadow)!important
       }
       .clientApp .visualMealItem,.clientApp .mealSessionCard,.clientApp .mealRow,
-      .clientApp .coachHomeGrid article{background:var(--surface-soft)!important;border-color:var(--line)!important}
+      .clientApp .coachHomeGrid article,.clientApp .clientMealDay article{
+        background:var(--surface-soft)!important;border-color:var(--line)!important
+      }
       .clientApp h1,.clientApp h2,.clientApp h3,.clientApp b,.clientApp strong{color:var(--text)!important}
       .clientApp p,.clientApp small,.clientApp label,.clientApp .planRowName small,
-      .clientApp .lvl span,.clientApp .profileOverviewItem span,.clientApp .profileHub small{color:var(--muted)!important}
-      :root[data-theme="light"] .clientApp p,
-      :root[data-theme="light"] .clientApp small,
-      :root[data-theme="light"] .clientApp .muted{opacity:1!important}
+      .clientApp .lvl span,.clientApp .profileOverviewItem span,.clientApp .profileHub small,
+      .clientApp .coachHomeGrid p,.clientApp .coachDecision p,.clientApp .clientCoachPanel p,
+      .clientApp .clientCoachSummary p{color:var(--muted)!important;opacity:1!important}
+      :root[data-theme="light"] .clientApp input,
+      :root[data-theme="light"] .clientApp textarea,
+      :root[data-theme="light"] .clientApp select{color:#244941!important;background:#f8fbf9!important;border-color:var(--line)!important}
 
-      /* Subscription: restore continuous readable level bars */
+      /* Subscription */
       .clientApp .planCompare{background:transparent!important;border:0!important;box-shadow:none!important;display:grid!important;gap:14px!important}
       .clientApp .planCompareHead{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;background:transparent!important}
       .clientApp .planCol{border-radius:18px!important;padding:22px!important;min-width:0}
@@ -61,24 +67,35 @@ export default function ClientDesignV3() {
       .clientApp .lvl i:has(em:nth-child(2).on)::after{width:67%}
       .clientApp .lvl i:has(em:nth-child(3).on)::after{width:100%}
 
-      /* Charts: mobile-first, no horizontal scroll */
+      /* Progress charts */
       .clientApp .progressCharts{grid-template-columns:1fr!important;gap:14px!important}
       .clientApp .progressChartCard,.clientApp .weightProgressCard{overflow:hidden!important}
-      .clientApp .periodBarChart{display:flex!important;width:100%!important;min-width:0!important;height:176px!important;gap:3px!important;overflow:hidden!important}
-      .clientApp .periodBar{flex:1 1 0!important;min-width:0!important;height:164px!important;grid-template-rows:16px 1fr 17px!important}
-      .clientApp .periodBar>div{height:126px!important}
+      .clientApp .weightProgressCard .sectionTitleRow>svg{width:18px!important;height:18px!important;max-width:18px!important;max-height:18px!important;opacity:.65}
+      .clientApp .weightChart svg,.clientApp .weightTrendChart svg{width:100%!important;max-width:100%!important;height:auto!important;max-height:190px!important}
+      .clientApp .weightHistory{margin-top:8px!important}
+      .clientApp .periodBarChart{display:flex!important;width:100%!important;min-width:0!important;height:166px!important;gap:3px!important;overflow:hidden!important}
+      .clientApp .periodBar{flex:1 1 0!important;min-width:0!important;height:154px!important;grid-template-rows:14px 1fr 17px!important}
+      .clientApp .periodBar>div{height:118px!important;background:var(--chart-empty)!important;border-radius:8px!important;overflow:hidden!important}
       .clientApp .periodBar>div i{width:64%!important;max-width:16px!important;border-radius:6px 6px 3px 3px!important}
+      .clientApp .periodBar>div em{border-color:var(--chart-line)!important;opacity:.75!important}
       .clientApp .periodBar>span{display:none!important}
-      .clientApp .periodBar>small{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important}
-      .clientApp .weightProgressCard svg,.clientApp .weightChart svg,.clientApp .weightTrendChart svg{width:100%!important;max-width:100%!important;height:auto!important;max-height:210px!important}
-      .clientApp .weightHistory{margin-top:10px!important}
+      .clientApp .periodBar>small{color:var(--muted)!important;font-size:9px!important;white-space:nowrap!important;overflow:hidden!important}
       .clientApp .macroSummaryGrid{grid-template-columns:1fr!important}
       .clientApp .macroSummaryCard{padding:16px!important;border-radius:14px!important}
 
-      /* Calorie ring and weekly chart */
-      .clientApp .calorieRing,.clientApp .clientCalorieRing{filter:none!important;transform:scale(.9)}
+      /* Calorie ring + weekly chart */
+      .clientApp .calorieRing,.clientApp .clientCalorieRing{
+        filter:none!important;transform:scale(.84)!important;
+        background:conic-gradient(#d6b34f var(--progress,0%),var(--chart-empty) 0)!important;
+        box-shadow:none!important
+      }
+      .clientApp .calorieRing::after,.clientApp .clientCalorieRing::after{background:var(--surface)!important}
       .clientApp .weekCaloriesChart,.clientApp .weeklyCalories{overflow:hidden!important}
       .clientApp .weekCaloriesChart>* ,.clientApp .weeklyCalories>*{min-width:0!important}
+      :root[data-theme="light"] .clientApp .weekCaloriesChart [class*="empty"],
+      :root[data-theme="light"] .clientApp .weeklyCalories [class*="empty"]{background:var(--chart-empty)!important}
+      :root[data-theme="light"] .clientApp .weekCaloriesChart [class*="bar"],
+      :root[data-theme="light"] .clientApp .weeklyCalories [class*="bar"]{border-color:var(--line)!important}
 
       /* Navigation */
       .clientApp .mobileTopbar{box-shadow:none!important}
@@ -92,20 +109,20 @@ export default function ClientDesignV3() {
         .clientApp .planCol,.clientApp .planGroup,.clientApp .planStatus{padding:18px!important;border-radius:18px!important}
         .clientApp .profileOverview{grid-template-columns:1fr 1fr!important;gap:8px!important}
         .clientApp .progressKeyStats{grid-template-columns:1fr!important}
-        .clientApp .periodBarChart{height:154px!important;gap:2px!important}
-        .clientApp .periodBar{height:144px!important;grid-template-rows:12px 1fr 16px!important}
-        .clientApp .periodBar>div{height:112px!important}
+        .clientApp .periodBarChart{height:144px!important;gap:2px!important}
+        .clientApp .periodBar{height:134px!important;grid-template-rows:10px 1fr 16px!important}
+        .clientApp .periodBar>div{height:104px!important}
         .clientApp .periodBar>div i{max-width:13px!important}
-        .clientApp .weightProgressCard svg,.clientApp .weightChart svg,.clientApp .weightTrendChart svg{max-height:180px!important}
+        .clientApp .weightChart svg,.clientApp .weightTrendChart svg{max-height:165px!important}
         .clientApp .clientBottomNav{left:12px!important;right:12px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;min-height:58px!important;border-radius:19px!important;padding:5px!important}
         .clientApp .clientBottomNav a{font-size:11.5px!important;border-radius:14px!important}
       }
       @media(max-width:430px){
         .clientApp .content{padding-left:13px!important;padding-right:13px!important}
         .clientApp .pageHead h1,.clientApp .clientWelcome h1{font-size:27px!important}
-        .clientApp .periodBarChart{height:142px!important}
-        .clientApp .periodBar{height:132px!important}
-        .clientApp .periodBar>div{height:101px!important}
+        .clientApp .periodBarChart{height:132px!important}
+        .clientApp .periodBar{height:122px!important}
+        .clientApp .periodBar>div{height:93px!important}
         .clientApp .periodBar>small{font-size:8px!important}
       }
     `}</style>
