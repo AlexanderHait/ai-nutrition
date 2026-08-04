@@ -28,6 +28,13 @@ type DayTotal = {
   active: boolean;
 };
 
+type ChartBucket = {
+  start: string;
+  end: string;
+  value: number;
+  active: number;
+};
+
 function validPeriod(value: unknown): Period {
   return value === "7" ? 7 : value === "90" ? 90 : 30;
 }
@@ -64,8 +71,8 @@ function buildDays(meals: Meal[], start: Date, count: number): DayTotal[] {
   });
 }
 
-function bucketDays(days: DayTotal[], size: number) {
-  const result: Array<{ start: string; end: string; value: number; active: number }> = [];
+function bucketDays(days: DayTotal[], size: number): ChartBucket[] {
+  const result: ChartBucket[] = [];
   for (let index = 0; index < days.length; index += size) {
     const chunk = days.slice(index, index + size);
     const active = chunk.filter((day) => day.active);
@@ -79,11 +86,16 @@ function bucketDays(days: DayTotal[], size: number) {
   return result;
 }
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ period?: string }>;
-}) {
+function chartLabel(item: ChartBucket, period: Period) {
+  const start = new Date(item.start + "T12:00:00");
+  const end = new Date(item.end + "T12:00:00");
+  if (period === 7) return start.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "");
+  const startLabel = start.toLocaleDateString("ru-RU", { day: "numeric", month: "short" }).replace(".", "");
+  const endLabel = end.toLocaleDateString("ru-RU", { day: "numeric", month: "short" }).replace(".", "");
+  return `${startLabel}–${endLabel}`;
+}
+
+export default async function Page({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const session = await requireClient();
   const query = await searchParams;
   const period = validPeriod(query.period);
@@ -157,8 +169,8 @@ export default async function Page({
 
   const kcalGap = kcalTarget > 0 && avgKcal > 0 ? Math.round(avgKcal - kcalTarget) : null;
   const weightAgainstGoal = weightDelta != null && (
-    (goal === "Набор массы" && weightDelta < 0)
-    || (goal === "Снижение веса" && weightDelta > 0)
+    (goal === "Набор массы" && weightDelta < 0) ||
+    (goal === "Снижение веса" && weightDelta > 0)
   );
 
   const conclusion = !activeDays
@@ -188,7 +200,7 @@ export default async function Page({
         ? `Средняя калорийность выросла на ${fmt(calorieChange)} ккал.`
         : `Средняя калорийность снизилась на ${fmt(Math.abs(calorieChange))} ккал.`;
 
-  const bucketSize = period === 90 ? 7 : 1;
+  const bucketSize = period === 7 ? 1 : period === 30 ? 5 : 15;
   const chart = bucketDays(current, bucketSize);
   const maxChart = Math.max(kcalTarget, 1, ...chart.map((item) => item.value));
 
@@ -250,28 +262,30 @@ export default async function Page({
       <div className="progressCharts top">
         <section className="card progressChartCard">
           <div className="sectionTitleRow">
-            <div><h2>Калории</h2><span className="muted">{period === 90 ? "Среднее по неделям" : "Каждый заполненный день"}</span></div>
+            <div>
+              <h2>Калории</h2>
+              <span className="muted">{period === 7 ? "По дням" : period === 30 ? "Среднее за каждые 5 дней" : "Среднее за каждые 15 дней"}</span>
+            </div>
             <b className="chartAverage">Ø {avgKcal ? fmt(avgKcal) : "—"}</b>
           </div>
-          <div className={`periodBarChart period${period}`}>
+          <div className="calorieMobileChart" role="img" aria-label={`Калории за ${period} дней`}>
             {chart.map((item) => {
               const deviation = kcalTarget > 0 && item.value > 0 ? Math.abs(item.value - kcalTarget) / kcalTarget : null;
               const state = deviation == null ? "empty" : deviation <= 0.12 ? "good" : deviation <= 0.25 ? "medium" : "far";
-              const label = period === 90
-                ? new Date(item.start + "T12:00:00").toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" })
-                : new Date(item.start + "T12:00:00").toLocaleDateString("ru-RU", { day: "2-digit" });
+              const height = item.value ? Math.max(12, Math.round(item.value / maxChart * 100)) : 5;
               return (
-                <Link href={`/client/nutrition?day=${item.start}#day-${item.start}`} className="periodBar" key={item.start}>
-                  <span>{item.value ? fmt(item.value) : ""}</span>
-                  <div>
-                    <i className={state} style={{ height: `${Math.max(item.value ? 5 : 2, item.value / maxChart * 100)}%` }} />
-                    {kcalTarget > 0 ? <em style={{ bottom: `${Math.min(100, kcalTarget / maxChart * 100)}%` }} /> : null}
-                  </div>
-                  <small>{label}</small>
+                <Link href={`/client/nutrition?day=${item.start}#day-${item.start}`} className="calorieMobileBar" key={item.start}>
+                  <span>{item.value ? fmt(item.value) : "—"}</span>
+                  <i aria-hidden>
+                    <em className={state} style={{ height: `${height}%` }} />
+                    {kcalTarget > 0 ? <b style={{ bottom: `${Math.min(100, kcalTarget / maxChart * 100)}%` }} /> : null}
+                  </i>
+                  <small>{chartLabel(item, period)}</small>
                 </Link>
               );
             })}
           </div>
+          {kcalTarget > 0 ? <div className="calorieTargetLegend"><i /> Цель: {fmt(kcalTarget)} ккал</div> : null}
         </section>
 
         <section className="card weightProgressCard">
@@ -279,7 +293,7 @@ export default async function Page({
           {latestWeight ? (
             <>
               <div className="weightBig"><b>{fmt(latestWeight.weight_kg, 1)}</b><span>кг</span></div>
-              <WeightChart weights={allWeights.slice(0, 24)} target={targetWeight} />
+              <WeightChart weights={allWeights.slice(0, 12)} target={targetWeight} />
               <div className="weightHistory modern">
                 {allWeights.slice(0, 5).map((weight: any, index: number) => (
                   <div className="row" key={weight.id}>
@@ -291,7 +305,7 @@ export default async function Page({
               </div>
             </>
           ) : (
-            <div className="emptyGuidance"><Scale /><b>Добавь первое измерение</b><span>После двух измерений появится линия, после нескольких — направление тренда.</span></div>
+            <div className="emptyGuidance"><Scale size={20} /><b>Добавь первое измерение</b><span>После двух измерений появится линия, после нескольких — направление тренда.</span></div>
           )}
         </section>
       </div>
@@ -358,23 +372,23 @@ function MacroCard({ label, actual, target, unit }: { label: string; actual: num
 }
 
 function WeightChart({ weights, target }: { weights: any[]; target: number }) {
-  if (weights.length < 2) return <div className="muted" style={{ fontSize: 12, marginBottom: 14 }}>Добавь ещё одно измерение — появится линия тренда.</div>;
+  if (weights.length < 2) return <div className="muted" style={{ fontSize: 14, marginBottom: 14 }}>Добавь ещё одно измерение — появится линия тренда.</div>;
   const points = [...weights].reverse();
   const values = points.map((point) => Number(point.weight_kg));
   if (target > 0) values.push(target);
   const min = Math.min(...values) - 0.3;
   const max = Math.max(...values) + 0.3;
   const range = Math.max(0.5, max - min);
-  const x = (index: number) => 8 + index / Math.max(1, points.length - 1) * 284;
-  const y = (value: number) => 82 - (value - min) / range * 68;
+  const x = (index: number) => 14 + index / Math.max(1, points.length - 1) * 272;
+  const y = (value: number) => 78 - (value - min) / range * 58;
   const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${x(index).toFixed(1)} ${y(Number(point.weight_kg)).toFixed(1)}`).join(" ");
   const targetY = target > 0 ? y(target) : null;
   return (
-    <div style={{ margin: "6px 0 16px" }}>
-      <svg viewBox="0 0 300 92" role="img" aria-label="График изменения веса" style={{ display: "block", width: "100%", height: 120 }}>
-        {targetY != null ? <><line x1="6" x2="294" y1={targetY} y2={targetY} stroke="rgba(224,190,104,.38)" strokeDasharray="5 5" /><text x="292" y={Math.max(10, targetY - 4)} textAnchor="end" fill="#8e908f" fontSize="8">цель {fmt(target, 1)}</text></> : null}
-        <path d={path} fill="none" stroke="#d4b45d" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        {points.map((point, index) => <circle key={point.id} cx={x(index)} cy={y(Number(point.weight_kg))} r={index === points.length - 1 ? 4 : 3} fill={index === points.length - 1 ? "#f7f6f1" : "#d4b45d"} />)}
+    <div className="weightChartCompact">
+      <svg viewBox="0 0 300 96" role="img" aria-label="График изменения веса">
+        {targetY != null ? <><line className="weightTargetLine" x1="10" x2="290" y1={targetY} y2={targetY} /><text className="weightTargetText" x="286" y={Math.max(12, targetY - 5)} textAnchor="end">цель {fmt(target, 1)}</text></> : null}
+        <path className="weightTrendLine" d={path} />
+        {points.map((point, index) => <circle className={index === points.length - 1 ? "latest" : undefined} key={point.id} cx={x(index)} cy={y(Number(point.weight_kg))} r={index === points.length - 1 ? 4.5 : 3.2} />)}
       </svg>
     </div>
   );
