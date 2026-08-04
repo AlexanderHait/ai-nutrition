@@ -18,6 +18,7 @@ import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals, type Meal } from "@/lib/data";
 import FoodIcon from "@/components/FoodIcon";
 import SimplifiedSections from "@/components/SimplifiedSections";
+import { CalorieRing, chartsCss, MacroRows, WeekBars } from "@/components/Charts";
 import MichelinSections from "@/components/MichelinSections";
 
 export const dynamic = "force-dynamic";
@@ -80,6 +81,18 @@ export default async function Page() {
   const premium = access.premium;
 
   const allMeals = (fortnightResult.data || []) as Meal[];
+
+  // Последние 7 дней калорий — для столбчатого графика.
+  const weekSeries = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - index));
+    const day = dayKey(date);
+    const kcal = allMeals
+      .filter((meal) => mealDay(meal) === day)
+      .reduce((sum, meal) => sum + Number(meal.kcal || 0), 0);
+    return { day, kcal, label: date.toLocaleDateString("ru-RU", { weekday: "short" }) };
+  });
+  const weekLogged = weekSeries.filter((day) => day.kcal > 0).length;
   const dayTotals = Array.from({ length: 14 }, (_, index) => {
     const date = new Date();
     date.setDate(date.getDate() - (13 - index));
@@ -187,6 +200,7 @@ export default async function Page() {
 
   return (
     <>
+      <style>{chartsCss}</style>
       <SimplifiedSections />
       <MichelinSections />
 
@@ -209,16 +223,18 @@ export default async function Page() {
       </section>
 
       <section className="todayNutritionCard top">
-        <div className="todayNumbers">
-          <small>Съедено сегодня</small>
-          <b>{fmt(total.kcal)} <em>из {fmt(kcalTarget)} ккал</em></b>
-          <p>{remainingKcal >= 0 ? `Осталось около ${fmt(remainingKcal)} ккал` : `Выше цели на ${fmt(Math.abs(remainingKcal))} ккал`}</p>
-        </div>
-        <div className="todayMacros">
-          <Macro label="Белок" value={total.prot} target={proteinTarget} />
-          <Macro label="Жиры" value={total.fat} target={fatTarget} />
-          <Macro label="Углеводы" value={total.carb} target={carbTarget} />
-        </div>
+        <CalorieRing
+          eaten={total.kcal}
+          target={kcalTarget}
+          subtitle={sessions.length ? `${sessions.length} ${pluralMeals(sessions.length)} за сегодня` : "Сегодня записей пока нет"}
+        />
+        <MacroRows
+          rows={[
+            { key: "prot", label: "Белок", value: total.prot, target: proteinTarget },
+            { key: "fat", label: "Жиры", value: total.fat, target: fatTarget },
+            { key: "carb", label: "Углеводы", value: total.carb, target: carbTarget },
+          ]}
+        />
         <div className="todayActions">
           <Link className="primary" href="/client/nutrition">Посмотреть сегодняшний рацион</Link>
           <span>
@@ -226,6 +242,19 @@ export default async function Page() {
             <Link href="/client/progress">Посмотреть прогресс</Link>
           </span>
         </div>
+      </section>
+
+      <section className="card top">
+        <div className="sectionTitleRow">
+          <div>
+            <h2>Неделя в калориях</h2>
+            <span className="muted">
+              {weekLogged ? `Записей в ${weekLogged} из 7 дней` : "За неделю записей пока нет"}
+              {kcalTarget > 0 ? " · пунктир — твоя цель" : ""}
+            </span>
+          </div>
+        </div>
+        <WeekBars days={weekSeries} target={kcalTarget} />
       </section>
 
       <section className="nextMealCard top">
@@ -317,14 +346,3 @@ export default async function Page() {
   );
 }
 
-function Macro({ label, value, target }: { label: string; value: number; target: number }) {
-  const ratio = percent(value, target);
-  return (
-    <div>
-      <span>{label}</span>
-      <b>{fmt(value, 1)} г</b>
-      <small>{target > 0 ? `${ratio}% от ${fmt(target, 1)} г` : "цель не задана"}</small>
-      <i><em style={{ width: `${Math.min(100, Math.max(0, ratio))}%` }} /></i>
-    </div>
-  );
-}

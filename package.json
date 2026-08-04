@@ -7,21 +7,24 @@
     "build": "next build",
     "start": "next start",
     "audit:workflows": "node scripts/audit-workflows.mjs",
-    "test:v20": "node scripts/audit-workflows.mjs && node scripts/test-v20.mjs"
+    "test:v20": "node scripts/audit-workflows.mjs && node scripts/test-v20.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.50.0",
+    "jose": "^6.0.11",
     "lucide-react": "^0.468.0",
     "next": "^16.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "jose": "^6.0.11"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.7"
   }
 }
