@@ -2,13 +2,13 @@ export default function MichelinSections() {
   return (
     <style>{`
       .todayNutritionCard{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(360px,1.2fr);gap:18px;padding:19px;border:1px solid var(--line);border-radius:15px;background:var(--bg)}
-      .todayNumbers small{display:block;color:#777;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em}
+      .todayNumbers small{display:block;color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.08em}
       .todayNumbers>b{display:block;margin-top:6px;font-size:28px;letter-spacing:-.8px}
-      .todayNumbers>b em{font-style:normal;font-size:13px;color:#777;font-weight:500}
+      .todayNumbers>b em{font-style:normal;font-size:13px;color:var(--muted);font-weight:500}
       .todayNumbers p{margin:5px 0 0;color:var(--muted);font-size:12.5px}
       .todayMacros{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
       .todayMacros>div{padding:12px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
-      .todayMacros span,.todayMacros small{display:block;color:#777;font-size:12.5px}
+      .todayMacros span,.todayMacros small{display:block;color:var(--muted);font-size:12.5px}
       .todayMacros b{display:block;margin:4px 0 2px;font-size:14px}
       .todayMacros i{display:block;height:4px;margin-top:9px;border-radius:999px;background:var(--panel2);overflow:hidden}
       .todayMacros em{display:block;height:100%;border-radius:999px;background:var(--gold)}
@@ -18,16 +18,16 @@ export default function MichelinSections() {
       .todayActions>span a{color:var(--muted);font-size:13px}
       .nextMealCard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:13px;background:var(--bg)}
       .nextMealCard>i{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;color:var(--muted)}
-      .nextMealCard small{display:block;color:#777;font-size:12.5px}
+      .nextMealCard small{display:block;color:var(--muted);font-size:12.5px}
       .nextMealCard b{display:block;margin-top:3px;font-size:13px}
       .nextMealCard p{margin:3px 0 0;color:var(--muted2);font-size:13px}
       .calmSignals h2{margin-bottom:0!important}
       .signalList{display:grid;margin-top:10px}
       .signalRow{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
       .signalRow:last-child{border-bottom:0}
-      .signalRow>i{width:31px;height:31px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;color:#888}
+      .signalRow>i{width:31px;height:31px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;color:var(--muted)}
       .signalRow.warn>i{color:var(--acc-warn)}.signalRow.good>i{color:var(--muted)}
-      .signalRow span{display:grid}.signalRow b{font-size:12.5px}.signalRow small{margin-top:2px;color:#777;font-size:12.5px;line-height:1.45}
+      .signalRow span{display:grid}.signalRow b{font-size:12.5px}.signalRow small{margin-top:2px;color:var(--muted);font-size:12.5px;line-height:1.45}
       .coachHome{border-color:var(--gold2)!important;background:var(--bg)!important}
       .coachHomeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}
       .coachHomeGrid article{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
@@ -38,19 +38,19 @@ export default function MichelinSections() {
       .premiumQuietInvite>svg,.allToolsQuiet>svg{color:var(--muted2)}
       .premiumQuietInvite span,.allToolsQuiet span,.criticalSystemBanner span,.healthySystemBanner span{display:grid}
       .premiumQuietInvite b,.allToolsQuiet b,.criticalSystemBanner b,.healthySystemBanner b{font-size:12.5px}
-      .premiumQuietInvite small,.allToolsQuiet small,.criticalSystemBanner small,.healthySystemBanner small{margin-top:2px;color:#777;font-size:12.5px}
+      .premiumQuietInvite small,.allToolsQuiet small,.criticalSystemBanner small,.healthySystemBanner small{margin-top:2px;color:var(--muted);font-size:12.5px}
       .premiumQuietInvite strong{color:var(--muted);font-size:13px}
       .recentMealsCompact .emptyGuidance{min-height:130px}
 
       .periodSwitch{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
-      .periodSwitch a{padding:7px 12px;border-radius:8px;color:#777;font-size:13px;font-weight:700}
+      .periodSwitch a{padding:7px 12px;border-radius:8px;color:var(--muted);font-size:13px;font-weight:700}
       .periodSwitch a.active{background:var(--surface);color:var(--text)}
       .progressNarrative{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:16px 17px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
       .progressNarrative>i{width:37px;height:37px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;color:var(--muted)}
-      .progressNarrative small{display:block;color:#777;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em}
+      .progressNarrative small{display:block;color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.08em}
       .progressNarrative b{display:block;margin-top:3px;font-size:15px}.progressNarrative p{margin:5px 0 0;color:var(--muted);font-size:12.5px;line-height:1.5}.progressNarrative span{display:block;margin-top:5px;color:var(--muted2);font-size:12.5px}
       .goalJourney{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:15px 16px 20px;border:1px solid var(--line);border-radius:13px;background:var(--bg);overflow:hidden}
-      .goalJourney small{display:block;color:#777;font-size:12.5px}.goalJourney b{display:flex;align-items:center;gap:7px;margin-top:4px;font-size:15px}.goalJourney p{margin:4px 0 0;color:#777;font-size:12.5px}
+      .goalJourney small{display:block;color:var(--muted);font-size:12.5px}.goalJourney b{display:flex;align-items:center;gap:7px;margin-top:4px;font-size:15px}.goalJourney p{margin:4px 0 0;color:var(--muted);font-size:12.5px}
       .goalJourney>strong{font-size:20px;color:var(--muted)}.goalJourney>i{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--panel2)}.goalJourney>i em{display:block;height:100%;background:var(--gold)}
       .progressCharts{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(290px,.55fr);gap:10px}
       .periodBarChart{height:230px;display:flex;align-items:end;gap:5px;margin-top:15px;overflow-x:auto;padding-bottom:3px}
@@ -62,13 +62,13 @@ export default function MichelinSections() {
       .periodBar>div em{position:absolute;left:0;right:0;border-top:1px dashed var(--line2)}.periodBar>small{font-size:12.5px;color:var(--muted2);padding-top:4px}
       .macroSummaryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px}
       .macroSummaryCard{padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
-      .macroSummaryCard span,.macroSummaryCard small,.macroSummaryCard em{display:block}.macroSummaryCard span{color:#777;font-size:12.5px}.macroSummaryCard b{margin-top:5px;font-size:16px}
-      .macroSummaryCard small{margin-top:2px;color:#777;font-size:12.5px}.macroSummaryCard em{margin-top:7px;color:var(--muted);font-size:12.5px;font-style:normal}
+      .macroSummaryCard span,.macroSummaryCard small,.macroSummaryCard em{display:block}.macroSummaryCard span{color:var(--muted);font-size:12.5px}.macroSummaryCard b{margin-top:5px;font-size:16px}
+      .macroSummaryCard small{margin-top:2px;color:var(--muted);font-size:12.5px}.macroSummaryCard em{margin-top:7px;color:var(--muted);font-size:12.5px;font-style:normal}
 
       .profileHub{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
       .profileHub>a{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
       .profileHub>a>i{width:33px;height:33px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;color:var(--muted)}
-      .profileHub span{display:grid}.profileHub b{font-size:12.5px}.profileHub small{margin-top:2px;color:#777;font-size:12.5px}.profileHub>a>svg{color:#666}
+      .profileHub span{display:grid}.profileHub b{font-size:12.5px}.profileHub small{margin-top:2px;color:var(--muted);font-size:12.5px}.profileHub>a>svg{color:var(--muted2)}
 
       .coachDecision{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:center;padding:17px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
       .coachDecision>i{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);border-radius:12px;color:var(--gold)}
@@ -77,7 +77,7 @@ export default function MichelinSections() {
       .coachFeedback{display:grid;grid-template-columns:auto minmax(180px,1fr) auto;gap:8px;margin-top:12px}.coachCheckin{grid-template-columns:repeat(3,minmax(0,1fr))}.coachCheckin textarea,.coachCheckin button{grid-column:1/-1}
       .coachSituations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
       .coachSituations>a{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
-      .coachSituations span{display:grid}.coachSituations b{font-size:12.5px}.coachSituations small{margin-top:2px;color:#777;font-size:12.5px}.coachSituations svg{color:#666}
+      .coachSituations span{display:grid}.coachSituations b{font-size:12.5px}.coachSituations small{margin-top:2px;color:var(--muted);font-size:12.5px}.coachSituations svg{color:var(--muted2)}
 
       .adminMichelinKpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}
       .criticalSystemBanner{border-color:var(--red);background:var(--red)}.criticalSystemBanner>svg{color:var(--red)}

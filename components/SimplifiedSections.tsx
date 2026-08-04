@@ -62,7 +62,7 @@ export default function SimplifiedSections() {
       .secondaryDisclosure>summary>span{display:grid;min-width:0}
       .secondaryDisclosure>summary b{font-size:13px}
       .secondaryDisclosure>summary small{color:var(--muted2);font-size:12.5px;margin-top:2px}
-      .secondaryDisclosure>summary svg{color:#777;transition:transform .18s}
+      .secondaryDisclosure>summary svg{color:var(--muted);transition:transform .18s}
       .secondaryDisclosure[open]>summary svg{transform:rotate(180deg)}
       .secondaryDisclosure>.disclosureBody{
         padding:0 16px 16px;
@@ -81,7 +81,7 @@ export default function SimplifiedSections() {
         border-radius:12px;
         background:var(--bg);
       }
-      .profileOverviewItem span{display:block;color:#777;font-size:12.5px}
+      .profileOverviewItem span{display:block;color:var(--muted);font-size:12.5px}
       .profileOverviewItem b{display:block;margin-top:5px;font-size:14px}
       .profileEditor>summary{padding:15px 17px}
       .profileEditor .profileForm{margin-top:16px}
@@ -112,7 +112,7 @@ export default function SimplifiedSections() {
         color:var(--gold);
       }
       .progressKeyStat span{display:grid}
-      .progressKeyStat small{font-size:12.5px;color:#777}
+      .progressKeyStat small{font-size:12.5px;color:var(--muted)}
       .progressKeyStat b{font-size:15px;margin-top:2px}
       .progressDetails{
         border:0;
@@ -185,7 +185,7 @@ export default function SimplifiedSections() {
         background:var(--bg);
       }
       .planCompareCard h3{margin:0;font-size:16px}
-      .planCompareCard>p{margin:4px 0 12px;color:#777;font-size:13px}
+      .planCompareCard>p{margin:4px 0 12px;color:var(--muted);font-size:13px}
       .planCompareCard ul{display:grid;gap:7px;margin:0;padding:0;list-style:none}
       .planCompareCard li{display:flex;gap:7px;color:var(--muted);font-size:13px}
       .planCompareCard li svg{flex:none;color:var(--gold)}
@@ -240,7 +240,7 @@ export default function SimplifiedSections() {
       .coachLockedBenefits svg{color:var(--gold);flex:none}
       .coachLockedBenefits span{display:grid}
       .coachLockedBenefits b{font-size:12.5px}
-      .coachLockedBenefits small{font-size:12.5px;color:#777;margin-top:2px}
+      .coachLockedBenefits small{font-size:12.5px;color:var(--muted);margin-top:2px}
       .coachExtras>.disclosureBody{padding-top:14px}
 
       .adminPriorityGrid{
@@ -272,7 +272,7 @@ export default function SimplifiedSections() {
       }
       .adminAction span{display:grid}
       .adminAction b{font-size:12.5px}
-      .adminAction small{font-size:12.5px;color:#777;margin-top:2px}
+      .adminAction small{font-size:12.5px;color:var(--muted);margin-top:2px}
       .adminAction>strong{font-size:13px;color:var(--gold)}
       .adminToolsGrid{
         display:grid;
@@ -302,7 +302,7 @@ export default function SimplifiedSections() {
       }
       .adminToolLink span{display:grid}
       .adminToolLink b{font-size:12.5px}
-      .adminToolLink small{font-size:12.5px;color:#777;margin-top:2px}
+      .adminToolLink small{font-size:12.5px;color:var(--muted);margin-top:2px}
       .adminToolLink>em{font-style:normal;color:var(--muted2);font-size:14px}
 
       .emptyGuidance{
@@ -312,7 +312,7 @@ export default function SimplifiedSections() {
         align-content:center;
         gap:6px;
         text-align:center;
-        color:#777;
+        color:var(--muted);
       }
       .emptyGuidance svg{color:var(--gold)}
       .emptyGuidance b{color:var(--text);font-size:14px}

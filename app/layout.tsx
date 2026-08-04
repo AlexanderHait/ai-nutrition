@@ -77,6 +77,8 @@ const themeCss = `
   --gold-btn:#d9bd68;
   --gold-btn2:#b99442;
   --on-gold:#17201e;
+  --red-badge:#df8585;
+  --on-red:#2a1212;
   --acc-prot:#6aa9e0;
   --acc-fat:#e0a86a;
   --acc-carb:#91c2a0;
@@ -110,6 +112,8 @@ const themeCss = `
   --gold-btn:#8a6618;
   --gold-btn2:#6d4f11;
   --on-gold:#ffffff;
+  --red-badge:#a33f3f;
+  --on-red:#ffffff;
   --acc-prot:#2f6fa8;
   --acc-fat:#996827;
   --acc-carb:#4c805f;

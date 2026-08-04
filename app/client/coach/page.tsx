@@ -127,7 +127,7 @@ export default async function Page({
         .coachMetric strong{display:block;margin-top:9px;color:var(--text);font-size:20px;line-height:1.15}
         .coachMetric small{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}
         .coachProgress{height:6px;margin-top:12px;overflow:hidden;border-radius:99px;background:var(--surface-soft)}
-        .coachProgress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--gold),var(--gold))}
+        .coachProgress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--gold),var(--gold2))}
         .coachDashboard{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(280px,.88fr);gap:10px;align-items:start}
         .coachColumn{display:grid;gap:10px}
         .coachContentCard{padding:18px;border-radius:19px}
