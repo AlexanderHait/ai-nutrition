@@ -1,290 +1,112 @@
 export default function ClientDesignV3() {
   return (
     <style>{`
-      /* TeddY client design v3.2 */
-      .clientApp{
-        --client-radius-lg:20px;
-        --client-radius-md:14px;
-        --client-gap:14px;
+      /* TeddY client design v3.3 — final unified client layer */
+      .clientApp{--client-radius-lg:20px;--client-radius-md:14px}
+      :root[data-theme="light"] .clientApp{
+        --surface:#fff;--surface-soft:#f3f6f3;--panel:#f8faf8;
+        --line:#d5dfd9;--line2:#c4d1ca;--text:#183a33;
+        --muted:#657a73;--muted2:#7b8c86;--accent-soft:#f6eedb;
+        --shadow:0 10px 26px rgba(28,55,47,.08)
       }
       :root[data-theme="dark"] .clientApp{
-        --surface:#111817;
-        --surface-soft:#151f1e;
-        --panel:#0d1514;
-        --line:#263330;
-        --line2:#34433f;
-        --shadow:0 14px 36px rgba(0,0,0,.22);
-        --accent-soft:#211f18;
-      }
-      :root[data-theme="light"] .clientApp{
-        --surface:#fff;
-        --surface-soft:#f4f7f4;
-        --panel:#fbfcfa;
-        --line:#dce4df;
-        --line2:#cad6cf;
-        --shadow:0 12px 28px rgba(35,58,51,.07);
-        --accent-soft:#f7f0df;
+        --surface:#111a18;--surface-soft:#16211f;--panel:#0d1614;
+        --line:#293936;--line2:#3a4c48;--text:#f0f4f2;
+        --muted:#9baca6;--muted2:#82948e;--accent-soft:#242117;
+        --shadow:0 12px 30px rgba(0,0,0,.24)
       }
 
       .clientApp .content{display:block;max-width:980px!important}
-      .clientApp .clientWelcome,.clientApp .pageHead{padding:2px 4px 8px}
-      .clientApp .clientWelcome h1,.clientApp .pageHead h1{font-weight:790;letter-spacing:-1.05px;line-height:1.06}
-      .clientApp .clientWelcome p,.clientApp .pageHead p{color:var(--gold2)!important}
-      .clientApp .clientWelcome span,.clientApp .pageHead span{font-size:14px!important;line-height:1.45!important}
+      .clientApp .pageHead h1,.clientApp .clientWelcome h1{color:var(--text)!important;font-weight:790;letter-spacing:-1px;line-height:1.07}
+      .clientApp .pageHead span,.clientApp .clientWelcome span,.clientApp .muted{color:var(--muted)!important}
 
-      .clientApp .primaryFocus,
-      .clientApp .todayNutritionCard,
-      .clientApp .nextMealCard,
-      .clientApp .coachHome,
-      .clientApp .recentMealsCompact,
-      .clientApp .calmSignals,
-      .clientApp .planStatus,
-      .clientApp .planCompare,
-      .clientApp .trialCta,
-      .clientApp .progressNarrative,
-      .clientApp .goalJourney,
-      .clientApp .coachDecision{
-        background:var(--surface)!important;
-        border:1px solid var(--line)!important;
-        border-radius:var(--client-radius-lg)!important;
-        box-shadow:var(--shadow)!important;
+      .clientApp .card,.clientApp .primaryFocus,.clientApp .todayNutritionCard,
+      .clientApp .nextMealCard,.clientApp .coachHome,.clientApp .recentMealsCompact,
+      .clientApp .calmSignals,.clientApp .planStatus,.clientApp .trialCta,
+      .clientApp .progressNarrative,.clientApp .goalJourney,.clientApp .coachDecision,
+      .clientApp .clientProfileHero,.clientApp .profileOverviewItem,.clientApp .profileHub>a,
+      .clientApp .secondaryDisclosure,.clientApp .progressKeyStat,.clientApp .macroSummaryCard,
+      .clientApp .coachSituations>a,.clientApp .visualMealSession,.clientApp .visualMealItem,
+      .clientApp .smartMealCard,.clientApp .clientMealList,.clientApp .clientTimelineCard,
+      .clientApp .clientCoachSummary,.clientApp .clientCoachPanel,.clientApp .periodSwitch,
+      .clientApp .planCol,.clientApp .planGroup{
+        background:var(--surface)!important;border:1px solid var(--line)!important;
+        color:var(--text)!important;box-shadow:var(--shadow)!important
       }
+      .clientApp .visualMealItem,.clientApp .mealSessionCard,.clientApp .mealRow,
+      .clientApp .coachHomeGrid article{background:var(--surface-soft)!important;border-color:var(--line)!important}
+      .clientApp h1,.clientApp h2,.clientApp h3,.clientApp b,.clientApp strong{color:var(--text)!important}
+      .clientApp p,.clientApp small,.clientApp label,.clientApp .planRowName small,
+      .clientApp .lvl span,.clientApp .profileOverviewItem span,.clientApp .profileHub small{color:var(--muted)!important}
+      :root[data-theme="light"] .clientApp p,
+      :root[data-theme="light"] .clientApp small,
+      :root[data-theme="light"] .clientApp .muted{opacity:1!important}
 
-      .clientApp .primaryFocus{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:14px!important;padding:20px!important}
-      .clientApp .primaryFocus>i{width:42px!important;height:42px!important;border-radius:13px!important;background:var(--accent-soft)!important;border:0!important;color:var(--gold2)!important}
-      .clientApp .primaryFocus small{color:var(--gold2)!important;font-size:12px!important;letter-spacing:.11em!important}
-      .clientApp .primaryFocus b{color:var(--text)!important;font-size:17px!important;line-height:1.25!important}
-      .clientApp .primaryFocus p{color:var(--muted)!important;font-size:14px!important;line-height:1.5!important}
-      .clientApp .primaryFocus>a{grid-column:2;color:var(--gold2)!important;font-size:13px!important}
-
-      .clientApp .todayNutritionCard{padding:24px!important;gap:20px!important}
-      .clientApp .todayActions{border-top:1px solid var(--line)!important;padding-top:18px!important}
-      .clientApp .todayActions>span a{color:var(--muted)!important}
-      .clientApp .calorieRing,.clientApp .clientCalorieRing{filter:none!important}
-      .clientApp .macroRow>i,.clientApp .heroMacroRow>i{background:var(--surface-soft)!important}
-      .clientApp .card{background:var(--surface)!important;border-color:var(--line)!important;box-shadow:var(--shadow)!important}
-
-      .clientApp .nextMealCard{padding:18px!important}
-      .clientApp .nextMealCard>i{background:var(--surface-soft)!important;border-color:var(--line)!important;color:var(--gold2)!important}
-      .clientApp .nextMealCard small,.clientApp .nextMealCard p{color:var(--muted)!important}
-      .clientApp .nextMealCard b{color:var(--text)!important;font-size:14px!important}
-
-      .clientApp .signalRow{border-color:var(--line)!important}
-      .clientApp .signalRow>i{background:var(--surface-soft)!important;border-color:var(--line)!important}
-      .clientApp .signalRow b{color:var(--text)!important;font-size:14px!important}
-      .clientApp .signalRow small{color:var(--muted)!important;font-size:13px!important}
-
-      .clientApp .coachHome{padding:22px!important}
-      .clientApp .coachHomeGrid{gap:12px!important}
-      .clientApp .coachHomeGrid article{background:var(--surface-soft)!important;border:1px solid var(--line)!important;border-radius:var(--client-radius-md)!important;padding:18px!important}
-      .clientApp .coachHomeGrid small{color:var(--gold2)!important}
-      .clientApp .coachHomeGrid b{color:var(--text)!important;font-size:15px!important}
-      .clientApp .coachHomeGrid p{color:var(--muted)!important;font-size:14px!important;line-height:1.55!important}
-      .clientApp .coachHomeLink{background:transparent!important;border-color:var(--line2)!important}
-
-      .clientApp .clientMealPreview{border-color:var(--line)!important;padding:14px 0!important}
-      .clientApp .clientMealPreview b,.clientApp .clientMealPreview strong{color:var(--text)!important}
-      .clientApp .clientMealPreview small{color:var(--muted)!important}
-      .clientApp .mealPreviewIcons i{background:var(--surface-soft)!important;border-color:var(--line)!important}
-
-      /* Subscription */
-      .clientApp .planStatus{padding:26px!important;background:var(--surface)!important}
-      .clientApp .planStatus.tier-premium,.clientApp .planStatus.tier-basic{background:var(--surface)!important}
-      .clientApp .planStatusBadge{background:var(--accent-soft)!important;border-color:color-mix(in srgb,var(--gold) 36%,var(--line))!important;color:var(--gold2)!important}
-      .clientApp .planStatusHead{gap:8px!important}
-      .clientApp .planStatusHead>b{color:var(--text)!important;font-size:22px!important;line-height:1.28!important;max-width:640px}
-      .clientApp .planStatusWhen,.clientApp .planMeterTop small{color:var(--muted)!important}
-      .clientApp .planStatusMeters{gap:18px!important;margin-top:24px!important}
-      .clientApp .planMeterTop b{color:var(--text)!important}
-      .clientApp .planMeterTrack{background:var(--surface-soft)!important;height:7px!important}
-
-      .clientApp .planCompare{overflow:visible!important;background:transparent!important;border:0!important;box-shadow:none!important;display:grid!important;gap:14px!important}
+      /* Subscription: restore continuous readable level bars */
+      .clientApp .planCompare{background:transparent!important;border:0!important;box-shadow:none!important;display:grid!important;gap:14px!important}
       .clientApp .planCompareHead{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;background:transparent!important}
-      .clientApp .planCol,.clientApp .planCol.tier-premium{background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:18px!important;padding:22px!important;box-shadow:var(--shadow)!important;min-width:0}
-      .clientApp .planCol.current{background:var(--surface)!important;border-color:color-mix(in srgb,var(--gold) 58%,var(--line))!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--gold) 18%,transparent),var(--shadow)!important}
-      .clientApp .planCol>strong{color:var(--text)!important;font-size:24px!important}
-      .clientApp .planCol>p{color:var(--muted)!important;min-height:48px!important;font-size:13px!important}
-      .clientApp .planColTag{top:14px!important;right:14px!important;border-radius:999px!important;padding:5px 10px!important}
-      .clientApp .planColBtn{min-height:42px!important;border-radius:12px!important}
-      .clientApp .planColCurrent{display:inline-flex!important;align-items:center!important;min-height:38px!important;margin-top:8px!important}
+      .clientApp .planCol{border-radius:18px!important;padding:22px!important;min-width:0}
+      .clientApp .planCol.current{border-color:color-mix(in srgb,var(--gold) 58%,var(--line))!important}
+      .clientApp .planGroup{border-radius:18px!important;padding:20px!important}
+      .clientApp .planStatus{border-radius:20px!important;padding:24px!important}
+      .clientApp .planMeterTrack{display:block!important;height:7px!important;border-radius:999px!important;background:var(--surface-soft)!important;overflow:hidden!important}
+      .clientApp .planMeterTrack em{display:block!important;height:100%!important;border-radius:999px!important;background:linear-gradient(90deg,#d6b34f,#9e83d6)!important}
+      .clientApp .lvl{gap:7px!important}
+      .clientApp .lvl i{position:relative!important;display:block!important;height:6px!important;border-radius:999px!important;background:var(--line)!important;overflow:hidden!important}
+      .clientApp .lvl i em{display:none!important}
+      .clientApp .lvl i::after{content:"";position:absolute;inset:0 auto 0 0;width:0;border-radius:999px;background:var(--tier-free)}
+      .clientApp .lvl.tier-basic i::after{background:var(--tier-basic)}
+      .clientApp .lvl.tier-premium i::after{background:linear-gradient(90deg,var(--tier-premium),var(--tier-premium-2))}
+      .clientApp .lvl i:has(em:nth-child(1).on)::after{width:34%}
+      .clientApp .lvl i:has(em:nth-child(2).on)::after{width:67%}
+      .clientApp .lvl i:has(em:nth-child(3).on)::after{width:100%}
 
-      .clientApp .planGroup{border:1px solid var(--line)!important;border-radius:18px!important;background:var(--surface)!important;padding:20px!important;box-shadow:var(--shadow)!important}
-      .clientApp .planGroup h3{color:var(--muted2)!important;margin-bottom:12px!important}
-      .clientApp .planRow{border-color:var(--line)!important;padding:14px 0!important}
-      .clientApp .planRowName b{color:var(--text)!important}
-      .clientApp .planRowName small,.clientApp .lvl span{color:var(--muted)!important}
-      .clientApp .lvl em{background:var(--line)!important}
-      .clientApp .trialCta{background:var(--surface)!important}
-
-      /* Remove legacy hard-coded black surfaces */
-      .clientApp .secondaryDisclosure,
-      .clientApp .profileOverviewItem,
-      .clientApp .profileHub>a,
-      .clientApp .progressKeyStat,
-      .clientApp .macroSummaryCard,
-      .clientApp .premiumOutcome,
-      .clientApp .planCompareCard,
-      .clientApp .coachSituations>a,
-      .clientApp .coachLockedCompact,
-      .clientApp .coachLockedLead,
-      .clientApp .visualMealSession,
-      .clientApp .visualMealItem,
-      .clientApp .smartMealCard,
-      .clientApp .clientMealList,
-      .clientApp .clientTimelineCard,
-      .clientApp .clientCoachSummary,
-      .clientApp .clientCoachPanel,
-      .clientApp .profileEditor,
-      .clientApp .periodSwitch,
-      .clientApp .adminAction{
-        background:var(--surface)!important;
-        border-color:var(--line)!important;
-        color:var(--text)!important;
-        box-shadow:none!important;
-      }
-      .clientApp .profileOverviewItem,
-      .clientApp .profileHub>a,
-      .clientApp .progressKeyStat,
-      .clientApp .macroSummaryCard,
-      .clientApp .coachSituations>a,
-      .clientApp .visualMealItem,
-      .clientApp .smartMealCard{
-        border-radius:var(--client-radius-md)!important;
-      }
-      .clientApp .secondaryDisclosure>summary,
-      .clientApp .profileHub b,
-      .clientApp .profileOverviewItem b,
-      .clientApp .progressKeyStat b,
-      .clientApp .macroSummaryCard b,
-      .clientApp .clientMealList b,
-      .clientApp .visualMealItem b,
-      .clientApp .smartMealCard b{
-        color:var(--text)!important;
-      }
-      .clientApp .secondaryDisclosure>summary small,
-      .clientApp .profileHub small,
-      .clientApp .profileOverviewItem span,
-      .clientApp .progressKeyStat small,
-      .clientApp .macroSummaryCard span,
-      .clientApp .macroSummaryCard small,
-      .clientApp .clientMealList small,
-      .clientApp .visualMealItem small,
-      .clientApp .smartMealCard small{
-        color:var(--muted)!important;
-      }
-      .clientApp .secondaryDisclosure>.disclosureBody,
-      .clientApp .visualMealSession>header,
-      .clientApp .clientMealList>header{
-        border-color:var(--line)!important;
-      }
-      .clientApp .profileHub>a>i,
-      .clientApp .progressKeyStat>i,
-      .clientApp .coachSituations>a>i,
-      .clientApp .visualMealItem>i{
-        background:var(--surface-soft)!important;
-        border-color:var(--line)!important;
-        color:var(--gold2)!important;
-      }
-      .clientApp .periodSwitch a{color:var(--muted)!important}
-      .clientApp .periodSwitch a.active{background:var(--accent-soft)!important;color:var(--gold2)!important}
-
-      /* Charts: responsive, compact, no sideways scrolling */
+      /* Charts: mobile-first, no horizontal scroll */
       .clientApp .progressCharts{grid-template-columns:1fr!important;gap:14px!important}
       .clientApp .progressChartCard,.clientApp .weightProgressCard{overflow:hidden!important}
-      .clientApp .periodBarChart{
-        width:100%!important;
-        height:190px!important;
-        min-width:0!important;
-        overflow-x:hidden!important;
-        gap:3px!important;
-      }
-      .clientApp .periodBar{
-        min-width:0!important;
-        flex:1 1 0!important;
-        height:178px!important;
-        grid-template-rows:18px 1fr 18px!important;
-      }
-      .clientApp .period90 .periodBar{flex-basis:0!important}
-      .clientApp .periodBar>span,.clientApp .periodBar>small{font-size:10px!important;white-space:nowrap!important;overflow:hidden!important}
-      .clientApp .periodBar>div{height:138px!important}
-      .clientApp .periodBar>div i{max-width:18px!important;width:62%!important}
-      .clientApp .weightProgressCard svg,
-      .clientApp .weightChart svg,
-      .clientApp .weightTrendChart svg{max-width:100%!important;height:auto!important;max-height:240px!important}
-      .clientApp .weightProgressCard{min-height:0!important}
-      .clientApp .weightHistory{margin-top:12px!important}
+      .clientApp .periodBarChart{display:flex!important;width:100%!important;min-width:0!important;height:176px!important;gap:3px!important;overflow:hidden!important}
+      .clientApp .periodBar{flex:1 1 0!important;min-width:0!important;height:164px!important;grid-template-rows:16px 1fr 17px!important}
+      .clientApp .periodBar>div{height:126px!important}
+      .clientApp .periodBar>div i{width:64%!important;max-width:16px!important;border-radius:6px 6px 3px 3px!important}
+      .clientApp .periodBar>span{display:none!important}
+      .clientApp .periodBar>small{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important}
+      .clientApp .weightProgressCard svg,.clientApp .weightChart svg,.clientApp .weightTrendChart svg{width:100%!important;max-width:100%!important;height:auto!important;max-height:210px!important}
+      .clientApp .weightHistory{margin-top:10px!important}
+      .clientApp .macroSummaryGrid{grid-template-columns:1fr!important}
+      .clientApp .macroSummaryCard{padding:16px!important;border-radius:14px!important}
 
-      /* Nutrition list follows theme */
-      .clientApp .visualMealSession,
-      .clientApp .clientMealDay,
-      .clientApp .mealDayCard{
-        background:var(--surface)!important;
-        border-color:var(--line)!important;
-      }
-      .clientApp .visualMealItem,
-      .clientApp .mealSessionCard,
-      .clientApp .mealRow{
-        background:var(--surface-soft)!important;
-        border-color:var(--line)!important;
-      }
+      /* Calorie ring and weekly chart */
+      .clientApp .calorieRing,.clientApp .clientCalorieRing{filter:none!important;transform:scale(.9)}
+      .clientApp .weekCaloriesChart,.clientApp .weeklyCalories{overflow:hidden!important}
+      .clientApp .weekCaloriesChart>* ,.clientApp .weeklyCalories>*{min-width:0!important}
 
-      /* Header + bottom nav */
+      /* Navigation */
       .clientApp .mobileTopbar{box-shadow:none!important}
-      .clientApp .mobileBrand strong::after{font-size:19px!important;letter-spacing:-.45px!important}
-      .clientApp .mobileMenuButton,#teddy-theme-toggle{border-radius:14px!important;background:var(--surface)!important;box-shadow:0 5px 18px rgba(21,39,34,.08)!important}
-      .clientApp .clientBottomNav{max-width:660px!important;margin:0 auto!important;box-shadow:0 12px 30px rgba(7,20,17,.18)!important}
-      .clientApp .clientBottomNav a.active{box-shadow:none!important}
+      .clientApp .mobileMenuButton,#teddy-theme-toggle{background:var(--surface)!important;border-color:var(--line)!important}
+      .clientApp .clientBottomNav{max-width:660px!important;margin:0 auto!important;box-shadow:0 10px 28px rgba(7,20,17,.16)!important}
 
       @media(max-width:700px){
-        .clientApp .content{padding:22px 18px 132px!important}
-        .clientApp .clientWelcome,.clientApp .pageHead{padding-left:2px!important;padding-right:2px!important}
-        .clientApp .clientWelcome h1,.clientApp .pageHead h1{font-size:30px!important}
-        .clientApp .primaryFocus{padding:18px!important;border-radius:18px!important}
-        .clientApp .todayNutritionCard,.clientApp .card,.clientApp .planStatus{border-radius:18px!important}
-        .clientApp .todayNutritionCard{padding:20px!important}
-        .clientApp .coachHome{padding:20px!important}
-        .clientApp .coachHomeGrid article{padding:16px!important}
-        .clientApp .planStatus{padding:22px!important}
-        .clientApp .planStatusHead>b{font-size:20px!important}
-        .clientApp .planStatusMeters{grid-template-columns:1fr!important;gap:16px!important}
-
+        .clientApp .content{padding:22px 16px 132px!important}
+        .clientApp .pageHead h1,.clientApp .clientWelcome h1{font-size:29px!important}
         .clientApp .planCompareHead{grid-template-columns:1fr!important;gap:12px!important}
-        .clientApp .planCol,.clientApp .planCol.tier-premium{padding:22px!important;border-radius:18px!important}
-        .clientApp .planCol>p{min-height:0!important}
-        .clientApp .planColTag{top:14px!important;right:14px!important}
-        .clientApp .planGroup{padding:18px!important;border-radius:18px!important}
-        .clientApp .planRow{gap:10px!important}
-        .clientApp .planRowCells{gap:8px!important}
-
-        .clientApp .profileOverview{grid-template-columns:1fr 1fr!important}
-        .clientApp .profileHub{grid-template-columns:1fr!important}
-        .clientApp .progressKeyStats{grid-template-columns:1fr!important}
-        .clientApp .macroSummaryGrid{grid-template-columns:1fr!important}
-
-        .clientApp .periodBarChart{height:166px!important;gap:2px!important}
-        .clientApp .periodBar{height:154px!important;grid-template-rows:15px 1fr 16px!important}
-        .clientApp .periodBar>div{height:118px!important}
-        .clientApp .periodBar>span{display:none!important}
-        .clientApp .periodBar>small{font-size:9px!important}
-        .clientApp .periodBar>div i{max-width:14px!important}
-
-        .clientApp .clientBottomNav{left:16px!important;right:16px!important;bottom:max(12px,env(safe-area-inset-bottom))!important;min-height:60px!important;border-radius:20px!important;padding:6px!important}
-        .clientApp .clientBottomNav a{font-size:11.5px!important;border-radius:15px!important;gap:4px!important}
-        .clientApp .clientBottomNav a svg{width:19px!important;height:19px!important}
-      }
-
-      @media(max-width:430px){
-        .clientApp .content{padding-left:14px!important;padding-right:14px!important}
-        .clientApp .clientWelcome h1,.clientApp .pageHead h1{font-size:28px!important}
-        .clientApp .planStatus,.clientApp .planCol,.clientApp .planGroup{padding:18px!important}
-        .clientApp .planRowCells{grid-template-columns:1fr!important;gap:7px!important}
-        .clientApp .lvl{grid-template-columns:72px 1fr!important;align-items:center!important}
+        .clientApp .planCol,.clientApp .planGroup,.clientApp .planStatus{padding:18px!important;border-radius:18px!important}
         .clientApp .profileOverview{grid-template-columns:1fr 1fr!important;gap:8px!important}
-        .clientApp .periodBarChart{height:150px!important}
-        .clientApp .periodBar{height:140px!important}
-        .clientApp .periodBar>div{height:106px!important}
+        .clientApp .progressKeyStats{grid-template-columns:1fr!important}
+        .clientApp .periodBarChart{height:154px!important;gap:2px!important}
+        .clientApp .periodBar{height:144px!important;grid-template-rows:12px 1fr 16px!important}
+        .clientApp .periodBar>div{height:112px!important}
+        .clientApp .periodBar>div i{max-width:13px!important}
+        .clientApp .weightProgressCard svg,.clientApp .weightChart svg,.clientApp .weightTrendChart svg{max-height:180px!important}
+        .clientApp .clientBottomNav{left:12px!important;right:12px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;min-height:58px!important;border-radius:19px!important;padding:5px!important}
+        .clientApp .clientBottomNav a{font-size:11.5px!important;border-radius:14px!important}
+      }
+      @media(max-width:430px){
+        .clientApp .content{padding-left:13px!important;padding-right:13px!important}
+        .clientApp .pageHead h1,.clientApp .clientWelcome h1{font-size:27px!important}
+        .clientApp .periodBarChart{height:142px!important}
+        .clientApp .periodBar{height:132px!important}
+        .clientApp .periodBar>div{height:101px!important}
         .clientApp .periodBar>small{font-size:8px!important}
-        .clientApp .clientBottomNav{left:10px!important;right:10px!important}
       }
     `}</style>
   );
