@@ -2,9 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Современные форматы весят заметно меньше JPEG на тех же фото еды.
     formats: ["image/avif", "image/webp"],
-    // Аватарки приходят из Telegram напрямую или через наш прокси /api/avatar.
     remotePatterns: [
       { protocol: "https", hostname: "api.telegram.org" },
       { protocol: "https", hostname: "**.telesco.pe" },
@@ -24,7 +22,15 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Аватарки меняются редко — пусть браузер и CDN держат их у себя.
+        source: "/client/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-cache, no-store, max-age=0, must-revalidate",
+          },
+        ],
+      },
+      {
         source: "/api/avatar/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
