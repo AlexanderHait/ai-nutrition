@@ -16,7 +16,8 @@ const errors: Record<string, string> = {
   telegram_verify: "Не удалось проверить ответ Telegram. Попробуй ещё раз.",
   telegram_callback: "Telegram вернул неполный ответ. Попробуй ещё раз.",
   telegram: "Не удалось войти через Telegram. Попробуй ещё раз.",
-  telegram_code_identifier: "Укажи email или логин аккаунта TeddY.",
+  telegram_code_identifier: "Укажи email, логин TeddY или Telegram username.",
+  telegram_code_not_linked: "Аккаунт не найден или Telegram ещё не связан с ним. Открой бота TeddY, отправь /start и повтори.",
   telegram_code_invalid: "Код неверный. Проверь сообщение от бота и попробуй ещё раз.",
   telegram_code_expired: "Код истёк или использован. Запроси новый.",
   telegram_code_rate: "Слишком много запросов. Подожди 15 минут и попробуй снова.",
@@ -38,7 +39,38 @@ export default async function Login({
   const telegramCodeSent = query.telegram_code === "sent";
 
   return (
-    <main className="login">
+    <main className="login loginV2">
+      <style>{`
+        .loginV2{--login-bg:#081311;--login-panel:#10201c;--login-panel-soft:#142721;--login-border:#294039;--login-text:#f5f7f4;--login-muted:#b9c7c2;--login-muted-strong:#d6dfdc;--login-gold:#e3c568;min-height:100svh;padding:28px 16px 48px;background:radial-gradient(700px 360px at 50% -120px,rgba(227,197,104,.15),transparent 62%),linear-gradient(180deg,#0a1714,#07110f);color:var(--login-text);display:grid;place-items:center}
+        .loginV2 .loginCard{width:min(520px,100%);padding:30px;border:1px solid var(--login-border);border-radius:24px;background:linear-gradient(180deg,rgba(18,36,31,.98),rgba(11,25,22,.99));box-shadow:0 28px 80px rgba(0,0,0,.34)}
+        .loginV2 .logoMark{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#efd47c,#cfa647);color:#13201c;font-weight:900;font-size:17px}
+        .loginV2 h1{margin:0;text-align:center;font-size:36px;letter-spacing:-1px;color:var(--login-text)}
+        .loginV2>.loginCard>.muted{margin:6px 0 24px;text-align:center;color:var(--login-muted)!important;font-size:15px}
+        .loginV2 .loginBlock{display:grid;gap:12px}
+        .loginV2 section.loginBlock,.loginV2 form.loginBlock,.loginV2 .adminLoginDetails{padding:18px;border:1px solid var(--login-border);border-radius:17px;background:var(--login-panel-soft)}
+        .loginV2 .loginBlock .loginBlock{padding:0;border:0;background:transparent}
+        .loginV2 h3{margin:0;color:var(--login-text);font-size:18px}
+        .loginV2 p{margin:0;color:var(--login-muted);font-size:14px;line-height:1.55}
+        .loginV2 input{min-height:50px;background:#0b1916;border-color:#365047;color:var(--login-text);font-size:16px}
+        .loginV2 input::placeholder{color:#91a39d;opacity:1}
+        .loginV2 input:focus{border-color:var(--login-gold);box-shadow:0 0 0 3px rgba(227,197,104,.14);background:#0d1d19}
+        .loginV2 input:-webkit-autofill{-webkit-text-fill-color:var(--login-text);-webkit-box-shadow:0 0 0 1000px #0b1916 inset}
+        .loginV2 .primary,.loginV2 .secondaryBtn{min-height:48px;justify-content:center;border-radius:13px;font-weight:800}
+        .loginV2 .primary{background:linear-gradient(135deg,#ecd076,#cda346);color:#12201c}
+        .loginV2 .secondaryBtn{width:100%;background:#162923;border-color:#3a554c;color:var(--login-text)}
+        .loginV2 .textLink{color:#ecd076;font-weight:750}
+        .loginV2 .divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#9eb0aa;font-size:13px}
+        .loginV2 .divider:before,.loginV2 .divider:after{content:"";height:1px;flex:1;background:#30463f}
+        .loginV2 .loginInlineLinks{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+        .loginV2 .notice,.loginV2 .successNotice{margin-bottom:14px;border-radius:14px;padding:13px 14px;font-size:14px;line-height:1.45}
+        .loginV2 .notice{border:1px solid #74484b;background:#321b1e;color:#ffd4d7}
+        .loginV2 .successNotice{border:1px solid #37614c;background:#142c21;color:#d8f5e3}
+        .loginV2 details{margin-top:14px}
+        .loginV2 details summary{cursor:pointer;color:var(--login-muted-strong);font-size:14px;font-weight:700}
+        .loginV2 details[open] summary{margin-bottom:14px;color:var(--login-text)}
+        @media(max-width:560px){.loginV2{padding:18px 12px 32px;place-items:start center}.loginV2 .loginCard{padding:21px 16px;border-radius:20px}.loginV2 h1{font-size:32px}.loginV2 section.loginBlock,.loginV2 form.loginBlock,.loginV2 .adminLoginDetails{padding:16px}}
+      `}</style>
+
       <div className="loginCard">
         <div className="logoMark">AI</div>
         <h1>TeddY</h1>
@@ -79,24 +111,14 @@ export default async function Login({
           <>
             <section className="loginBlock">
               <h3>Вход кодом из Telegram</h3>
-              <p>Работает без VPN и без открытия Telegram OAuth в браузере.</p>
+              <p>Введи email, логин TeddY или свой Telegram username. Работает без VPN.</p>
 
               {telegramCodeSent ? (
                 <>
                   <div className="successNotice">Код отправлен ботом TeddY. Он действует 10 минут.</div>
                   <form action="/api/auth/telegram/code/verify" method="post" className="loginBlock">
                     <input type="hidden" name="identifier" value={identifier} />
-                    <input
-                      name="code"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      pattern="[0-9]{6}"
-                      maxLength={6}
-                      placeholder="6-значный код"
-                      required
-                      autoFocus
-                    />
+                    <input name="code" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} placeholder="6-значный код" required autoFocus />
                     <button className="primary">Войти в TeddY</button>
                   </form>
                   <form action="/api/auth/telegram/code/request" method="post">
@@ -106,14 +128,7 @@ export default async function Login({
                 </>
               ) : (
                 <form action="/api/auth/telegram/code/request" method="post" className="loginBlock">
-                  <input
-                    name="identifier"
-                    type="text"
-                    autoComplete="username"
-                    defaultValue={identifier}
-                    placeholder="Email или логин"
-                    required
-                  />
+                  <input name="identifier" type="text" autoComplete="username" defaultValue={identifier} placeholder="Email, логин или @username" required />
                   <button className="primary">Получить код в Telegram</button>
                 </form>
               )}
