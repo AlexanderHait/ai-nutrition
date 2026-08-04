@@ -4,6 +4,10 @@ import {
   Activity,
   CheckCircle2,
   ChevronRight,
+  CircleAlert,
+  Gauge,
+  History,
+  Scale,
   Settings2,
   Sparkles,
   Target,
@@ -19,6 +23,8 @@ import { subscriptionAccess } from "@/lib/subscription-access";
 import { fmt } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 function clean(value: unknown) {
   return String(value || "")
@@ -28,6 +34,11 @@ function clean(value: unknown) {
     .replace(/_(.*?)_/g, "$1")
     .replace(/`(.*?)`/g, "$1")
     .trim();
+}
+
+function shortText(value: string, limit = 420) {
+  if (value.length <= limit) return value;
+  return `${value.slice(0, limit).trim()}…`;
 }
 
 export default async function Page({
@@ -52,136 +63,204 @@ export default async function Page({
   const settings = context.settings || {};
   const latest = intelligence.recommendations?.[0];
   const checkin = intelligence.checkins?.[0];
-  const remainingKcal = Math.max(0, Number(remaining.kcal || 0));
-  const remainingProtein = Math.max(0, Number(remaining.protein || 0));
+
+  const kcalTarget = Math.max(0, Number(settings.kcal_target || today.target?.kcal || 0));
+  const proteinTarget = Math.max(0, Number(settings.protein_target || today.target?.protein || 0));
+  const eatenKcal = Math.max(0, Number(eaten.kcal || 0));
+  const eatenProtein = Math.max(0, Number(eaten.protein || 0));
+  const remainingKcal = Math.max(0, Number(remaining.kcal ?? kcalTarget - eatenKcal));
+  const remainingProtein = Math.max(0, Number(remaining.protein ?? proteinTarget - eatenProtein));
+  const kcalProgress = kcalTarget ? Math.min(100, Math.round((eatenKcal / kcalTarget) * 100)) : 0;
+  const proteinProgress = proteinTarget ? Math.min(100, Math.round((eatenProtein / proteinTarget) * 100)) : 0;
   const weightCount = Number(context.weight_trend?.count || context.data_quality?.weight_count || 0);
+  const currentWeight = Number(context.weight_trend?.current || context.weight_trend?.latest || 0);
 
-  const dailyPlan = data.plan?.content_md
-    ? clean(data.plan.content_md)
-    : Number(settings.kcal_target || 0)
-      ? `На остаток дня около ${fmt(remainingKcal)} ккал${Number(settings.protein_target || 0) ? ` и ${fmt(remainingProtein)} г белка` : ""}. Распредели их спокойно, без резких компенсаций.`
-      : "Заполни дневную цель в профиле — после этого TeddY сразу соберёт конкретный план дня.";
+  const dailyPlan = shortText(
+    data.plan?.content_md
+      ? clean(data.plan.content_md)
+      : kcalTarget
+        ? `На остаток дня около ${fmt(remainingKcal)} ккал${proteinTarget ? ` и ${fmt(remainingProtein)} г белка` : ""}. Распредели их между привычными приёмами пищи без резких компенсаций.`
+        : "Заполни дневную цель в профиле — после этого TeddY сразу соберёт конкретный план дня.",
+  );
 
-  const weeklyFocus = data.report?.content_md
-    ? clean(data.report.content_md)
-    : "Сохраняй обычный ритм питания и фиксируй реальные приёмы пищи. Рекомендации станут точнее по мере накопления данных.";
+  const weeklyFocus = shortText(
+    data.report?.content_md
+      ? clean(data.report.content_md)
+      : "Сохраняй обычный ритм питания и фиксируй реальные приёмы пищи. Чем стабильнее записи, тем точнее рекомендации.",
+    360,
+  );
 
   const nextStep = remainingProtein >= 25
     ? "Сделай белок основой следующего приёма"
-    : Number(remaining.kcal || 0) < 0
-      ? "Следующий приём сделай легче, без компенсации голоданием"
-      : "Продолжай обычный режим без лишних корректировок";
+    : remainingKcal <= 0 && kcalTarget > 0
+      ? "Остановись на обычном лёгком приёме без голодания"
+      : "Продолжай привычный режим без лишних корректировок";
+
+  const statusTone = remainingKcal > Math.max(600, kcalTarget * 0.3) ? "warning" : "good";
 
   return (
-    <div className="coachPageV2">
+    <div className="coachProductPage">
       <style>{`
-        .coachPageV2{display:grid;gap:14px;min-width:0;max-width:100%;overflow:hidden}
-        .coachPageV2 *{min-width:0}
-        .coachHeadV2{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-        .coachHeadV2 p{margin:0 0 6px;color:var(--gold2);font-size:12px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}
-        .coachHeadV2 h1{margin:0;color:var(--text);font-size:clamp(30px,4vw,42px);line-height:1.02;letter-spacing:-1px}
-        .coachHeadV2 span{display:block;margin-top:7px;color:var(--muted);font-size:14px;line-height:1.5}
-        .coachHeadActions{display:flex;gap:8px;flex-wrap:wrap}
-        .coachHeadActions a{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:0 14px;border:1px solid var(--line2);border-radius:12px;background:var(--surface);color:var(--text);font-size:13px;font-weight:800}
-        .coachHeadActions a:last-child{border:0;background:linear-gradient(135deg,#e2c56b,#cda648);color:#17201e}
-        .coachStatsV2{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
-        .coachStatV2,.coachPanelV2,.coachActionV2,.coachQuickV2 a{border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
-        .coachStatV2{padding:14px;border-radius:15px}
-        .coachStatV2 small{display:block;color:var(--gold2);font-size:11px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
-        .coachStatV2 b{display:block;margin-top:6px;color:var(--text);font-size:14px;line-height:1.35}
-        .coachStatV2 span{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.4}
-        .coachActionV2{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:13px;align-items:center;padding:17px;border-radius:17px;background:linear-gradient(135deg,var(--surface),var(--accent-soft))}
-        .coachActionV2 i,.coachQuickV2 i{display:grid;place-items:center;background:var(--accent-soft);color:var(--gold2)}
-        .coachActionV2 i{width:44px;height:44px;border-radius:13px}
-        .coachActionV2 small{display:block;color:var(--gold2);font-size:11px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
-        .coachActionV2 h2{margin:4px 0 3px;color:var(--text);font-size:19px;line-height:1.3}
-        .coachActionV2 p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
-        .coachActionV2>a{display:inline-flex;align-items:center;gap:4px;color:var(--gold2);font-size:13px;font-weight:800;white-space:nowrap}
-        .coachGridV2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-        .coachPanelV2{padding:18px;border-radius:17px}
-        .coachPanelTitle{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}
-        .coachPanelTitle h2{margin:0;color:var(--text);font-size:17px}.coachPanelTitle span{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}.coachPanelTitle>svg{color:var(--gold2)}
-        .coachBodyV2{color:var(--text);font-size:14px;line-height:1.68;white-space:pre-wrap;overflow-wrap:anywhere}
-        .coachFeedbackV2{display:grid;grid-template-columns:auto minmax(180px,1fr) auto;gap:8px;margin-top:13px}
-        .coachCheckinV2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-        .coachCheckinV2 label{display:grid;gap:6px;color:var(--muted);font-size:12px}.coachCheckinV2 textarea,.coachCheckinV2 button{grid-column:1/-1}.coachCheckinV2 textarea{min-height:90px}
-        .coachQuickV2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-        .coachQuickV2 a{display:grid;grid-template-columns:38px minmax(0,1fr) 16px;gap:10px;align-items:center;padding:14px;border-radius:14px}
-        .coachQuickV2 i{width:38px;height:38px;border-radius:11px}.coachQuickV2 span{display:grid;gap:2px}.coachQuickV2 b{color:var(--text);font-size:13px}.coachQuickV2 small{color:var(--muted);font-size:12px;line-height:1.35}.coachQuickV2>a>svg{color:var(--muted)}
-        @media(max-width:900px){.coachHeadV2{display:grid}.coachStatsV2{grid-template-columns:1fr 1fr}.coachGridV2,.coachQuickV2{grid-template-columns:1fr}}
-        @media(max-width:560px){
-          .coachHeadV2 h1{font-size:30px}.coachHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.coachHeadActions a{padding:0 9px}
-          .coachStatsV2{gap:7px}.coachStatV2{padding:12px}.coachStatV2 b{font-size:13px}
-          .coachActionV2{grid-template-columns:42px minmax(0,1fr);padding:15px}.coachActionV2>a{grid-column:2;justify-self:start}.coachPanelV2{padding:16px}
-          .coachFeedbackV2,.coachCheckinV2{grid-template-columns:1fr}.coachCheckinV2 textarea,.coachCheckinV2 button{grid-column:1}
+        .coachProductPage{display:grid;gap:14px;width:100%;min-width:0;overflow:hidden;padding-bottom:8px}
+        .coachProductPage *{box-sizing:border-box;min-width:0}
+        .coachHeroNew{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;padding:4px 2px 2px}
+        .coachEyebrow{margin:0 0 7px;color:var(--gold2);font-size:12px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}
+        .coachHeroNew h1{margin:0;color:var(--text);font-size:clamp(30px,5vw,43px);line-height:1.02;letter-spacing:-1.25px}
+        .coachHeroNew p:last-child{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.5}
+        .coachSettingsButton{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line2);border-radius:14px;background:var(--surface);color:var(--text)}
+        .coachPrimaryCard,.coachMetric,.coachContentCard,.coachQuickLink{border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
+        .coachPrimaryCard{position:relative;overflow:hidden;padding:20px;border-radius:22px;background:linear-gradient(145deg,var(--surface),var(--accent-soft))}
+        .coachPrimaryCard:after{content:"";position:absolute;width:180px;height:180px;right:-70px;top:-90px;border-radius:50%;background:color-mix(in srgb,var(--gold) 12%,transparent);pointer-events:none}
+        .coachPrimaryTop{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
+        .coachPrimaryTop span{display:inline-flex;align-items:center;gap:7px;color:var(--gold2);font-size:12px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+        .coachPrimaryTop b{padding:6px 9px;border-radius:999px;background:var(--surface-soft);color:var(--muted);font-size:11px}
+        .coachPrimaryCard h2{position:relative;z-index:1;margin:17px 0 7px;max-width:680px;color:var(--text);font-size:clamp(22px,4vw,30px);line-height:1.18;letter-spacing:-.55px}
+        .coachPrimaryCard>p{position:relative;z-index:1;margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+        .coachPrimaryActions{position:relative;z-index:1;display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+        .coachPrimaryActions a{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 15px;border-radius:13px;font-size:13px;font-weight:800}
+        .coachPrimaryActions a:first-child{background:linear-gradient(135deg,#e6ca73,#cfa748);color:#16201d}
+        .coachPrimaryActions a:last-child{border:1px solid var(--line2);background:var(--surface);color:var(--text)}
+        .coachMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+        .coachMetric{padding:15px;border-radius:17px}
+        .coachMetricHead{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px}
+        .coachMetricHead svg{color:var(--gold2)}
+        .coachMetric strong{display:block;margin-top:9px;color:var(--text);font-size:20px;line-height:1.15}
+        .coachMetric small{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}
+        .coachProgress{height:6px;margin-top:12px;overflow:hidden;border-radius:99px;background:var(--surface-soft)}
+        .coachProgress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#d2aa50,#ead17d)}
+        .coachDashboard{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(280px,.88fr);gap:10px;align-items:start}
+        .coachColumn{display:grid;gap:10px}
+        .coachContentCard{padding:18px;border-radius:19px}
+        .coachCardHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
+        .coachCardHead h2{margin:0;color:var(--text);font-size:17px;line-height:1.25}
+        .coachCardHead p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.4}
+        .coachCardHead>i{display:grid;place-items:center;width:38px;height:38px;flex:0 0 auto;border-radius:12px;background:var(--accent-soft);color:var(--gold2)}
+        .coachReadable{color:var(--text);font-size:14px;line-height:1.68;white-space:pre-wrap;overflow-wrap:anywhere}
+        .coachRisk{display:grid;grid-template-columns:38px minmax(0,1fr);gap:11px;align-items:start;padding:13px;border-radius:14px;background:var(--surface-soft)}
+        .coachRisk i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--gold2)}
+        .coachRisk b{display:block;color:var(--text);font-size:13px}.coachRisk span{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.45}
+        .coachRisk.warning i{color:#d39a4e}.coachRisk.good i{color:#71aa88}
+        .coachQuickGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+        .coachQuickLink{display:grid;grid-template-columns:38px minmax(0,1fr) 16px;gap:10px;align-items:center;padding:13px;border-radius:15px}
+        .coachQuickLink i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--surface-soft);color:var(--gold2)}
+        .coachQuickLink b{display:block;color:var(--text);font-size:13px}.coachQuickLink small{display:block;margin-top:2px;color:var(--muted);font-size:11px;line-height:1.35}.coachQuickLink>svg{color:var(--muted)}
+        .coachCheckin{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+        .coachCheckin label{display:grid;gap:6px;color:var(--muted);font-size:12px}.coachCheckin textarea,.coachCheckin button{grid-column:1/-1}.coachCheckin textarea{min-height:82px}
+        .coachFeedback{display:grid;grid-template-columns:auto minmax(160px,1fr) auto;gap:8px;margin-top:14px}
+        @media(max-width:900px){.coachDashboard{grid-template-columns:1fr}.coachMetrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+        @media(max-width:600px){
+          .coachProductPage{gap:11px}
+          .coachHeroNew{padding-top:2px}.coachHeroNew h1{font-size:30px}.coachHeroNew p:last-child{font-size:13px}
+          .coachPrimaryCard{padding:17px;border-radius:19px}.coachPrimaryCard h2{font-size:23px;margin-top:15px}.coachPrimaryActions{display:grid;grid-template-columns:1fr 1fr}.coachPrimaryActions a{padding:0 9px}
+          .coachMetrics{grid-template-columns:1fr 1fr}.coachMetric:last-child{grid-column:1/-1}.coachMetric{padding:13px}.coachMetric strong{font-size:17px}
+          .coachContentCard{padding:16px;border-radius:17px}.coachQuickGrid{grid-template-columns:1fr 1fr}
+          .coachCheckin,.coachFeedback{grid-template-columns:1fr}.coachCheckin textarea,.coachCheckin button{grid-column:1}
         }
+        @media(max-width:380px){.coachPrimaryActions,.coachQuickGrid{grid-template-columns:1fr}.coachMetrics{grid-template-columns:1fr}.coachMetric:last-child{grid-column:auto}}
       `}</style>
 
-      <header className="coachHeadV2">
+      <header className="coachHeroNew">
         <div>
-          <p>Premium Coach</p>
+          <p className="coachEyebrow">Premium Coach</p>
           <h1>Твой нутрициолог</h1>
-          <span>Конкретные решения на сегодня и понятный фокус на неделю.</span>
+          <p>Одно главное решение на сегодня — без перегруженного дашборда.</p>
         </div>
-        <div className="coachHeadActions">
-          <Link href="/client/profile"><Settings2 size={17} /> Настройки</Link>
-          <Link href="/client/nutrition"><UtensilsCrossed size={17} /> Питание</Link>
-        </div>
+        <Link className="coachSettingsButton" href="/client/profile" aria-label="Настройки Coach">
+          <Settings2 size={20} />
+        </Link>
       </header>
 
       {(query.saved || query.feedback || query.checkin) ? (
         <div className="successNotice"><CheckCircle2 size={16} /> Сохранено. TeddY учтёт это в следующих рекомендациях.</div>
       ) : null}
 
-      <section className="coachStatsV2">
-        <article className="coachStatV2"><small>Сегодня</small><b>{fmt(Number(eaten.kcal || 0))} ккал съедено</b><span>{fmt(remainingKcal)} ккал осталось</span></article>
-        <article className="coachStatV2"><small>Белок</small><b>{fmt(Number(eaten.protein || 0))} г съедено</b><span>{fmt(remainingProtein)} г осталось</span></article>
-        <article className="coachStatV2"><small>Вес</small><b>{weightCount || "Мало"} измерений</b><span>Регулярность улучшает прогноз</span></article>
-        <article className="coachStatV2"><small>Данные</small><b>{intelligence.context ? "Контекст обновлён" : "Нужны записи"}</b><span>Питание, вес и обратная связь</span></article>
+      <section className="coachPrimaryCard">
+        <div className="coachPrimaryTop">
+          <span><Sparkles size={16} /> Главная задача</span>
+          <b>{statusTone === "warning" ? "Требует внимания" : "Всё по плану"}</b>
+        </div>
+        <h2>{nextStep}</h2>
+        <p>Ориентир на остаток дня: {fmt(remainingKcal)} ккал и {fmt(remainingProtein)} г белка.</p>
+        <div className="coachPrimaryActions">
+          <Link href="/client/nutrition"><UtensilsCrossed size={17} /> Добавить еду</Link>
+          <Link href="/client"><Gauge size={17} /> Сегодня</Link>
+        </div>
       </section>
 
-      <section className="coachActionV2">
-        <i><Sparkles size={21} /></i>
-        <div><small>Следующее действие</small><h2>{nextStep}</h2><p>Ориентир: {fmt(remainingKcal)} ккал и {fmt(remainingProtein)} г белка.</p></div>
-        <Link href="/client/nutrition">Открыть рацион <ChevronRight size={14} /></Link>
+      <section className="coachMetrics" aria-label="Прогресс дня">
+        <article className="coachMetric">
+          <div className="coachMetricHead"><span>Калории</span><Gauge size={16} /></div>
+          <strong>{fmt(eatenKcal)} / {fmt(kcalTarget || remainingKcal)}</strong>
+          <small>{fmt(remainingKcal)} ккал осталось</small>
+          <div className="coachProgress"><i style={{ width: `${kcalProgress}%` }} /></div>
+        </article>
+        <article className="coachMetric">
+          <div className="coachMetricHead"><span>Белок</span><UtensilsCrossed size={16} /></div>
+          <strong>{fmt(eatenProtein)} / {fmt(proteinTarget || remainingProtein)} г</strong>
+          <small>{fmt(remainingProtein)} г осталось</small>
+          <div className="coachProgress"><i style={{ width: `${proteinProgress}%` }} /></div>
+        </article>
+        <article className="coachMetric">
+          <div className="coachMetricHead"><span>Вес</span><Scale size={16} /></div>
+          <strong>{currentWeight ? `${fmt(currentWeight)} кг` : `${weightCount} измерений`}</strong>
+          <small>{weightCount >= 7 ? "Данных достаточно для динамики" : "Добавляй вес регулярно"}</small>
+        </article>
       </section>
 
-      <div className="coachGridV2">
-        <section className="coachPanelV2"><div className="coachPanelTitle"><div><h2>План на сегодня</h2><span>Без резких ограничений</span></div><Sparkles size={18} /></div><div className="coachBodyV2">{dailyPlan}</div></section>
-        <section className="coachPanelV2"><div className="coachPanelTitle"><div><h2>Фокус недели</h2><span>Одна главная задача</span></div><Target size={18} /></div><div className="coachBodyV2">{weeklyFocus}</div></section>
-      </div>
+      <div className="coachDashboard">
+        <div className="coachColumn">
+          <section className="coachContentCard">
+            <div className="coachCardHead"><div><h2>План на сегодня</h2><p>Коротко и по делу</p></div><i><Target size={18} /></i></div>
+            <div className="coachReadable">{dailyPlan}</div>
+          </section>
 
-      {latest ? (
-        <section className="coachPanelV2">
-          <div className="coachPanelTitle"><div><h2>Последняя рекомендация</h2><span>Отметь, насколько она подходит</span></div><TrendingUp size={18} /></div>
-          <div className="coachBodyV2">{clean(latest.recommendation_text)}</div>
-          {!latest.feedback ? (
-            <form action="/api/premium/feedback" method="post" className="coachFeedbackV2">
-              <input type="hidden" name="id" value={latest.id} />
-              <button name="feedback" value="useful" className="secondaryBtn">Полезно</button>
-              <select name="reason" defaultValue=""><option value="">Причина — необязательно</option><option>Не люблю эти продукты</option><option>Слишком дорого</option><option>Нет времени готовить</option><option>Слишком большой объём</option><option>Другое</option></select>
-              <button name="feedback" value="not_fit" className="secondaryBtn">Не подходит</button>
-            </form>
+          <section className="coachContentCard">
+            <div className="coachCardHead"><div><h2>Фокус недели</h2><p>Одна задача, которая даст результат</p></div><i><TrendingUp size={18} /></i></div>
+            <div className="coachReadable">{weeklyFocus}</div>
+          </section>
+
+          {latest ? (
+            <section className="coachContentCard">
+              <div className="coachCardHead"><div><h2>Последняя рекомендация</h2><p>Помоги TeddY стать точнее</p></div><i><Sparkles size={18} /></i></div>
+              <div className="coachReadable">{shortText(clean(latest.recommendation_text), 500)}</div>
+              {!latest.feedback ? (
+                <form action="/api/premium/feedback" method="post" className="coachFeedback">
+                  <input type="hidden" name="id" value={latest.id} />
+                  <button name="feedback" value="useful" className="secondaryBtn">Полезно</button>
+                  <select name="reason" defaultValue=""><option value="">Причина — необязательно</option><option>Не люблю эти продукты</option><option>Слишком дорого</option><option>Нет времени готовить</option><option>Слишком большой объём</option><option>Другое</option></select>
+                  <button name="feedback" value="not_fit" className="secondaryBtn">Не подходит</button>
+                </form>
+              ) : null}
+            </section>
           ) : null}
-        </section>
-      ) : null}
+        </div>
 
-      <section className="coachPanelV2">
-        <div className="coachPanelTitle"><div><h2>Как ты себя чувствуешь</h2><span>Помогает точнее корректировать план</span></div><Activity size={18} /></div>
-        <form className="coachCheckinV2" action="/api/premium/checkin" method="post">
-          <label>Голод<select name="hunger" defaultValue={checkin?.hunger || "normal"}><option value="low">Низкий</option><option value="normal">Нормальный</option><option value="high">Высокий</option></select></label>
-          <label>Энергия<select name="energy" defaultValue={checkin?.energy || "normal"}><option value="low">Низкая</option><option value="normal">Нормальная</option><option value="high">Высокая</option></select></label>
-          <label>Соблюдать питание<select name="adherence_ease" defaultValue={checkin?.adherence_ease || "normal"}><option value="easy">Легко</option><option value="normal">Нормально</option><option value="hard">Сложно</option></select></label>
-          <textarea name="note" placeholder="Комментарий — необязательно" defaultValue={checkin?.note || ""} />
-          <button className="primary">Сохранить самочувствие</button>
-        </form>
-      </section>
+        <aside className="coachColumn">
+          <section className="coachContentCard">
+            <div className="coachCardHead"><div><h2>Статус</h2><p>Что важно сейчас</p></div><i><CircleAlert size={18} /></i></div>
+            <div className={`coachRisk ${statusTone}`}><i><CircleAlert size={18} /></i><div><b>{statusTone === "warning" ? "Есть отставание по энергии" : "День идёт по плану"}</b><span>{statusTone === "warning" ? `Осталось около ${fmt(remainingKcal)} ккал. Не оставляй весь объём на поздний вечер.` : "Продолжай привычный ритм и фиксируй приёмы пищи."}</span></div></div>
+            <div className={`coachRisk ${weightCount >= 7 ? "good" : "warning"}`} style={{ marginTop: 9 }}><i><Scale size={18} /></i><div><b>{weightCount >= 7 ? "Вес отслеживается" : "Мало измерений веса"}</b><span>{weightCount >= 7 ? "Динамика уже достаточно надёжная." : `Сейчас доступно ${weightCount} измерений. Добавь ещё несколько.`}</span></div></div>
+          </section>
 
-      <nav className="coachQuickV2">
-        <Link href="/client/nutrition"><i><UtensilsCrossed size={18} /></i><span><b>Что поесть сейчас</b><small>Рацион и остаток КБЖУ</small></span><ChevronRight size={15} /></Link>
-        <Link href="/client/progress"><i><TrendingUp size={18} /></i><span><b>Почему меняется вес</b><small>Питание и динамика</small></span><ChevronRight size={15} /></Link>
-        <Link href="/client/profile"><i><Settings2 size={18} /></i><span><b>Изменить цель</b><small>Вес, калории и КБЖУ</small></span><ChevronRight size={15} /></Link>
-      </nav>
+          <nav className="coachQuickGrid" aria-label="Быстрые действия">
+            <Link className="coachQuickLink" href="/client/nutrition"><i><UtensilsCrossed size={18} /></i><span><b>Питание</b><small>Добавить приём</small></span><ChevronRight size={15} /></Link>
+            <Link className="coachQuickLink" href="/client/progress"><i><TrendingUp size={18} /></i><span><b>Прогресс</b><small>Графики и вес</small></span><ChevronRight size={15} /></Link>
+            <Link className="coachQuickLink" href="/client/history"><i><History size={18} /></i><span><b>История</b><small>Прошлые дни</small></span><ChevronRight size={15} /></Link>
+            <Link className="coachQuickLink" href="/client/profile"><i><Settings2 size={18} /></i><span><b>Настройки</b><small>Цели и КБЖУ</small></span><ChevronRight size={15} /></Link>
+          </nav>
+
+          <section className="coachContentCard">
+            <div className="coachCardHead"><div><h2>Самочувствие</h2><p>Три ответа улучшают рекомендации</p></div><i><Activity size={18} /></i></div>
+            <form className="coachCheckin" action="/api/premium/checkin" method="post">
+              <label>Голод<select name="hunger" defaultValue={checkin?.hunger || "normal"}><option value="low">Низкий</option><option value="normal">Нормальный</option><option value="high">Высокий</option></select></label>
+              <label>Энергия<select name="energy" defaultValue={checkin?.energy || "normal"}><option value="low">Низкая</option><option value="normal">Нормальная</option><option value="high">Высокая</option></select></label>
+              <label>Соблюдение<select name="adherence_ease" defaultValue={checkin?.adherence_ease || "normal"}><option value="easy">Легко</option><option value="normal">Нормально</option><option value="hard">Сложно</option></select></label>
+              <textarea name="note" placeholder="Комментарий — необязательно" defaultValue={checkin?.note || ""} />
+              <button className="primary">Сохранить</button>
+            </form>
+          </section>
+        </aside>
+      </div>
     </div>
   );
 }
