@@ -9,8 +9,9 @@ export type YooPayment = {
   paid?: boolean;
   amount: YooAmount;
   confirmation?: {
-    type?: string;
+    type?: "redirect" | "embedded" | string;
     confirmation_url?: string;
+    confirmation_token?: string;
   };
   metadata?: Record<string, string>;
   payment_method?: {
@@ -29,10 +30,14 @@ export type YooPayment = {
 export type YooCreatePaymentBody = {
   amount: YooAmount;
   capture: true;
-  confirmation: {
-    type: "redirect";
-    return_url: string;
-  };
+  confirmation:
+    | {
+        type: "redirect";
+        return_url: string;
+      }
+    | {
+        type: "embedded";
+      };
   description: string;
   metadata: Record<string, string>;
   receipt?: {
