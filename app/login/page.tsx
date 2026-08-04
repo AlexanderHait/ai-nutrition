@@ -41,9 +41,9 @@ export default async function Login({
   return (
     <main className="login loginV2">
       <style>{`
-        .loginV2{--bg:#081311;--surface:#10201c;--surface-soft:#142721;--panel:#10201c;--line:#294039;--line2:#365047;--text:#f5f7f4;--muted:#b9c7c2;--muted2:#98a8a3;--gold:#e3c568;--gold2:#e3c568;--accent-soft:#1b2a24;--login-bg:#081311;--login-panel:#10201c;--login-panel-soft:#142721;--login-border:#294039;--login-text:#f5f7f4;--login-muted:#b9c7c2;--login-muted-strong:#d6dfdc;--login-gold:#e3c568;min-height:100svh;padding:28px 16px 48px;background:radial-gradient(700px 360px at 50% -120px,rgba(227,197,104,.15),transparent 62%),linear-gradient(180deg,#0a1714,#07110f);color:var(--login-text);display:grid;place-items:center}
+        .loginV2{--login-bg:var(--bg);--login-panel:var(--panel);--login-panel-soft:var(--surface-soft);--login-border:var(--line);--login-text:var(--text);--login-muted:var(--muted);--login-muted-strong:var(--body,var(--text));--login-gold:var(--gold);min-height:100svh;padding:28px 16px 48px;background:radial-gradient(700px 360px at 50% -120px,color-mix(in srgb,var(--gold) 16%,transparent),transparent 62%),linear-gradient(180deg,var(--bg),var(--panel));color:var(--login-text);display:grid;place-items:center}
         .loginV2 .loginCard{width:min(520px,100%);padding:30px;border:1px solid var(--login-border);border-radius:24px;background:linear-gradient(180deg,rgba(18,36,31,.98),rgba(11,25,22,.99));box-shadow:0 28px 80px rgba(0,0,0,.34)}
-        .loginV2 .logoMark{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#efd47c,#cfa647);color:#13201c;font-weight:900;font-size:17px}
+        .loginV2 .logoMark{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold-btn),var(--gold-btn2));color:var(--on-gold);font-weight:900;font-size:17px}
         .loginV2 h1{margin:0;text-align:center;font-size:36px;letter-spacing:-1px;color:var(--login-text)}
         .loginV2>.loginCard>.muted{margin:6px 0 24px;text-align:center;color:var(--login-muted)!important;font-size:15px}
         .loginV2 .loginBlock{display:grid;gap:12px}
@@ -51,20 +51,20 @@ export default async function Login({
         .loginV2 .loginBlock .loginBlock{padding:0;border:0;background:transparent}
         .loginV2 h3{margin:0;color:var(--login-text);font-size:18px}
         .loginV2 p{margin:0;color:var(--login-muted);font-size:14px;line-height:1.55}
-        .loginV2 input{min-height:50px;background:#0b1916;border-color:#365047;color:var(--login-text);font-size:16px}
-        .loginV2 input::placeholder{color:#91a39d;opacity:1}
-        .loginV2 input:focus{border-color:var(--login-gold);box-shadow:0 0 0 3px rgba(227,197,104,.14);background:#0d1d19}
-        .loginV2 input:-webkit-autofill{-webkit-text-fill-color:var(--login-text);-webkit-box-shadow:0 0 0 1000px #0b1916 inset}
+        .loginV2 input{min-height:50px;background:var(--surface-soft);border-color:var(--line2);color:var(--login-text);font-size:16px}
+        .loginV2 input::placeholder{color:var(--muted);opacity:1}
+        .loginV2 input:focus{border-color:var(--login-gold);box-shadow:0 0 0 3px rgba(227,197,104,.14);background:var(--surface)}
+        .loginV2 input:-webkit-autofill{-webkit-text-fill-color:var(--login-text);-webkit-box-shadow:0 0 0 1000px var(--surface-soft) inset}
         .loginV2 .primary,.loginV2 .secondaryBtn{min-height:48px;justify-content:center;border-radius:13px;font-weight:800}
-        .loginV2 .primary{background:linear-gradient(135deg,#ecd076,#cda346);color:#12201c}
-        .loginV2 .secondaryBtn{width:100%;background:#162923;border-color:#3a554c;color:var(--login-text)}
-        .loginV2 .textLink{color:#ecd076;font-weight:750}
-        .loginV2 .divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#9eb0aa;font-size:13px}
-        .loginV2 .divider:before,.loginV2 .divider:after{content:"";height:1px;flex:1;background:#30463f}
+        .loginV2 .primary{background:linear-gradient(135deg,var(--gold-btn),var(--gold-btn2));color:var(--on-gold)}
+        .loginV2 .secondaryBtn{width:100%;background:var(--surface-soft);border-color:var(--line2);color:var(--login-text)}
+        .loginV2 .textLink{color:var(--gold);font-weight:750}
+        .loginV2 .divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted2);font-size:13px}
+        .loginV2 .divider:before,.loginV2 .divider:after{content:"";height:1px;flex:1;background:var(--panel2)}
         .loginV2 .loginInlineLinks{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
         .loginV2 .notice,.loginV2 .successNotice{margin-bottom:14px;border-radius:14px;padding:13px 14px;font-size:14px;line-height:1.45}
-        .loginV2 .notice{border:1px solid #74484b;background:#321b1e;color:#ffd4d7}
-        .loginV2 .successNotice{border:1px solid #37614c;background:#142c21;color:#d8f5e3}
+        .loginV2 .notice{border:1px solid color-mix(in srgb,var(--red) 45%,transparent);background:color-mix(in srgb,var(--red) 14%,var(--surface));color:var(--red)}
+        .loginV2 .successNotice{border:1px solid color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 14%,var(--surface));color:var(--green)}
         .loginV2 details{margin-top:14px}
         .loginV2 details summary{cursor:pointer;color:var(--login-muted-strong);font-size:14px;font-weight:700}
         .loginV2 details[open] summary{margin-bottom:14px;color:var(--login-text)}
