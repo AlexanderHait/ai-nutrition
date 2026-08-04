@@ -7,7 +7,7 @@ import { BrainCircuit, Home, TrendingUp, UserRound, Utensils } from "lucide-reac
 const items = [
   { href: "/client", label: "Сегодня", icon: Home },
   { href: "/client/nutrition", label: "Питание", icon: Utensils },
-  { href: "/client/coach", label: "Coach", icon: BrainCircuit },
+  { href: "/client/coach-v3", label: "Coach", icon: BrainCircuit },
   { href: "/client/progress", label: "Прогресс", icon: TrendingUp },
   { href: "/client/profile", label: "Профиль", icon: UserRound },
 ];
@@ -15,6 +15,7 @@ const items = [
 function active(pathname: string, href: string) {
   if (href === "/client") return pathname === href;
   if (href === "/client/nutrition") return pathname.startsWith("/client/nutrition") || pathname.startsWith("/client/history");
+  if (href === "/client/coach-v3") return pathname.startsWith("/client/coach");
   if (href === "/client/profile") {
     return pathname.startsWith("/client/profile")
       || pathname.startsWith("/client/plan")
