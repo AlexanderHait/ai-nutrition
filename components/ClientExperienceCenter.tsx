@@ -65,27 +65,27 @@ export default function ClientExperienceCenter({ setupRequired }: { setupRequire
     <>
       <style>{`
         .experienceCenter{position:fixed;top:18px;right:18px;z-index:90}
-        .experienceCenter>summary{list-style:none;width:42px;height:42px;border:1px solid #303238;border-radius:12px;background:#111216;display:grid;place-items:center;color:#d8b85f;cursor:pointer;box-shadow:0 12px 38px rgba(0,0,0,.32);position:relative}
+        .experienceCenter>summary{list-style:none;width:42px;height:42px;border:1px solid var(--line);border-radius:12px;background:var(--bg);display:grid;place-items:center;color:var(--gold);cursor:pointer;box-shadow:0 12px 38px rgba(0,0,0,.32);position:relative}
         .experienceCenter>summary::-webkit-details-marker{display:none}
-        .experienceCenterBadge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:grid;place-items:center;background:#d8b85f;color:#111;font-size:12.5px;font-weight:900;border:2px solid #0a0b0d}
-        .experiencePanel{position:absolute;top:50px;right:0;width:min(390px,calc(100vw - 24px));max-height:76vh;overflow:auto;padding:16px;border:1px solid #2c2e33;border-radius:16px;background:#0f1013;box-shadow:0 24px 70px rgba(0,0,0,.58)}
+        .experienceCenterBadge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:grid;place-items:center;background:var(--gold);color:#111;font-size:12.5px;font-weight:900;border:2px solid var(--line)}
+        .experiencePanel{position:absolute;top:50px;right:0;width:min(390px,calc(100vw - 24px));max-height:76vh;overflow:auto;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--bg);box-shadow:0 24px 70px rgba(0,0,0,.58)}
         .experiencePanelHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
-        .experiencePanelHead h2{margin:0;font-size:16px}.experiencePanelHead span{display:block;color:#777b78;font-size:13px;margin-top:3px}
+        .experiencePanelHead h2{margin:0;font-size:16px}.experiencePanelHead span{display:block;color:var(--muted2);font-size:13px;margin-top:3px}
         .experienceNoticeList{display:grid;gap:7px}
-        .experienceNotice{display:grid;grid-template-columns:31px minmax(0,1fr) 15px;gap:10px;align-items:start;padding:11px;border:1px solid #24262b;border-radius:12px;background:#121317}
-        .experienceNotice>i{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;background:#17181c;color:#9da09c}
-        .experienceNotice.warning>i{background:#1c1712;color:#dfad63}.experienceNotice.good>i{background:#111914;color:#77b88d}
-        .experienceNotice b{display:block;font-size:13px}.experienceNotice small{display:block;margin-top:3px;color:#888b88;font-size:13px;line-height:1.4}
-        .experienceNotice>svg{margin-top:7px;color:#666a67}
-        .experienceSectionTitle{margin:15px 0 8px;color:#666a67;font-size:12.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:800}
+        .experienceNotice{display:grid;grid-template-columns:31px minmax(0,1fr) 15px;gap:10px;align-items:start;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+        .experienceNotice>i{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;background:var(--surface-soft);color:var(--muted)}
+        .experienceNotice.warning>i{background:#1c1712;color:var(--gold)}.experienceNotice.good>i{background:var(--green);color:var(--green)}
+        .experienceNotice b{display:block;font-size:13px}.experienceNotice small{display:block;margin-top:3px;color:var(--muted2);font-size:13px;line-height:1.4}
+        .experienceNotice>svg{margin-top:7px;color:var(--muted2)}
+        .experienceSectionTitle{margin:15px 0 8px;color:var(--muted2);font-size:12.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:800}
         .achievementList{display:grid;gap:6px}
-        .achievementItem{display:grid;grid-template-columns:29px 1fr;gap:9px;padding:9px 10px;border-radius:11px;background:#11130f;border:1px solid #25281f}
-        .achievementItem>i{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;color:#c7ad60;background:#18180f}
-        .achievementItem b{display:block;font-size:12.5px}.achievementItem small{display:block;color:#7e817b;font-size:12.5px;margin-top:2px}
-        .premiumMoment{display:grid;grid-template-columns:34px 1fr;gap:10px;margin-top:13px;padding:12px;border-radius:13px;border:1px solid #473d24;background:#15130e}
-        .premiumMoment>i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#e0bd64;background:#1d1910}
-        .premiumMoment b{display:block;font-size:13px}.premiumMoment p{margin:4px 0 9px;color:#96978f;font-size:13px;line-height:1.4}.premiumMoment a{display:inline-flex;align-items:center;gap:5px;color:#dfbd66;font-size:13px;font-weight:800}
-        .experienceEmpty{padding:14px;border:1px solid #25272b;border-radius:12px;color:#838683;font-size:12.5px;text-align:center}
+        .achievementItem{display:grid;grid-template-columns:29px 1fr;gap:9px;padding:9px 10px;border-radius:11px;background:var(--bg);border:1px solid var(--line)}
+        .achievementItem>i{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;color:var(--gold);background:var(--accent-soft)}
+        .achievementItem b{display:block;font-size:12.5px}.achievementItem small{display:block;color:var(--muted2);font-size:12.5px;margin-top:2px}
+        .premiumMoment{display:grid;grid-template-columns:34px 1fr;gap:10px;margin-top:13px;padding:12px;border-radius:13px;border:1px solid var(--gold2);background:var(--accent-soft)}
+        .premiumMoment>i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--gold);background:var(--accent-soft)}
+        .premiumMoment b{display:block;font-size:13px}.premiumMoment p{margin:4px 0 9px;color:var(--muted);font-size:13px;line-height:1.4}.premiumMoment a{display:inline-flex;align-items:center;gap:5px;color:var(--gold);font-size:13px;font-weight:800}
+        .experienceEmpty{padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted2);font-size:12.5px;text-align:center}
         @media(max-width:900px){.experienceCenter{top:10px;right:68px}.experienceCenter>summary{width:40px;height:40px}.experiencePanel{top:47px;right:-55px;max-height:70vh}}
       `}</style>
 

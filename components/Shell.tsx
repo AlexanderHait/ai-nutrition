@@ -9,34 +9,34 @@ type NavGroup = { label: string; items: readonly NavItem[] };
 
 const calmUiCss = String.raw`
 .calmUi{
-  --calm-bg:#0a0b0d;
-  --calm-surface:#111216;
-  --calm-surface-soft:#0e0f12;
-  --calm-line:#24262b;
-  --calm-text:#f3f3ef;
-  --calm-muted:#858885;
+  --calm-bg:var(--bg);
+  --calm-surface:var(--surface);
+  --calm-surface-soft:var(--surface-soft);
+  --calm-line:var(--line);
+  --calm-text:var(--text);
+  --calm-muted:var(--muted);
 }
 .calmUi.app{grid-template-columns:208px minmax(0,1fr);background:var(--calm-bg)}
-.calmUi .side{padding:20px 12px;border-color:#202226;background:#0c0d0f;backdrop-filter:none}
+.calmUi .side{padding:20px 12px;border-color:var(--line);background:var(--panel);backdrop-filter:none}
 .calmUi .brand{padding:5px 9px 24px;font-size:18px}
 .calmUi .brand span{width:31px;height:31px;border-radius:9px;margin-right:8px;box-shadow:none}
-.calmUi .desktopNav{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#26282d transparent}
+.calmUi .desktopNav{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
 .calmUi .desktopNav::-webkit-scrollbar{width:5px}
-.calmUi .desktopNav::-webkit-scrollbar-thumb{background:#26282d;border-radius:99px}
-.calmUi .sideBottom{padding-top:10px;border-top:1px solid #1c1e22}
+.calmUi .desktopNav::-webkit-scrollbar-thumb{background:var(--panel2);border-radius:99px}
+.calmUi .sideBottom{padding-top:10px;border-top:1px solid var(--line)}
 .calmUi .navSection{gap:3px;margin-bottom:12px}
-.calmUi .navSectionLabel{padding:0 11px 5px;color:#55585a;font-size:12.5px;letter-spacing:.12em}
-.calmUi .desktopNav a{min-height:41px;padding:10px 11px;border-radius:10px;color:#9a9d99;font-size:13px}
-.calmUi .desktopNav a:hover{background:#14161a;color:#e8e8e4}
+.calmUi .navSectionLabel{padding:0 11px 5px;color:var(--muted2);font-size:12.5px;letter-spacing:.12em}
+.calmUi .desktopNav a{min-height:41px;padding:10px 11px;border-radius:10px;color:var(--muted);font-size:13px}
+.calmUi .desktopNav a:hover{background:var(--surface-soft);color:var(--text)}
 .calmUi .desktopNav a.active,
-.calmUi .desktopNav a[aria-current="page"]{background:#171710;color:#ead484;box-shadow:inset 2px 0 0 #d3b35b}
+.calmUi .desktopNav a[aria-current="page"]{background:var(--accent-soft);color:var(--gold);box-shadow:inset 2px 0 0 var(--gold)}
 .calmUi .sideLogout{min-height:40px;padding:9px 11px;border-radius:9px;font-size:13px}
 .calmUi .content{max-width:1180px;padding:32px clamp(22px,3.2vw,42px) 64px}
 .calmUi .pageHead{margin-bottom:19px;gap:16px}
 .calmUi .pageHead>div{max-width:720px}
 .calmUi .pageHead p{margin-bottom:6px;font-size:12.5px;letter-spacing:.12em}
 .calmUi .pageHead h1{font-size:clamp(28px,2.7vw,36px);line-height:1.04;letter-spacing:-1px;margin-bottom:6px}
-.calmUi .pageHead span{max-width:670px;color:#949793;font-size:13px;line-height:1.48}
+.calmUi .pageHead span{max-width:670px;color:var(--muted);font-size:13px;line-height:1.48}
 .calmUi .card,
 .calmUi .stat,
 .calmUi .clientTodayHero,
@@ -46,40 +46,40 @@ const calmUiCss = String.raw`
 .calmUi .card h2{font-size:15px;margin-bottom:13px}
 .calmUi .top{margin-top:11px}
 .calmUi .sectionTitleRow{gap:12px}
-.calmUi .sectionTitleRow .muted{font-size:13px;color:#777a77!important}
-.calmUi .sectionTitleRow>svg{opacity:.5;color:#8a8d89}
+.calmUi .sectionTitleRow .muted{font-size:13px;color:var(--muted2)!important}
+.calmUi .sectionTitleRow>svg{opacity:.5;color:var(--muted2)}
 .calmUi .muted{color:var(--calm-muted)!important}
-.calmUi .textLink{font-size:12.5px;font-weight:650;color:#b8bab6}
-.calmUi .primary{background:#d8b85f;color:#111;border-radius:10px;box-shadow:none}
-.calmUi .secondaryBtn{background:transparent;border-color:#303238;border-radius:10px;color:#b5b7b4}
+.calmUi .textLink{font-size:12.5px;font-weight:650;color:var(--muted)}
+.calmUi .primary{background:var(--gold);color:var(--bg);border-radius:10px;box-shadow:none}
+.calmUi .secondaryBtn{background:transparent;border-color:var(--line);border-radius:10px;color:var(--muted)}
 .calmUi input,
 .calmUi select,
-.calmUi textarea{background:#0d0e11;border-color:#2a2c31;border-radius:10px}
+.calmUi textarea{background:var(--bg);border-color:var(--line);border-radius:10px}
 .calmUi .tableCard{background:var(--calm-surface-soft);border-color:var(--calm-line);box-shadow:none}
-.calmUi .tableHead{background:#0c0d0f;color:#666966}
-.calmUi .tableRow{border-color:#202227}
-.calmUi .tableRow:hover{background:#121418}
+.calmUi .tableHead{background:var(--bg);color:var(--muted2)}
+.calmUi .tableRow{border-color:var(--line)}
+.calmUi .tableRow:hover{background:var(--surface-soft)}
 
 .clientApp .clientWelcome{margin-bottom:14px}
 .clientApp .clientWelcome h1{font-size:30px;letter-spacing:-.8px}
-.clientApp .clientWelcome>div>span{font-size:12.5px;color:#858885}
+.clientApp .clientWelcome>div>span{font-size:12.5px;color:var(--muted2)}
 .clientApp .clientProfileHero{padding:15px;border-radius:14px;background:var(--calm-surface);border-color:var(--calm-line)}
-.clientApp .profileForm.modern .formSection{background:var(--calm-surface-soft);border-color:#24262b;border-radius:12px}
+.clientApp .profileForm.modern .formSection{background:var(--calm-surface-soft);border-color:var(--line);border-radius:12px}
 .clientApp .planCard{padding:18px;border-radius:14px;background:var(--calm-surface)}
-.clientApp .planCard.premium{background:#14130f;border-color:#4b4127}
+.clientApp .planCard.premium{background:var(--bg);border-color:var(--gold2)}
 .clientApp .planFeatures{margin:15px 0;gap:7px}
 .clientApp .premiumDifference>div,
-.clientApp .premiumExamples article{background:var(--calm-surface-soft);border-color:#25272c}
+.clientApp .premiumExamples article{background:var(--calm-surface-soft);border-color:var(--line)}
 
 .adminApp .adminKpis,
 .adminApp .metricGrid{gap:8px}
 .adminApp .adminKpi,
 .adminApp .metricCard{padding:14px;border-radius:13px;background:var(--calm-surface);border-color:var(--calm-line);box-shadow:none}
-.adminApp .adminKpi>i{width:34px;height:34px;border:1px solid #292c31;border-radius:10px;background:transparent;color:#8f928e}
+.adminApp .adminKpi>i{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted)}
 .adminApp .adminKpi b{font-size:21px}
 .adminApp .attentionCard,
 .adminApp .profileFactV2,
-.adminApp .foodCard{background:var(--calm-surface-soft);border-color:#24262b}
+.adminApp .foodCard{background:var(--calm-surface-soft);border-color:var(--line)}
 .adminApp .dialogsList{background:var(--calm-surface-soft)}
 .adminApp .dialogPerson:hover{transform:none}
 
@@ -92,8 +92,8 @@ const calmUiCss = String.raw`
   .clientApp.calmUi.app{padding-bottom:76px}
   .calmUi .content{max-width:760px;padding:18px 14px 38px}
   .clientApp .content{padding-bottom:84px}
-  .calmUi .mobileTopbar{height:62px;background:rgba(10,11,13,.96);border-color:#202226;backdrop-filter:blur(16px)}
-  .calmUi .mobileDrawer{background:#0c0d0f;border-color:#24262b}
+  .calmUi .mobileTopbar{height:62px;background:var(--nav);border-color:var(--line);backdrop-filter:blur(16px)}
+  .calmUi .mobileDrawer{background:var(--panel);border-color:var(--line)}
   .calmUi .mobileDrawerNav a{min-height:43px;border-radius:10px;font-size:13px}
   .calmUi .pageHead{margin-bottom:16px}
   .calmUi .pageHead h1{font-size:27px}

@@ -8,9 +8,9 @@ export default function SimplifiedSections() {
         gap:14px;
         padding:17px 18px;
         margin-bottom:11px;
-        border:1px solid #403821;
+        border:1px solid var(--gold2);
         border-radius:15px;
-        background:linear-gradient(120deg,#17150f,#111216);
+        background:linear-gradient(120deg,var(--accent-soft),var(--bg));
       }
       .primaryFocus>i{
         width:40px;
@@ -18,19 +18,19 @@ export default function SimplifiedSections() {
         display:grid;
         place-items:center;
         border-radius:12px;
-        background:#242015;
+        background:var(--accent-soft);
         color:var(--gold);
       }
       .primaryFocus>div{display:grid;min-width:0}
       .primaryFocus small{
-        color:#8f7c49;
+        color:var(--gold);
         font-size:12.5px;
         font-weight:800;
         letter-spacing:.09em;
         text-transform:uppercase;
       }
       .primaryFocus b{font-size:16px;margin-top:3px}
-      .primaryFocus p{margin:3px 0 0;color:#9b9d99;font-size:12.5px;line-height:1.5}
+      .primaryFocus p{margin:3px 0 0;color:var(--muted);font-size:12.5px;line-height:1.5}
       .primaryFocus>a{
         display:flex;
         align-items:center;
@@ -42,9 +42,9 @@ export default function SimplifiedSections() {
       }
 
       .secondaryDisclosure{
-        border:1px solid #25272c;
+        border:1px solid var(--line);
         border-radius:14px;
-        background:#0e0f12;
+        background:var(--bg);
         overflow:hidden;
       }
       .secondaryDisclosure>summary{
@@ -56,17 +56,17 @@ export default function SimplifiedSections() {
         min-height:52px;
         padding:13px 16px;
         cursor:pointer;
-        color:#c8cac6;
+        color:var(--muted);
       }
       .secondaryDisclosure>summary::-webkit-details-marker{display:none}
       .secondaryDisclosure>summary>span{display:grid;min-width:0}
       .secondaryDisclosure>summary b{font-size:13px}
-      .secondaryDisclosure>summary small{color:#737673;font-size:12.5px;margin-top:2px}
+      .secondaryDisclosure>summary small{color:var(--muted2);font-size:12.5px;margin-top:2px}
       .secondaryDisclosure>summary svg{color:#777;transition:transform .18s}
       .secondaryDisclosure[open]>summary svg{transform:rotate(180deg)}
       .secondaryDisclosure>.disclosureBody{
         padding:0 16px 16px;
-        border-top:1px solid #22242a;
+        border-top:1px solid var(--line);
       }
 
       .profileOverview{
@@ -77,9 +77,9 @@ export default function SimplifiedSections() {
       }
       .profileOverviewItem{
         padding:12px 13px;
-        border:1px solid #25272c;
+        border:1px solid var(--line);
         border-radius:12px;
-        background:#0e0f12;
+        background:var(--bg);
       }
       .profileOverviewItem span{display:block;color:#777;font-size:12.5px}
       .profileOverviewItem b{display:block;margin-top:5px;font-size:14px}
@@ -98,9 +98,9 @@ export default function SimplifiedSections() {
         align-items:center;
         gap:10px;
         padding:13px;
-        border:1px solid #25272c;
+        border:1px solid var(--line);
         border-radius:12px;
-        background:#0e0f12;
+        background:var(--bg);
       }
       .progressKeyStat>i{
         width:34px;
@@ -108,7 +108,7 @@ export default function SimplifiedSections() {
         display:grid;
         place-items:center;
         border-radius:10px;
-        border:1px solid #2c2e33;
+        border:1px solid var(--line);
         color:var(--gold);
       }
       .progressKeyStat span{display:grid}
@@ -145,9 +145,9 @@ export default function SimplifiedSections() {
         display:grid;
         gap:6px;
         padding:16px;
-        border:1px solid #2b2d32;
+        border:1px solid var(--line);
         border-radius:14px;
-        background:#101115;
+        background:var(--bg);
       }
       .premiumOutcome>i{
         width:34px;
@@ -155,21 +155,21 @@ export default function SimplifiedSections() {
         display:grid;
         place-items:center;
         border-radius:10px;
-        background:#1f1b12;
+        background:var(--accent-soft);
         color:var(--gold);
       }
       .premiumOutcome b{font-size:13px}
-      .premiumOutcome p{margin:0;color:#858885;font-size:13px;line-height:1.5}
+      .premiumOutcome p{margin:0;color:var(--muted2);font-size:13px;line-height:1.5}
       .premiumOffer{
         display:grid;
         grid-template-columns:minmax(0,1fr) auto;
         align-items:center;
         gap:18px;
-        border-color:#4b4127!important;
-        background:linear-gradient(120deg,#17150f,#111216)!important;
+        border-color:var(--gold2)!important;
+        background:linear-gradient(120deg,var(--accent-soft),var(--bg))!important;
       }
       .premiumOffer h2{margin:0 0 5px!important}
-      .premiumOffer p{margin:0;color:#898c88;font-size:12.5px}
+      .premiumOffer p{margin:0;color:var(--muted2);font-size:12.5px}
       .premiumOffer strong{display:block;margin-top:9px;font-size:20px}
       .premiumOffer form,.premiumOffer>a{min-width:220px}
       .planCompareGrid{
@@ -180,22 +180,22 @@ export default function SimplifiedSections() {
       }
       .planCompareCard{
         padding:15px;
-        border:1px solid #27292e;
+        border:1px solid var(--line);
         border-radius:13px;
-        background:#101115;
+        background:var(--bg);
       }
       .planCompareCard h3{margin:0;font-size:16px}
       .planCompareCard>p{margin:4px 0 12px;color:#777;font-size:13px}
       .planCompareCard ul{display:grid;gap:7px;margin:0;padding:0;list-style:none}
-      .planCompareCard li{display:flex;gap:7px;color:#bfc1bd;font-size:13px}
-      .planCompareCard li svg{flex:none;color:#cbb05e}
+      .planCompareCard li{display:flex;gap:7px;color:var(--muted);font-size:13px}
+      .planCompareCard li svg{flex:none;color:var(--gold)}
 
       .coachLockedCompact{
         max-width:930px;
         margin:0 auto;
-        border:1px solid #413821;
+        border:1px solid var(--gold2);
         border-radius:16px;
-        background:linear-gradient(120deg,#15140f,#101114);
+        background:linear-gradient(120deg,var(--accent-soft),var(--bg));
         overflow:hidden;
       }
       .coachLockedLead{
@@ -211,33 +211,33 @@ export default function SimplifiedSections() {
         display:grid;
         place-items:center;
         border-radius:14px;
-        background:#231f14;
+        background:var(--accent-soft);
         color:var(--gold);
       }
       .coachLockedLead small{
-        color:#9c864d;
+        color:var(--gold);
         font-size:12.5px;
         font-weight:800;
         letter-spacing:.1em;
         text-transform:uppercase;
       }
       .coachLockedLead h2{margin:3px 0 4px;font-size:21px}
-      .coachLockedLead p{margin:0;max-width:610px;color:#8b8e8a;font-size:12.5px;line-height:1.55}
+      .coachLockedLead p{margin:0;max-width:610px;color:var(--muted);font-size:12.5px;line-height:1.55}
       .coachLockedLead .primary{white-space:nowrap}
       .coachLockedBenefits{
         display:grid;
         grid-template-columns:repeat(3,minmax(0,1fr));
-        border-top:1px solid #2c2a22;
+        border-top:1px solid var(--line);
       }
       .coachLockedBenefits>div{
         display:flex;
         align-items:center;
         gap:10px;
         padding:14px 18px;
-        border-right:1px solid #292922;
+        border-right:1px solid var(--line);
       }
       .coachLockedBenefits>div:last-child{border-right:0}
-      .coachLockedBenefits svg{color:#c9aa57;flex:none}
+      .coachLockedBenefits svg{color:var(--gold);flex:none}
       .coachLockedBenefits span{display:grid}
       .coachLockedBenefits b{font-size:12.5px}
       .coachLockedBenefits small{font-size:12.5px;color:#777;margin-top:2px}
@@ -257,9 +257,9 @@ export default function SimplifiedSections() {
         gap:10px;
         align-items:center;
         padding:11px 12px;
-        border:1px solid #25272c;
+        border:1px solid var(--line);
         border-radius:11px;
-        background:#0e0f12;
+        background:var(--bg);
       }
       .adminAction>i{
         width:32px;
@@ -267,13 +267,13 @@ export default function SimplifiedSections() {
         display:grid;
         place-items:center;
         border-radius:9px;
-        border:1px solid #2b2d32;
+        border:1px solid var(--line);
         color:var(--gold);
       }
       .adminAction span{display:grid}
       .adminAction b{font-size:12.5px}
       .adminAction small{font-size:12.5px;color:#777;margin-top:2px}
-      .adminAction>strong{font-size:13px;color:#d5bc70}
+      .adminAction>strong{font-size:13px;color:var(--gold)}
       .adminToolsGrid{
         display:grid;
         grid-template-columns:repeat(3,minmax(0,1fr));
@@ -288,7 +288,7 @@ export default function SimplifiedSections() {
         gap:10px;
         align-items:center;
         padding:11px 0;
-        border-bottom:1px solid #22242a;
+        border-bottom:1px solid var(--line);
       }
       .adminToolLink:last-child{border-bottom:0}
       .adminToolLink>i{
@@ -296,14 +296,14 @@ export default function SimplifiedSections() {
         height:30px;
         display:grid;
         place-items:center;
-        border:1px solid #2b2d32;
+        border:1px solid var(--line);
         border-radius:9px;
         color:var(--gold);
       }
       .adminToolLink span{display:grid}
       .adminToolLink b{font-size:12.5px}
       .adminToolLink small{font-size:12.5px;color:#777;margin-top:2px}
-      .adminToolLink>em{font-style:normal;color:#686b68;font-size:14px}
+      .adminToolLink>em{font-style:normal;color:var(--muted2);font-size:14px}
 
       .emptyGuidance{
         min-height:150px;
@@ -315,7 +315,7 @@ export default function SimplifiedSections() {
         color:#777;
       }
       .emptyGuidance svg{color:var(--gold)}
-      .emptyGuidance b{color:#d7d8d4;font-size:14px}
+      .emptyGuidance b{color:var(--text);font-size:14px}
       .emptyGuidance span{max-width:420px;font-size:13px;line-height:1.5}
 
       @media(max-width:1000px){
@@ -338,7 +338,7 @@ export default function SimplifiedSections() {
         .coachLockedLead{grid-template-columns:1fr;text-align:left;padding:18px}
         .coachLockedLead .primary{grid-column:1;width:100%;justify-content:center}
         .coachLockedBenefits{grid-template-columns:1fr}
-        .coachLockedBenefits>div{border-right:0;border-bottom:1px solid #292922}
+        .coachLockedBenefits>div{border-right:0;border-bottom:1px solid var(--line)}
         .coachLockedBenefits>div:last-child{border-bottom:0}
         .adminKpisCompact{grid-template-columns:1fr!important}
         .adminToolsGrid{grid-template-columns:1fr}

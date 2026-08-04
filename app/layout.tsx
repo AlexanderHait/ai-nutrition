@@ -121,19 +121,9 @@ const themeCss = `
 html,body{background:var(--bg)!important;color:var(--text)!important}
 body{background-image:none!important}
 .calmUi.app{background:var(--bg)!important;color:var(--text)!important}
-.calmUi{--calm-bg:var(--bg)!important;--calm-surface:var(--surface)!important;--calm-surface-soft:var(--surface-soft)!important;--calm-line:var(--line)!important;--calm-text:var(--text)!important;--calm-muted:var(--muted)!important}
-.calmUi .content{background:transparent!important}
-.calmUi .side{background:var(--panel)!important;border-color:var(--line)!important}
-.calmUi .brand,.calmUi .mobileBrand{color:var(--text)!important}
 .calmUi .brand strong,.calmUi .mobileBrand strong{font-size:18px!important;font-weight:800;letter-spacing:-.35px}
 .calmUi .brand span,.calmUi .mobileBrand span{background:linear-gradient(145deg,#e8cd78,#cda749)!important;color:#17201e!important;box-shadow:none!important}
-.calmUi .desktopNav a{color:var(--muted)!important}
-.calmUi .desktopNav a:hover{background:var(--surface-soft)!important;color:var(--text)!important}
 .calmUi .desktopNav a.active,.calmUi .desktopNav a[aria-current="page"]{background:var(--accent-soft)!important;color:var(--gold2)!important;box-shadow:none!important}
-.calmUi .navSectionLabel{color:var(--muted2)!important}
-.calmUi .sideBottom{border-color:var(--line)!important}
-.calmUi .sideLogout{color:var(--muted)!important}
-.calmUi .sideLogout:hover{background:var(--surface-soft)!important;color:var(--text)!important}
 
 .card,.stat,.heroKcal,.clientTodayHero,.clientMacroCard,.progressSummaryCard,.clientDashboardHero,.clientInsightCard,.clientProfileHero,.clientWeekCard,.clientCoachCard,.planCard,.premiumLockHero,.premiumPlanHero,.currentPlanStrip,.planTeaser,.subscriptionCard,.todayNutritionCard,.attentionCard,.miniStat,.clientFact,.funnelStep,.visualMealSession,.smartMealCard,.conversation,.dialogsList,.formSection,.clientQuickStat,.clientNextMeal,.clientTimelineCard,.clientMealList,.clientCoachSummary,.clientCoachPanel,.clientPremiumCard{
   background:var(--surface)!important;
@@ -144,9 +134,6 @@ body{background-image:none!important}
 .clientInsightCard,.clientQuickStat,.clientNextMeal,.miniStat,.clientFact,.funnelStep,.visualMealSession,.smartMealCard{border-radius:14px!important}
 .card .card,.clientCoachCard .card,.premiumPlanHero .card,.todayNutritionCard .card{background:var(--surface-soft)!important;box-shadow:none!important}
 
-.clientDashboardHero,.clientTodayHero,.todayNutritionCard,.premiumPlanHero,.planCard.premium{background:var(--surface)!important}
-
-.clientWelcome h1,.pageHead h1,.clientWelcome p,.pageHead p,.sectionTitleRow h2,.card h2,.clientCoachCard h2,.planCard h2{color:var(--text)!important}
 .clientWelcome>div>span,.pageHead span,.muted,.clientHeroCopy>span,.clientHeroCopy p,.sectionSub,.clientQuickStat span,.clientQuickStat small,.clientMealList small,.planCard p,.planFeatures div,.premiumLongText{color:var(--muted)!important}
 .textLink,.clientMealList a,.clientCoachCard a{color:var(--gold2)!important}
 
@@ -156,11 +143,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold)!important;box-s
 .secondaryBtn,.compactBtn,.planCta{background:var(--surface-soft)!important;color:var(--text)!important;border-color:var(--line2)!important}
 
 .tableHead,.conversationHead,.visualMealSession>header{background:var(--surface-soft)!important;color:var(--muted)!important;border-color:var(--line)!important}
-.tableRow,.row,.meal,.health,.visualMealItem,.recentClient,.subscriptionRow{border-color:var(--line)!important}
-.tableRow:hover,.dialogPerson:hover,.dialogPerson.active{background:var(--surface-soft)!important}
 .messageBubble,.chat,.telegramPreview>div,.premiumScenario,.aiObservations p{background:var(--surface-soft)!important;border-color:var(--line)!important;color:var(--text)!important}
 .messageBubble.assistant,.chat.assistant{background:var(--accent-soft)!important;border-color:var(--line2)!important}
-.messageBubble p,.chat p,.digest,.premiumLongText{color:var(--text)!important}
 
 .progress,.goalProgress,.macroProgress,.macroRow>i,.heroMacroRow>i,.stackedBar,.funnelStep>i{background:color-mix(in srgb,var(--line) 72%,transparent)!important}
 .progress i,.goalProgress i,.macroProgress i,.heroMacroRow em,.funnelStep em{background:linear-gradient(90deg,#c69f42,#e4c96f)!important}
