@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: {
@@ -54,34 +55,6 @@ const themeBoot = `
   }
 })();`;
 
-const themeControls = `
-(() => {
-  const mount = () => {
-    if (document.getElementById('teddy-theme-toggle')) return;
-    const button = document.createElement('button');
-    button.id = 'teddy-theme-toggle';
-    button.type = 'button';
-    button.setAttribute('aria-label', 'Переключить тему');
-    const render = () => {
-      const dark = document.documentElement.dataset.theme === 'dark';
-      button.textContent = dark ? '☀' : '☾';
-      button.title = dark ? 'Включить светлую тему' : 'Включить тёмную тему';
-      button.setAttribute('aria-pressed', String(!dark));
-    };
-    button.addEventListener('click', () => {
-      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
-      document.documentElement.style.colorScheme = next;
-      localStorage.setItem('teddy-theme', next);
-      render();
-    });
-    document.body.appendChild(button);
-    render();
-  };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });
-  else mount();
-})();`;
-
 const themeCss = `
 :root[data-theme="dark"]{
   --bg:#0d1716;
@@ -101,6 +74,17 @@ const themeCss = `
   --shadow:0 18px 46px rgba(2,12,11,.28);
   --nav:rgba(15,25,24,.94);
   --accent-soft:#20261e;
+  --acc-prot:#6aa9e0;
+  --acc-fat:#e0a86a;
+  --acc-carb:#7fc9a4;
+  --acc-good:#63b98a;
+  --acc-warn:#d8a05c;
+  --acc-bad:#cf7a6b;
+  --acc-info:#5cb0c4;
+  --tier-free:#8a9099;
+  --tier-basic:#5cb0c4;
+  --tier-premium:#d8b85f;
+  --tier-premium-2:#a08ad0;
 }
 :root[data-theme="light"]{
   --bg:#f2f5f2;
@@ -120,8 +104,20 @@ const themeCss = `
   --shadow:0 12px 32px rgba(38,61,54,.08);
   --nav:rgba(250,251,248,.95);
   --accent-soft:#f5efe0;
+  --acc-prot:#2f6fa8;
+  --acc-fat:#a5702c;
+  --acc-carb:#2f8f6b;
+  --acc-good:#2f8f70;
+  --acc-warn:#a5702c;
+  --acc-bad:#b34a3a;
+  --acc-info:#2b7f93;
+  --tier-free:#5f6b73;
+  --tier-basic:#2b7f93;
+  --tier-premium:#a97e21;
+  --tier-premium-2:#6d55a3;
 }
-*{transition-property:background-color,border-color,color,box-shadow;transition-duration:.16s;transition-timing-function:ease}
+.card,.stat,.tableRow,.dialogPerson,.messageBubble,.chat,.side,.mobileTopbar,.mobileDrawer,.clientBottomNav,.themeToggle,input,select,textarea,button,a{transition-property:background-color,border-color,color,box-shadow;transition-duration:.16s;transition-timing-function:ease}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation-duration:0s!important}}
 html,body{background:var(--bg)!important;color:var(--text)!important}
 body{background-image:none!important}
 .calmUi.app{background:var(--bg)!important;color:var(--text)!important}
@@ -129,8 +125,7 @@ body{background-image:none!important}
 .calmUi .content{background:transparent!important}
 .calmUi .side{background:var(--panel)!important;border-color:var(--line)!important}
 .calmUi .brand,.calmUi .mobileBrand{color:var(--text)!important}
-.calmUi .brand strong,.calmUi .mobileBrand strong{font-size:0!important}
-.calmUi .brand strong::after,.calmUi .mobileBrand strong::after{content:"TeddY";font-size:18px;font-weight:800;letter-spacing:-.35px}
+.calmUi .brand strong,.calmUi .mobileBrand strong{font-size:18px!important;font-weight:800;letter-spacing:-.35px}
 .calmUi .brand span,.calmUi .mobileBrand span{background:linear-gradient(145deg,#e8cd78,#cda749)!important;color:#17201e!important;box-shadow:none!important}
 .calmUi .desktopNav a{color:var(--muted)!important}
 .calmUi .desktopNav a:hover{background:var(--surface-soft)!important;color:var(--text)!important}
@@ -149,20 +144,7 @@ body{background-image:none!important}
 .clientInsightCard,.clientQuickStat,.clientNextMeal,.miniStat,.clientFact,.funnelStep,.visualMealSession,.smartMealCard{border-radius:14px!important}
 .card .card,.clientCoachCard .card,.premiumPlanHero .card,.todayNutritionCard .card{background:var(--surface-soft)!important;box-shadow:none!important}
 
-:root[data-theme="light"] .clientDashboardHero,
-:root[data-theme="light"] .clientTodayHero,
-:root[data-theme="light"] .todayNutritionCard,
-:root[data-theme="light"] .premiumPlanHero,
-:root[data-theme="light"] .planCard.premium{
-  background:var(--surface)!important;
-}
-:root[data-theme="dark"] .clientDashboardHero,
-:root[data-theme="dark"] .clientTodayHero,
-:root[data-theme="dark"] .todayNutritionCard,
-:root[data-theme="dark"] .premiumPlanHero,
-:root[data-theme="dark"] .planCard.premium{
-  background:var(--surface)!important;
-}
+.clientDashboardHero,.clientTodayHero,.todayNutritionCard,.premiumPlanHero,.planCard.premium{background:var(--surface)!important}
 
 .clientWelcome h1,.pageHead h1,.clientWelcome p,.pageHead p,.sectionTitleRow h2,.card h2,.clientCoachCard h2,.planCard h2{color:var(--text)!important}
 .clientWelcome>div>span,.pageHead span,.muted,.clientHeroCopy>span,.clientHeroCopy p,.sectionSub,.clientQuickStat span,.clientQuickStat small,.clientMealList small,.planCard p,.planFeatures div,.premiumLongText{color:var(--muted)!important}
@@ -196,9 +178,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold)!important;box-s
 .clientBottomNav a{color:var(--muted)!important}
 .clientBottomNav a.active{background:var(--accent-soft)!important;color:var(--gold2)!important}
 
-#teddy-theme-toggle{position:fixed;top:max(12px,env(safe-area-inset-top));right:16px;z-index:9999;width:42px;height:42px;border:1px solid var(--line);border-radius:13px;background:var(--panel);color:var(--gold2);display:grid;place-items:center;font-size:21px;line-height:1;cursor:pointer;box-shadow:none;transition:transform .14s ease,background .16s ease,border-color .16s ease}
-#teddy-theme-toggle:hover{transform:translateY(-1px)}
-#teddy-theme-toggle:active{transform:scale(.96)}
+.themeToggle{position:fixed;top:max(12px,env(safe-area-inset-top));right:16px;z-index:60;width:42px;height:42px;border:1px solid var(--line);border-radius:13px;background:var(--panel);color:var(--gold2);display:grid;place-items:center;line-height:1;cursor:pointer;padding:0;box-shadow:var(--shadow)}
+.themeToggle:hover{background:var(--surface-soft);border-color:var(--line2)}
+.themeToggle:active{transform:scale(.96)}
+.themeToggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 @media(max-width:900px){
   .calmUi.app{padding-top:68px!important;background:var(--bg)!important}
@@ -206,14 +189,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold)!important;box-s
   .mobileTopbar{height:68px!important;padding:0 16px!important}
   .mobileMenuButton{width:42px!important;height:42px!important;border-radius:13px!important}
   .mobileBrand span{width:36px!important;height:36px!important;border-radius:12px!important}
-  #teddy-theme-toggle{top:max(13px,env(safe-area-inset-top));right:16px;width:42px;height:42px;border-radius:13px}
+  .themeToggle{top:max(13px,env(safe-area-inset-top));right:16px}
   .clientBottomNav{left:14px!important;right:14px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;min-height:64px!important;padding:6px!important;border-radius:20px!important}
-  .clientBottomNav a{font-size:12px!important;border-radius:14px!important;gap:4px!important}
+  .clientBottomNav a{font-size:12.5px!important;border-radius:14px!important;gap:4px!important}
   .clientBottomNav a svg{width:20px!important;height:20px!important}
   .card,.clientDashboardHero,.clientTodayHero,.todayNutritionCard,.planCard,.premiumPlanHero,.clientCoachPanel,.clientPremiumCard{border-radius:18px!important}
   .clientWelcome{margin-bottom:18px!important}
   .clientWelcome h1{font-size:28px!important;line-height:1.08!important;letter-spacing:-.7px!important}
-  .clientWelcome p{font-size:12px!important;letter-spacing:.1em!important}
+  .clientWelcome p{font-size:12.5px!important;letter-spacing:.1em!important}
 }
 @media(max-width:520px){
   .calmUi .content{padding-left:14px!important;padding-right:14px!important}
@@ -231,7 +214,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
-        <script dangerouslySetInnerHTML={{ __html: themeControls }} />
+        <ThemeToggle />
       </body>
     </html>
   );

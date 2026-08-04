@@ -2,39 +2,39 @@
 
 export const chartsCss = String.raw`
 .kcalRingWrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
-.kcalRing{position:relative;width:132px;height:132px;border-radius:50%;flex:none;background:conic-gradient(var(--ring-color,#d8b85f) var(--progress,0%),var(--chart-empty,#1c1e23) 0)}
-.kcalRing:after{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--surface,#0e0f12)}
+.kcalRing{position:relative;width:132px;height:132px;border-radius:50%;flex:none;background:conic-gradient(var(--ring-color,#d8b85f) var(--progress,0%),var(--chart-empty,color-mix(in srgb,var(--line) 75%,transparent)) 0)}
+.kcalRing:after{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--surface,var(--surface))}
 .kcalRing>div{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:1}
 .kcalRing b{display:block;font-size:26px;line-height:1.05;letter-spacing:-.6px}
-.kcalRing small{display:block;margin-top:3px;font-size:12.5px;color:var(--muted,#83867f)}
+.kcalRing small{display:block;margin-top:3px;font-size:12.5px;color:var(--muted,var(--muted))}
 .kcalRingSide{display:grid;gap:9px;min-width:0}
 .kcalRingSide>b{font-size:15px;line-height:1.3}
-.kcalRingSide>span{font-size:13px;color:var(--muted,#8a8d88)}
+.kcalRingSide>span{font-size:13px;color:var(--muted,var(--muted))}
 
 .macroRows{display:grid;gap:10px}
 .macroRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:baseline}
-.macroRow>span{font-size:13px;color:var(--muted,#9a9d98)}
+.macroRow>span{font-size:13px;color:var(--muted,var(--muted))}
 .macroRow>b{font-size:13.5px;white-space:nowrap}
-.macroRow>i{grid-column:1/3;display:block;height:7px;border-radius:99px;background:var(--chart-empty,#1c1e23);overflow:hidden}
+.macroRow>i{grid-column:1/3;display:block;height:7px;border-radius:99px;background:var(--chart-empty,color-mix(in srgb,var(--line) 75%,transparent));overflow:hidden}
 .macroRow>i>em{display:block;height:100%;border-radius:99px;transition:width .3s ease}
-.macroRow.prot>i>em{background:linear-gradient(90deg,var(--acc-prot),#8fc4ee)}
-.macroRow.fat>i>em{background:linear-gradient(90deg,var(--acc-fat),#efc48f)}
-.macroRow.carb>i>em{background:linear-gradient(90deg,var(--acc-carb),#a5ddc0)}
-.macroRow.over>i>em{background:linear-gradient(90deg,var(--acc-bad),#e09a8c)}
+.macroRow.prot>i>em{background:linear-gradient(90deg,var(--acc-prot),color-mix(in srgb,var(--acc-prot) 55%,#fff))}
+.macroRow.fat>i>em{background:linear-gradient(90deg,var(--acc-fat),color-mix(in srgb,var(--acc-fat) 55%,#fff))}
+.macroRow.carb>i>em{background:linear-gradient(90deg,var(--acc-carb),color-mix(in srgb,var(--acc-carb) 55%,#fff))}
+.macroRow.over>i>em{background:linear-gradient(90deg,var(--acc-bad),color-mix(in srgb,var(--acc-bad) 60%,#fff))}
 
 .weekChart{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;align-items:end;height:132px;position:relative}
 .weekCol{display:grid;grid-template-rows:1fr auto auto;gap:5px;height:100%;align-items:end;text-align:center;min-width:0}
-.weekBarTrack{position:relative;height:100%;border-radius:8px;background:var(--chart-empty,#141519);display:flex;align-items:flex-end;overflow:hidden;border:1px solid var(--line,transparent)}
-.weekBar{width:100%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#d8b85f,#a8894a);transition:height .3s ease}
-.weekBar.over{background:linear-gradient(180deg,var(--acc-bad),#a35b4f)}
+.weekBarTrack{position:relative;height:100%;border-radius:8px;background:var(--chart-empty,color-mix(in srgb,var(--line) 55%,transparent));display:flex;align-items:flex-end;overflow:hidden;border:1px solid var(--line,transparent)}
+.weekBar{width:100%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold2));transition:height .3s ease}
+.weekBar.over{background:linear-gradient(180deg,var(--acc-bad),color-mix(in srgb,var(--acc-bad) 70%,#000))}
 .weekBar.empty{background:transparent}
-.weekCol small{font-size:12.5px;color:var(--muted,#7d817c)}
-.weekCol em{font-size:12.5px;font-style:normal;color:var(--body,var(--muted,#a9aca6))}
-.weekTargetLine{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--chart-line,#575a4a);pointer-events:none;z-index:1}
+.weekCol small{font-size:12.5px;color:var(--muted,var(--muted))}
+.weekCol em{font-size:12.5px;font-style:normal;color:var(--body,var(--muted,var(--text)))}
+.weekTargetLine{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--chart-line,var(--line2));pointer-events:none;z-index:1}
 
 .trendCard{display:grid;gap:10px}
 .trendSvg{width:100%;height:96px;display:block;overflow:visible}
-.trendMeta{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted,#83867f)}
+.trendMeta{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted,var(--muted))}
 
 @media(max-width:560px){
   .kcalRingWrap{grid-template-columns:1fr;justify-items:center;text-align:center}
@@ -75,5 +75,5 @@ export function WeightTrend({ points }:{ points:Array<{date:string;kg:number}> }
   if(points.length<2)return <p className="muted" style={{margin:0,fontSize:13}}>Нужно минимум два измерения, чтобы построить линию.</p>;
   const values=points.map(p=>p.kg);const min=Math.min(...values);const max=Math.max(...values);const span=max-min||1;const width=100;const height=34;
   const coords=points.map((p,i)=>`${((i/(points.length-1))*width).toFixed(2)},${(height-((p.kg-min)/span)*height).toFixed(2)}`);const delta=values.at(-1)!-values[0];
-  return <div className="trendCard"><svg className="trendSvg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden><polyline points={`0,${height} ${coords.join(" ")} ${width},${height}`} fill="rgba(92,176,196,.12)" stroke="none"/><polyline points={coords.join(" ")} fill="none" stroke="var(--acc-info)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/></svg><div className="trendMeta"><span>{points[0].date} · {values[0].toFixed(1)} кг</span><span style={{color:delta===0?undefined:delta<0?"var(--acc-good)":"var(--acc-warn)"}}>{delta>0?"+":""}{delta.toFixed(1)} кг</span><span>{points.at(-1)!.date} · {values.at(-1)!.toFixed(1)} кг</span></div></div>;
+  return <div className="trendCard"><svg className="trendSvg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden><polyline points={`0,${height} ${coords.join(" ")} ${width},${height}`} fill="color-mix(in srgb,var(--acc-info) 14%,transparent)" stroke="none"/><polyline points={coords.join(" ")} fill="none" stroke="var(--acc-info)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"/></svg><div className="trendMeta"><span>{points[0].date} · {values[0].toFixed(1)} кг</span><span style={{color:delta===0?undefined:delta<0?"var(--acc-good)":"var(--acc-warn)"}}>{delta>0?"+":""}{delta.toFixed(1)} кг</span><span>{points.at(-1)!.date} · {values.at(-1)!.toFixed(1)} кг</span></div></div>;
 }
