@@ -5,16 +5,16 @@ export default function ClientDesignV3() {
       .clientApp{--client-radius-lg:20px;--client-radius-md:14px}
       :root[data-theme="light"] .clientApp{
         --surface:#ffffff;--surface-soft:#f2f6f3;--panel:#f7faf8;
-        --line:#c8d6cf;--line2:#b4c7bd;--text:var(--green);
-        --body:var(--green);--muted:var(--green);--muted2:#60766f;
-        --accent-soft:#f6eedb;--chart-empty:#e5ece8;--chart-line:var(--gold);
+        --line:#c8d6cf;--line2:#b4c7bd;--text:#173a32;
+        --body:#294b43;--muted:#48645c;--muted2:#60766f;
+        --accent-soft:#f6eedb;--chart-empty:#e5ece8;--chart-line:#9b7b22;
         --shadow:0 10px 26px rgba(28,55,47,.08)
       }
       :root[data-theme="dark"] .clientApp{
-        --surface:var(--green);--surface-soft:var(--green);--panel:var(--green);
-        --line:var(--green);--line2:#3a4c48;--text:#f0f4f2;
+        --surface:#111a18;--surface-soft:#16211f;--panel:#0d1614;
+        --line:#293936;--line2:#3a4c48;--text:#f0f4f2;
         --body:#d8e1de;--muted:#a6b5b0;--muted2:#8fa19b;
-        --accent-soft:var(--accent-soft);--chart-empty:#202a28;--chart-line:var(--gold);
+        --accent-soft:#242117;--chart-empty:#202a28;--chart-line:#d6b34f;
         --shadow:0 12px 30px rgba(0,0,0,.24)
       }
 
@@ -99,7 +99,7 @@ export default function ClientDesignV3() {
       :root[data-theme="light"] .clientApp input,
       :root[data-theme="light"] .clientApp textarea,
       :root[data-theme="light"] .clientApp select{
-        color:var(--green)!important;background:#f8fbf9!important;border-color:var(--line)!important
+        color:#244941!important;background:#f8fbf9!important;border-color:var(--line)!important
       }
 
       /* Subscription */
@@ -110,7 +110,7 @@ export default function ClientDesignV3() {
       .clientApp .planGroup{border-radius:18px!important;padding:20px!important}
       .clientApp .planStatus{border-radius:20px!important;padding:24px!important}
       .clientApp .planMeterTrack{display:block!important;height:7px!important;border-radius:999px!important;background:var(--surface-soft)!important;overflow:hidden!important}
-      .clientApp .planMeterTrack em{display:block!important;height:100%!important;border-radius:999px!important;background:linear-gradient(90deg,var(--gold),#9e83d6)!important}
+      .clientApp .planMeterTrack em{display:block!important;height:100%!important;border-radius:999px!important;background:linear-gradient(90deg,#d6b34f,#9e83d6)!important}
       .clientApp .lvl{gap:7px!important}
       .clientApp .lvl i{position:relative!important;display:block!important;height:6px!important;border-radius:999px!important;background:var(--line)!important;overflow:hidden!important}
       .clientApp .lvl i em{display:none!important}
@@ -140,10 +140,10 @@ export default function ClientDesignV3() {
       }
       .clientApp .calorieMobileBar>span{font-size:11px!important;font-weight:700!important;color:var(--text)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
       .clientApp .calorieMobileBar>i{position:relative!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;height:132px!important;border-radius:12px!important;background:var(--chart-empty)!important;overflow:hidden!important}
-      .clientApp .calorieMobileBar>i>em{display:block!important;width:62%!important;max-width:28px!important;border-radius:8px 8px 4px 4px!important;background:var(--gold)!important;min-height:5px!important}
+      .clientApp .calorieMobileBar>i>em{display:block!important;width:62%!important;max-width:28px!important;border-radius:8px 8px 4px 4px!important;background:#d6b34f!important;min-height:5px!important}
       .clientApp .calorieMobileBar>i>em.good{background:#86a88e!important}
-      .clientApp .calorieMobileBar>i>em.medium{background:var(--gold)!important}
-      .clientApp .calorieMobileBar>i>em.far{background:var(--red)!important}
+      .clientApp .calorieMobileBar>i>em.medium{background:#b59a63!important}
+      .clientApp .calorieMobileBar>i>em.far{background:#a46e6b!important}
       .clientApp .calorieMobileBar>i>em.empty{background:transparent!important}
       .clientApp .calorieMobileBar>i>b{position:absolute!important;left:0!important;right:0!important;height:1px!important;border-top:1px dashed color-mix(in srgb,var(--chart-line) 75%,transparent)!important}
       .clientApp .calorieMobileBar>small{font-size:11px!important;line-height:1.2!important;color:var(--muted)!important;white-space:normal!important}
@@ -153,16 +153,16 @@ export default function ClientDesignV3() {
 
       .clientApp .weightChartCompact{margin:8px 0 12px!important;height:132px!important}
       .clientApp .weightChartCompact svg{display:block!important;width:100%!important;height:132px!important;overflow:visible!important}
-      .clientApp .weightTrendLine{fill:none!important;stroke:var(--gold)!important;stroke-width:3!important;stroke-linecap:round!important;stroke-linejoin:round!important}
-      .clientApp .weightChartCompact circle{fill:var(--gold)!important;stroke:var(--surface)!important;stroke-width:2!important}
+      .clientApp .weightTrendLine{fill:none!important;stroke:#d4b45d!important;stroke-width:3!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+      .clientApp .weightChartCompact circle{fill:#d4b45d!important;stroke:var(--surface)!important;stroke-width:2!important}
       .clientApp .weightChartCompact circle.latest{fill:var(--text)!important}
-      .clientApp .weightTargetLine{stroke:color-mix(in srgb,var(--gold) 58%,transparent)!important;stroke-width:1!important;stroke-dasharray:5 5!important}
+      .clientApp .weightTargetLine{stroke:color-mix(in srgb,#d4b45d 58%,transparent)!important;stroke-width:1!important;stroke-dasharray:5 5!important}
       .clientApp .weightTargetText{fill:var(--muted)!important;font-size:9px!important}
 
       /* Home calorie ring and week chart */
       .clientApp .calorieRing,.clientApp .clientCalorieRing{
         filter:none!important;transform:scale(.84)!important;
-        background:conic-gradient(var(--gold) var(--progress,0%),var(--chart-empty) 0)!important;
+        background:conic-gradient(#d6b34f var(--progress,0%),var(--chart-empty) 0)!important;
         box-shadow:none!important
       }
       .clientApp .calorieRing::after,.clientApp .clientCalorieRing::after{background:var(--surface)!important}
@@ -174,7 +174,7 @@ export default function ClientDesignV3() {
       }
       :root[data-theme="light"] .clientApp .weekCaloriesChart [class*="fill"],
       :root[data-theme="light"] .clientApp .weeklyCalories [class*="fill"]{
-        background:linear-gradient(180deg,var(--gold),var(--gold))!important
+        background:linear-gradient(180deg,#e2c465,#b79543)!important
       }
 
       /* Navigation */
