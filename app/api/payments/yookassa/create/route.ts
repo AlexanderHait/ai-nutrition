@@ -6,7 +6,6 @@ import { verifyAndProcessYooPayment } from "@/lib/process-yookassa-payment";
 import {
   createYooPayment,
   isTransientYooKassaError,
-  publicSiteUrl,
   rublesToYooValue,
   yooKassaConfigured,
   type YooCreatePaymentBody,
@@ -38,10 +37,21 @@ function checkoutUrl(requestUrl: string, plan: string, error?: string) {
   return url;
 }
 
+function widgetUrl(requestUrl: string, orderId: string) {
+  const url = new URL("/client/payment/widget", requestUrl);
+  url.searchParams.set("order", orderId);
+  return url;
+}
+
 async function recordEvent(db: ReturnType<typeof getSupabaseAdmin>, row: Record<string, unknown>) {
   const { error } = await db.from("payment_events").insert(row);
   if (error && error.code !== "23505") {
-    console.error("payment event save failed", { eventType: row.event_type, orderId: row.order_id, code: error.code, message: error.message });
+    console.error("payment event save failed", {
+      eventType: row.event_type,
+      orderId: row.order_id,
+      code: error.code,
+      message: error.message,
+    });
   }
 }
 
@@ -100,7 +110,12 @@ export async function POST(request: Request) {
   );
   const order = (Array.isArray(preparedData) ? preparedData[0] : preparedData) as PreparedOrder | null;
   if (prepareError || !order?.id) {
-    console.error("payment order preparation failed", { plan, accountId: current.accountId, code: prepareError?.code, message: prepareError?.message });
+    console.error("payment order preparation failed", {
+      plan,
+      accountId: current.accountId,
+      code: prepareError?.code,
+      message: prepareError?.message,
+    });
     return NextResponse.redirect(checkoutUrl(request.url, plan, "order"), 303);
   }
 
@@ -109,23 +124,36 @@ export async function POST(request: Request) {
       const processed = await verifyAndProcessYooPayment(order.provider_payment_id);
       if (processed.status === "succeeded") return NextResponse.redirect(new URL("/client/plan?payment=success", request.url), 303);
       if (processed.status === "canceled") return NextResponse.redirect(checkoutUrl(request.url, plan, "canceled"), 303);
-      const recoveredUrl = processed.payment.confirmation?.confirmation_url || order.confirmation_url;
-      if (recoveredUrl) {
-        if (recoveredUrl !== order.confirmation_url) {
-          await db.from("payment_orders").update({ confirmation_url: recoveredUrl, updated_at: new Date().toISOString() }).eq("id", order.id);
-        }
-        return NextResponse.redirect(recoveredUrl, 303);
+
+      const recoveredToken = processed.payment.confirmation?.confirmation_token;
+      if (recoveredToken) {
+        await db.from("payment_orders").update({
+          metadata: {
+            ...(order.metadata || {}),
+            confirmation_token: recoveredToken,
+            confirmation_type: "embedded",
+          },
+          updated_at: new Date().toISOString(),
+        }).eq("id", order.id);
+        return NextResponse.redirect(widgetUrl(request.url, order.id), 303);
       }
+
+      const recoveredUrl = processed.payment.confirmation?.confirmation_url || order.confirmation_url;
+      if (recoveredUrl) return NextResponse.redirect(recoveredUrl, 303);
       return NextResponse.redirect(checkoutUrl(request.url, plan, "processing"), 303);
     } catch (error) {
-      console.error("existing YooKassa payment recovery failed", { orderId: order.id, paymentId: order.provider_payment_id, transient: isTransientYooKassaError(error), error });
+      console.error("existing YooKassa payment recovery failed", {
+        orderId: order.id,
+        paymentId: order.provider_payment_id,
+        transient: isTransientYooKassaError(error),
+        error,
+      });
       return NextResponse.redirect(checkoutUrl(request.url, plan, isTransientYooKassaError(error) ? "processing" : "provider"), 303);
     }
   }
 
-  const siteUrl = publicSiteUrl(request.url);
   const amountValue = rublesToYooValue(Number(order.amount_rub));
-  const description = `AI-Nutrition · ${product.title} — доступ на ${Number(product.period_days)} дней`;
+  const description = `TeddY · ${product.title} — доступ на ${Number(product.period_days)} дней`;
   const metadata: Record<string, string> = {
     order_id: String(order.id),
     account_id: String(order.account_id),
@@ -136,7 +164,7 @@ export async function POST(request: Request) {
   const body: YooCreatePaymentBody = {
     amount: { value: amountValue, currency: "RUB" },
     capture: true,
-    confirmation: { type: "redirect", return_url: `${siteUrl}/client/payment/return?order=${encodeURIComponent(order.id)}` },
+    confirmation: { type: "embedded" },
     description: description.slice(0, 128),
     metadata,
   };
@@ -161,8 +189,15 @@ export async function POST(request: Request) {
   } catch (error) {
     const transient = isTransientYooKassaError(error);
     const now = new Date().toISOString();
-    const orderMetadata = { ...(order.metadata || {}), provider_create_state: transient ? "unknown" : "failed", provider_attempted_at: now };
-    await db.from("payment_orders").update({ status: transient ? "pending" : "failed", metadata: orderMetadata, updated_at: now }).eq("id", order.id);
+    await db.from("payment_orders").update({
+      status: transient ? "pending" : "failed",
+      metadata: {
+        ...(order.metadata || {}),
+        provider_create_state: transient ? "unknown" : "failed",
+        provider_attempted_at: now,
+      },
+      updated_at: now,
+    }).eq("id", order.id);
     await recordEvent(db, {
       order_id: order.id,
       account_id: current.accountId,
@@ -172,14 +207,14 @@ export async function POST(request: Request) {
       amount_rub: Number(order.amount_rub),
       plan,
       status: transient ? "pending" : "failed",
-      payload: { stage: "create", transient },
+      payload: { stage: "create", transient, confirmation_type: "embedded" },
       updated_at: now,
     });
     console.error("YooKassa payment creation failed", { orderId: order.id, accountId: current.accountId, plan, transient, error });
     return NextResponse.redirect(checkoutUrl(request.url, plan, transient ? "processing" : "provider"), 303);
   }
 
-  const confirmationUrl = payment.confirmation?.confirmation_url || null;
+  const confirmationToken = payment.confirmation?.confirmation_token || "";
   const now = new Date().toISOString();
   const orderMetadata = {
     ...(order.metadata || {}),
@@ -187,17 +222,24 @@ export async function POST(request: Request) {
     terms_accepted_at: termsAcceptedAt,
     provider_created_at: payment.created_at || null,
     provider_create_state: "created",
+    confirmation_type: "embedded",
+    confirmation_token: confirmationToken,
   };
   const { error: updateError } = await db.from("payment_orders").update({
     provider_payment_id: payment.id,
-    confirmation_url: confirmationUrl,
+    confirmation_url: null,
     status: "pending",
     updated_at: now,
     metadata: orderMetadata,
   }).eq("id", order.id);
 
   if (updateError) {
-    console.error("YooKassa payment persistence failed", { orderId: order.id, paymentId: payment.id, code: updateError.code, message: updateError.message });
+    console.error("YooKassa payment persistence failed", {
+      orderId: order.id,
+      paymentId: payment.id,
+      code: updateError.code,
+      message: updateError.message,
+    });
     return NextResponse.redirect(checkoutUrl(request.url, plan, "processing"), 303);
   }
 
@@ -225,6 +267,6 @@ export async function POST(request: Request) {
     }
   }
 
-  if (!confirmationUrl) return NextResponse.redirect(checkoutUrl(request.url, plan, "processing"), 303);
-  return NextResponse.redirect(confirmationUrl, 303);
+  if (!confirmationToken) return NextResponse.redirect(checkoutUrl(request.url, plan, "processing"), 303);
+  return NextResponse.redirect(widgetUrl(request.url, order.id), 303);
 }
