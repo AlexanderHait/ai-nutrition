@@ -2,7 +2,7 @@
 :root{
   --bg:#08090b;--panel:#101114;--panel2:#141519;--line:#25272d;--line2:#31343b;
   --text:#f7f6f1;--muted:#8e908f;--muted2:#686a6a;--gold:#e0be68;--gold2:#b99645;
-  --green:#74b98d;--red:#d17a7a;--shadow:0 20px 60px rgba(0,0,0,.28);
+  --green:#8abd9c;--red:#d17a7a;--shadow:0 20px 60px rgba(0,0,0,.28);
   color-scheme:dark
 }
 *{box-sizing:border-box}
