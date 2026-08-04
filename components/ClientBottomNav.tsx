@@ -61,11 +61,12 @@ export default function ClientBottomNav() {
             grid-template-columns:repeat(5,minmax(0,1fr));
             min-height:62px;
             padding:6px 4px;
-            border:1px solid #292b30;
+            border:1px solid var(--line);
             border-radius:17px;
-            background:rgba(14,15,18,.96);
-            box-shadow:0 18px 50px rgba(0,0,0,.42);
+            background:color-mix(in srgb,var(--surface) 94%,transparent);
+            box-shadow:var(--shadow);
             backdrop-filter:blur(18px);
+            -webkit-backdrop-filter:blur(18px);
           }
           .clientBottomNav a{
             display:grid;
@@ -74,12 +75,22 @@ export default function ClientBottomNav() {
             gap:3px;
             min-width:0;
             border-radius:12px;
-            color:#797c79;
+            color:var(--muted);
             font-size:12.5px;
-            font-weight:650;
+            font-weight:700;
+            transition:background-color .18s ease,color .18s ease,transform .18s ease;
           }
-          .clientBottomNav a.active{background:#1a1a15;color:#e4c86f}
-          .clientBottomNav a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+          .clientBottomNav a:active{transform:scale(.97)}
+          .clientBottomNav a.active{
+            background:var(--accent-soft);
+            color:var(--gold2);
+          }
+          .clientBottomNav a span{
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            max-width:100%;
+          }
         }
       `}</style>
     </>
