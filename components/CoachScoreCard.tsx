@@ -71,14 +71,14 @@ export default function CoachScoreCard({ score, compact = false }: { score: Coac
           <div style={{ display: "flex", gap: 9, alignItems: "center", flexWrap: "wrap" }}>
             <b>{scoreLabel(value)}</b>
             {trend != null ? (
-              <span style={{ display: "inline-flex", gap: 4, alignItems: "center", fontSize: 12, opacity: .8 }}>
+              <span style={{ display: "inline-flex", gap: 4, alignItems: "center", fontSize: 13, opacity: .8 }}>
                 {trend >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                 {trend > 0 ? "+" : ""}{trend} за неделю
               </span>
             ) : null}
           </div>
           <p className="muted" style={{ margin: 0, lineHeight: 1.5 }}>{statusText(score)}</p>
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 12, opacity: .78 }}>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 13, opacity: .78 }}>
             <span style={{ display: "inline-flex", gap: 5, alignItems: "center" }}><Activity size={13} /> {score?.active_days ?? 0}/{score?.period_days ?? 7} дней</span>
             <span style={{ display: "inline-flex", gap: 5, alignItems: "center" }}><CheckCircle2 size={13} /> уверенность {confidence == null ? "—" : `${confidence}%`}</span>
           </div>

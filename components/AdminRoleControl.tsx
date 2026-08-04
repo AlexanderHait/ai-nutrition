@@ -43,7 +43,7 @@ export default function AdminRoleControl({chatId,current=false}:{chatId:number|s
         background:enabled?"rgba(226,92,92,.07)":"rgba(232,194,91,.09)",
         color:enabled?"#ef9a9a":"#e8c25b",
         fontWeight:750,
-        fontSize:13,
+        fontSize: 13,
         cursor:saving?"wait":"pointer"
       }}
     >
@@ -51,10 +51,10 @@ export default function AdminRoleControl({chatId,current=false}:{chatId:number|s
       {saving?"Сохраняю…":enabled?"Снять права админа":"Назначить админом"}
     </button>
 
-    <span style={{fontSize:12,opacity:.6}}>
+    <span style={{fontSize: 13,opacity:.6}}>
       {enabled?"Администратор":"Обычный клиент"}
     </span>
 
-    {error?<div style={{width:"100%",fontSize:12,color:"#ef7777"}}>{error}</div>:null}
+    {error?<div style={{width:"100%",fontSize: 13,color:"#ef7777"}}>{error}</div>:null}
   </div>
 }

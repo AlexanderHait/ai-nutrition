@@ -203,7 +203,7 @@ export default function TimelinePanel({
                     <div style={{ minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
                         <b style={{ fontSize: compact ? 13 : 14 }}>{event.title}</b>
-                        <time style={{ fontSize: 11, opacity: 0.55, whiteSpace: "nowrap", display: "inline-flex", gap: 4, alignItems: "center" }}>
+                        <time style={{ fontSize: 12, opacity: 0.55, whiteSpace: "nowrap", display: "inline-flex", gap: 4, alignItems: "center" }}>
                           <Clock3 size={11} /> {timeLabel(event.occurred_at)}
                         </time>
                       </div>
@@ -213,7 +213,7 @@ export default function TimelinePanel({
                         </p>
                       ) : null}
                       {state ? (
-                        <span style={{ display: "inline-block", marginTop: 7, fontSize: 10, fontWeight: 700, opacity: 0.66 }}>
+                        <span style={{ display: "inline-block", marginTop: 7, fontSize: 12, fontWeight: 700, opacity: 0.66 }}>
                           {state}
                         </span>
                       ) : null}

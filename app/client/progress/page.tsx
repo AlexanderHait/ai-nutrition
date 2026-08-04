@@ -358,7 +358,7 @@ function MacroCard({ label, actual, target, unit }: { label: string; actual: num
 }
 
 function WeightChart({ weights, target }: { weights: any[]; target: number }) {
-  if (weights.length < 2) return <div className="muted" style={{ fontSize: 11, marginBottom: 14 }}>Добавь ещё одно измерение — появится линия тренда.</div>;
+  if (weights.length < 2) return <div className="muted" style={{ fontSize: 12, marginBottom: 14 }}>Добавь ещё одно измерение — появится линия тренда.</div>;
   const points = [...weights].reverse();
   const values = points.map((point) => Number(point.weight_kg));
   if (target > 0) values.push(target);

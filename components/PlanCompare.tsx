@@ -197,16 +197,16 @@ export const planCompareCss = String.raw`
 .planStatus.tier-basic{border-color:#28454c;background:linear-gradient(135deg,#0f1719,#0d0e11)}
 .planStatus.tier-premium{border-color:#453c22;background:linear-gradient(135deg,#16130d,#0d0e11)}
 .planStatusHead{display:grid;gap:5px}
-.planStatusBadge{display:inline-flex;align-items:center;gap:6px;justify-self:start;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:800;letter-spacing:.04em;border:1px solid #2c2f35;background:#0c0d10;color:var(--tier-free)}
+.planStatusBadge{display:inline-flex;align-items:center;gap:6px;justify-self:start;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:800;letter-spacing:.04em;border:1px solid #2c2f35;background:#0c0d10;color:var(--tier-free)}
 .planStatus.tier-basic .planStatusBadge{border-color:#2a4d55;color:var(--tier-basic)}
 .planStatus.tier-premium .planStatusBadge{border-color:#4a4025;color:var(--tier-premium)}
 .planStatusHead>b{font-size:18px;letter-spacing:-.3px}
-.planStatusWhen{font-size:11px;color:#7d817e}
+.planStatusWhen{font-size:12.5px;color:#7d817e}
 .planStatusMeters{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:15px}
 .planMeter{display:grid;gap:6px}
 .planMeterTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.planMeterTop small{font-size:11.5px;color:#83867f;text-transform:uppercase;letter-spacing:.08em}
-.planMeterTop b{display:inline-flex;align-items:center;gap:4px;font-size:12px}
+.planMeterTop small{font-size:13px;color:#83867f;text-transform:uppercase;letter-spacing:.08em}
+.planMeterTop b{display:inline-flex;align-items:center;gap:4px;font-size:13px}
 .planMeterTrack{display:block;height:6px;border-radius:99px;background:#1c1e23;overflow:hidden}
 .planMeterTrack em{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--tier-basic),#7fd0c4)}
 .planMeterTrack.low em{background:linear-gradient(90deg,#c9705f,#e0a06a)}
@@ -215,9 +215,9 @@ export const planCompareCss = String.raw`
 /* Пробный период */
 .trialCta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:10px;padding:16px 18px;border:1px solid #3c3722;border-radius:16px;background:linear-gradient(120deg,#15130d,#100f0c)}
 .trialCta>div{display:grid;gap:3px}
-.trialCta small{font-size:11.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--tier-premium)}
+.trialCta small{font-size:13px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--tier-premium)}
 .trialCta b{font-size:16px}
-.trialCta span{font-size:11.5px;color:#858884}
+.trialCta span{font-size:13px;color:#858884}
 
 /* Сравнение тарифов */
 .planCompare{border:1px solid #24262b;border-radius:17px;background:#0e0f12;overflow:hidden}
@@ -228,25 +228,25 @@ export const planCompareCss = String.raw`
 .planCol.tier-free{color:var(--tier-free)}
 .planCol.tier-basic{color:var(--tier-basic)}
 .planCol.tier-premium{color:var(--tier-premium)}
-.planColTag{position:absolute;top:0;right:0;padding:3px 9px;border-bottom-left-radius:9px;background:linear-gradient(90deg,var(--tier-premium),var(--tier-premium-2));color:#14120c;font-size:10.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.planColTag{position:absolute;top:0;right:0;padding:4px 10px;border-bottom-left-radius:9px;background:linear-gradient(90deg,var(--tier-premium),var(--tier-premium-2));color:#14120c;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
 .planCol>b{font-size:13px;font-weight:800;letter-spacing:.03em}
 .planCol>strong{color:#f2f2ee;font-size:20px;letter-spacing:-.5px}
-.planCol>strong small{color:#797c78;font-size:11.5px;font-weight:600;letter-spacing:0}
-.planCol>p{min-height:32px;margin:0;color:#848783;font-size:11px;line-height:1.35}
-.planColCurrent{margin-top:4px;font-size:10.5px;font-weight:700}
+.planCol>strong small{color:#797c78;font-size:13px;font-weight:600;letter-spacing:0}
+.planCol>p{min-height:32px;margin:0;color:#848783;font-size:12.5px;line-height:1.35}
+.planColCurrent{margin-top:4px;font-size:12.5px;font-weight:700}
 .planColCurrent.muted{color:#6f726f!important}
-.planColBtn{margin-top:4px;display:grid;place-items:center;min-height:34px;border-radius:10px;font-size:11.5px;font-weight:800;color:#12130f;background:currentColor}
+.planColBtn{margin-top:4px;display:grid;place-items:center;min-height:34px;border-radius:10px;font-size:13px;font-weight:800;color:#12130f;background:currentColor}
 .planColBtn:hover{filter:brightness(1.08)}
 .planCol.tier-basic .planColBtn{color:#0d1416;background:var(--tier-basic)}
 .planCol.tier-premium .planColBtn{color:#14120c;background:linear-gradient(90deg,var(--tier-premium),var(--tier-premium-2))}
 
 .planGroup{padding:13px 15px 4px;border-top:1px solid #1e2025}
-.planGroup h3{margin:0 0 8px;font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#5f6361}
+.planGroup h3{margin:0 0 8px;font-size:12.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#5f6361}
 .planRow{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;padding:9px 0;border-bottom:1px solid #191b1f}
 .planRow:last-child{border-bottom:0}
 .planRowName{display:grid;gap:1px}
-.planRowName b{font-size:12.5px;font-weight:650}
-.planRowName small{font-size:11.5px;color:#747774}
+.planRowName b{font-size:13.5px;font-weight:650}
+.planRowName small{font-size:13px;color:#747774}
 .planRowCells{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .lvl{display:grid;gap:5px}
 .lvl i{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
@@ -254,19 +254,19 @@ export const planCompareCss = String.raw`
 .lvl.tier-free em.on{background:var(--tier-free)}
 .lvl.tier-basic em.on{background:var(--tier-basic)}
 .lvl.tier-premium em.on{background:linear-gradient(90deg,var(--tier-premium),var(--tier-premium-2))}
-.lvl span{font-size:10.5px;color:#9a9d99}
+.lvl span{font-size:12.5px;color:#9a9d99}
 .lvl.off span{color:#5a5d5b}
 
 .planFinalCta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .planFinalCta h2{margin:0 0 3px;font-size:17px}
-.planFinalCta p{margin:0;color:#858884;font-size:12px}
+.planFinalCta p{margin:0;color:#858884;font-size:13px}
 
 @media(max-width:760px){
   .planStatusMeters{grid-template-columns:1fr}
   .planCompareHead{grid-template-columns:1fr;gap:1px}
   .planCol>p{min-height:0}
   .planRowCells{gap:7px}
-  .lvl span{font-size:11px}
+  .lvl span{font-size:12.5px}
   .planColTag{border-bottom-left-radius:0;border-top-right-radius:0}
 }
 `;

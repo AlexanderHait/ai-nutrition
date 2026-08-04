@@ -30,7 +30,7 @@ export default function MailingComposer(){
             <ImagePlus size={16}/>Добавить файл
             <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" style={{display:"none"}} onChange={e=>setFile(e.target.files?.[0]||null)}/>
           </label>
-          {file&&<><span style={{fontSize:13,opacity:.75}}>{file.name}</span><button type="button" onClick={()=>setFile(null)}><X size={15}/> Убрать</button></>}
+          {file&&<><span style={{fontSize: 13,opacity:.75}}>{file.name}</span><button type="button" onClick={()=>setFile(null)}><X size={15}/> Убрать</button></>}
         </div>
       </label>
       <div className="telegramPreview"><span>Предпросмотр</span><div><b>TeddY</b>{preview&&<img src={preview} alt="" style={{width:"100%",maxHeight:260,objectFit:"cover",borderRadius:12,marginTop:8}}/>}{isPdf&&<div style={{padding:"12px",marginTop:8,border:"1px solid #9994",borderRadius:12}}>📄 {file?.name}</div>}<p>{content||"Здесь появится сообщение, которое получат клиенты."}</p></div></div>

@@ -10,15 +10,15 @@ export const chartsCss = String.raw`
 .kcalRing:after{content:"";position:absolute;inset:11px;border-radius:50%;background:#0e0f12}
 .kcalRing>div{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:1}
 .kcalRing b{display:block;font-size:26px;line-height:1.05;letter-spacing:-.6px}
-.kcalRing small{display:block;margin-top:3px;font-size:11px;color:#83867f}
+.kcalRing small{display:block;margin-top:3px;font-size:12.5px;color:#83867f}
 .kcalRingSide{display:grid;gap:9px;min-width:0}
 .kcalRingSide>b{font-size:15px;line-height:1.3}
-.kcalRingSide>span{font-size:12px;color:#8a8d88}
+.kcalRingSide>span{font-size:13px;color:#8a8d88}
 
 .macroRows{display:grid;gap:10px}
 .macroRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:baseline}
-.macroRow>span{font-size:12px;color:#9a9d98}
-.macroRow>b{font-size:12.5px;white-space:nowrap}
+.macroRow>span{font-size:13px;color:#9a9d98}
+.macroRow>b{font-size:13.5px;white-space:nowrap}
 .macroRow>i{grid-column:1/3;display:block;height:7px;border-radius:99px;background:#1c1e23;overflow:hidden}
 .macroRow>i>em{display:block;height:100%;border-radius:99px;transition:width .3s ease}
 .macroRow.prot>i>em{background:linear-gradient(90deg,var(--acc-prot),#8fc4ee)}
@@ -32,13 +32,13 @@ export const chartsCss = String.raw`
 .weekBar{width:100%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#d8b85f,#a8894a);transition:height .3s ease}
 .weekBar.over{background:linear-gradient(180deg,var(--acc-bad),#a35b4f)}
 .weekBar.empty{background:#20222700}
-.weekCol small{font-size:11px;color:#7d817c}
-.weekCol em{font-size:11px;font-style:normal;color:#a9aca6}
+.weekCol small{font-size:12.5px;color:#7d817c}
+.weekCol em{font-size:12.5px;font-style:normal;color:#a9aca6}
 .weekTargetLine{position:absolute;left:0;right:0;height:0;border-top:1px dashed #575a4a;pointer-events:none;z-index:1}
 
 .trendCard{display:grid;gap:10px}
 .trendSvg{width:100%;height:96px;display:block;overflow:visible}
-.trendMeta{display:flex;justify-content:space-between;gap:12px;font-size:11.5px;color:#83867f}
+.trendMeta{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:#83867f}
 
 @media(max-width:560px){
   .kcalRingWrap{grid-template-columns:1fr;justify-items:center;text-align:center}
@@ -147,7 +147,7 @@ export function WeightTrend({
   points: Array<{ date: string; kg: number }>;
 }) {
   if (points.length < 2) {
-    return <p className="muted" style={{ margin: 0, fontSize: 12 }}>Нужно минимум два измерения, чтобы построить линию.</p>;
+    return <p className="muted" style={{ margin: 0, fontSize: 13 }}>Нужно минимум два измерения, чтобы построить линию.</p>;
   }
   const values = points.map((point) => point.kg);
   const min = Math.min(...values);

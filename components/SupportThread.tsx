@@ -25,5 +25,5 @@ export default function SupportThread({messages,role}:{messages:SupportMessage[]
  {messages.length===0&&<div className="supportEmpty"><b>Диалог пока пуст</b><span>{role==='client'?'Напиши вопрос или оставь обратную связь — здесь ответит человек.':'Напишите клиенту первое сообщение — оно придёт прямо в Telegram.'}</span></div>}
  {messages.map(message=>{const own=message.sender===role,status=deliveryLabel(message,role);return <article className={`supportBubble ${own?'own':'other'}`} key={message.id}>
  <div className="supportBubbleMeta"><b>{message.sender==='client'?'Клиент':'Администратор'}</b><time>{new Date(message.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'})}</time></div>
- <SupportMessageBody message={message}/>{status?<small style={{display:'block',marginTop:6,fontSize:10}}>{status}</small>:null}</article>})}</div>
+ <SupportMessageBody message={message}/>{status?<small style={{display:'block',marginTop:6,fontSize: 12}}>{status}</small>:null}</article>})}</div>
 }
