@@ -66,7 +66,7 @@ const themeCss = `
   --line2:#334a46;
   --text:#f1f5f3;
   --muted:#98a8a3;
-  --muted2:#6f817c;
+  --muted2:#879995;
   --gold:#d9bd68;
   --gold2:#b99442;
   --green:#8abd9c;
@@ -99,9 +99,9 @@ const themeCss = `
   --line2:#cbd6cf;
   --text:#19342f;
   --muted:#5c6d68;
-  --muted2:#78877f;
-  --gold:#a97e21;
-  --gold2:#805d13;
+  --muted2:#68766f;
+  --gold:#8a6618;
+  --gold2:#6d4f11;
   --green:#487d5f;
   --red:#b95353;
   --shadow:0 12px 32px rgba(38,61,54,.08);
@@ -111,15 +111,15 @@ const themeCss = `
   --gold-btn2:#6d4f11;
   --on-gold:#ffffff;
   --acc-prot:#2f6fa8;
-  --acc-fat:#a5702c;
+  --acc-fat:#996827;
   --acc-carb:#4c805f;
   --acc-good:#467d60;
-  --acc-warn:#a5702c;
+  --acc-warn:#996827;
   --acc-bad:#b34a3a;
   --acc-info:#2b7f93;
   --tier-free:#5f6b73;
   --tier-basic:#2b7f93;
-  --tier-premium:#a97e21;
+  --tier-premium:#8a6618;
   --tier-premium-2:#6d55a3;
 }
 .card,.stat,.tableRow,.dialogPerson,.messageBubble,.chat,.side,.mobileTopbar,.mobileDrawer,.clientBottomNav,.themeToggle,input,select,textarea,button,a{transition-property:background-color,border-color,color,box-shadow;transition-duration:.16s;transition-timing-function:ease}
@@ -128,7 +128,7 @@ html,body{background:var(--bg)!important;color:var(--text)!important}
 body{background-image:none!important}
 .calmUi.app{background:var(--bg)!important;color:var(--text)!important}
 .calmUi .brand strong,.calmUi .mobileBrand strong{font-size:18px!important;font-weight:800;letter-spacing:-.35px}
-.calmUi .brand span,.calmUi .mobileBrand span{background:linear-gradient(145deg,#e8cd78,#cda749)!important;color:#17201e!important;box-shadow:none!important}
+.calmUi .brand span,.calmUi .mobileBrand span{background:linear-gradient(145deg,var(--gold),var(--gold2))!important;color:var(--on-gold)!important;box-shadow:none!important}
 .calmUi .desktopNav a.active,.calmUi .desktopNav a[aria-current="page"]{background:var(--accent-soft)!important;color:var(--gold2)!important;box-shadow:none!important}
 
 .card,.stat,.heroKcal,.clientTodayHero,.clientMacroCard,.progressSummaryCard,.clientDashboardHero,.clientInsightCard,.clientProfileHero,.clientWeekCard,.clientCoachCard,.planCard,.premiumLockHero,.premiumPlanHero,.currentPlanStrip,.planTeaser,.subscriptionCard,.todayNutritionCard,.attentionCard,.miniStat,.clientFact,.funnelStep,.visualMealSession,.smartMealCard,.conversation,.dialogsList,.formSection,.clientQuickStat,.clientNextMeal,.clientTimelineCard,.clientMealList,.clientCoachSummary,.clientCoachPanel,.clientPremiumCard{

@@ -26,7 +26,7 @@ export default function MichelinSections() {
       .signalRow{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
       .signalRow:last-child{border-bottom:0}
       .signalRow>i{width:31px;height:31px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;color:#888}
-      .signalRow.warn>i{color:#c89b67}.signalRow.good>i{color:var(--muted)}
+      .signalRow.warn>i{color:var(--acc-warn)}.signalRow.good>i{color:var(--muted)}
       .signalRow span{display:grid}.signalRow b{font-size:12.5px}.signalRow small{margin-top:2px;color:#777;font-size:12.5px;line-height:1.45}
       .coachHome{border-color:var(--gold2)!important;background:var(--bg)!important}
       .coachHomeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}

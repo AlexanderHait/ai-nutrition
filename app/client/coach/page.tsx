@@ -139,7 +139,7 @@ export default async function Page({
         .coachRisk{display:grid;grid-template-columns:38px minmax(0,1fr);gap:11px;align-items:start;padding:13px;border-radius:14px;background:var(--surface-soft)}
         .coachRisk i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--gold2)}
         .coachRisk b{display:block;color:var(--text);font-size:13px}.coachRisk span{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.45}
-        .coachRisk.warning i{color:#d39a4e}.coachRisk.good i{color:var(--green)}
+        .coachRisk.warning i{color:var(--acc-warn)}.coachRisk.good i{color:var(--green)}
         .coachQuickGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
         .coachQuickLink{display:grid;grid-template-columns:38px minmax(0,1fr) 16px;gap:10px;align-items:center;padding:13px;border-radius:15px}
         .coachQuickLink i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--surface-soft);color:var(--gold2)}
