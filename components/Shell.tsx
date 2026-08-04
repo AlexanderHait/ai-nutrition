@@ -50,7 +50,7 @@ const calmUiCss = String.raw`
 .calmUi .sectionTitleRow>svg{opacity:.5;color:var(--muted2)}
 .calmUi .muted{color:var(--calm-muted)!important}
 .calmUi .textLink{font-size:12.5px;font-weight:650;color:var(--muted)}
-.calmUi .primary{background:var(--gold);color:var(--bg);border-radius:10px;box-shadow:none}
+.calmUi .primary{background:var(--gold-btn);color:var(--on-gold);border-radius:10px;box-shadow:none}
 .calmUi .secondaryBtn{background:transparent;border-color:var(--line);border-radius:10px;color:var(--muted)}
 .calmUi input,
 .calmUi select,

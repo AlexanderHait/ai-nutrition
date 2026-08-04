@@ -74,6 +74,9 @@ const themeCss = `
   --shadow:0 18px 46px rgba(2,12,11,.28);
   --nav:rgba(15,25,24,.94);
   --accent-soft:#20261e;
+  --gold-btn:#d9bd68;
+  --gold-btn2:#b99442;
+  --on-gold:#17201e;
   --acc-prot:#6aa9e0;
   --acc-fat:#e0a86a;
   --acc-carb:#91c2a0;
@@ -104,6 +107,9 @@ const themeCss = `
   --shadow:0 12px 32px rgba(38,61,54,.08);
   --nav:rgba(250,251,248,.95);
   --accent-soft:#f5efe0;
+  --gold-btn:#8a6618;
+  --gold-btn2:#6d4f11;
+  --on-gold:#ffffff;
   --acc-prot:#2f6fa8;
   --acc-fat:#a5702c;
   --acc-carb:#4c805f;
@@ -139,7 +145,7 @@ body{background-image:none!important}
 
 input,select,textarea,.calmUi input,.calmUi select,.calmUi textarea{background:var(--surface-soft)!important;color:var(--text)!important;border-color:var(--line2)!important;box-shadow:none!important}
 input:focus,select:focus,textarea:focus{border-color:var(--gold)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 16%,transparent)!important}
-.primary{background:linear-gradient(135deg,#e3c76f,#c9a24a)!important;color:#17201e!important;border:0!important;box-shadow:none!important}
+.primary{background:linear-gradient(135deg,var(--gold-btn),var(--gold-btn2))!important;color:var(--on-gold)!important;border:0!important;box-shadow:none!important}
 .secondaryBtn,.compactBtn,.planCta{background:var(--surface-soft)!important;color:var(--text)!important;border-color:var(--line2)!important}
 
 .tableHead,.conversationHead,.visualMealSession>header{background:var(--surface-soft)!important;color:var(--muted)!important;border-color:var(--line)!important}

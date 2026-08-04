@@ -118,7 +118,7 @@ export default async function Page({
         .coachPrimaryCard>p{position:relative;z-index:1;margin:0;color:var(--muted);font-size:14px;line-height:1.55}
         .coachPrimaryActions{position:relative;z-index:1;display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
         .coachPrimaryActions a{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 15px;border-radius:13px;font-size:13px;font-weight:800}
-        .coachPrimaryActions a:first-child{background:linear-gradient(135deg,var(--gold),var(--gold));color:var(--green)}
+        .coachPrimaryActions a:first-child{background:linear-gradient(135deg,var(--gold-btn),var(--gold-btn2));color:var(--on-gold)}
         .coachPrimaryActions a:last-child{border:1px solid var(--line2);background:var(--surface);color:var(--text)}
         .coachMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
         .coachMetric{padding:15px;border-radius:17px}

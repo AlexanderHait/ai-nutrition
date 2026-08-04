@@ -67,7 +67,7 @@ export default function ClientExperienceCenter({ setupRequired }: { setupRequire
         .experienceCenter{position:fixed;top:18px;right:18px;z-index:90}
         .experienceCenter>summary{list-style:none;width:42px;height:42px;border:1px solid var(--line);border-radius:12px;background:var(--bg);display:grid;place-items:center;color:var(--gold);cursor:pointer;box-shadow:0 12px 38px rgba(0,0,0,.32);position:relative}
         .experienceCenter>summary::-webkit-details-marker{display:none}
-        .experienceCenterBadge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:grid;place-items:center;background:var(--gold);color:#111;font-size:12.5px;font-weight:900;border:2px solid var(--line)}
+        .experienceCenterBadge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:grid;place-items:center;background:var(--gold);color:var(--on-gold);font-size:12.5px;font-weight:900;border:2px solid var(--line)}
         .experiencePanel{position:absolute;top:50px;right:0;width:min(390px,calc(100vw - 24px));max-height:76vh;overflow:auto;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--bg);box-shadow:0 24px 70px rgba(0,0,0,.58)}
         .experiencePanelHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
         .experiencePanelHead h2{margin:0;font-size:16px}.experiencePanelHead span{display:block;color:var(--muted2);font-size:13px;margin-top:3px}
