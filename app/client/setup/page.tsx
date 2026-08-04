@@ -55,7 +55,11 @@ export default async function Page({
           <span>После сохранения сразу появятся персональные калории, БЖУ и первый понятный шаг — без пустого кабинета.</span>
         </div>
 
-        {query.error ? <div className="errorNotice">Проверь заполненные данные. Ничего не было сохранено.</div> : null}
+        {query.error === "save" ? (
+          <div className="errorNotice">Не удалось сохранить настройки. Данные верные — это сбой на нашей стороне, попробуй ещё раз.</div>
+        ) : query.error ? (
+          <div className="errorNotice">Проверь заполненные данные. Ничего не было сохранено.</div>
+        ) : null}
 
         <div className="setupProgress">
           <div><i>1</i><span><b>Цель</b><small>Куда движемся</small></span></div>
