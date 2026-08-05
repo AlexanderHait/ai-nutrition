@@ -521,6 +521,15 @@ RPC `cache_verified_external_food_catalog` получил необязатель
 
 API n8n не отдаёт credentials ни у одного узла — ни у нового `RECORD Receipt Prices`, ни у давно работающего `UPSERT Trusted Food Cache Supabase`. Привязка сделана явной операцией и применилась (`appliedOperations`), но убедиться чтением нельзя. Если после первого сохранённого чека в `receipt_price_observations` не появится новых строк — открыть узел `RECORD Receipt Prices` и выбрать credential «Supabase account».
 
+### Сайт: проверено 05.08.2026
+
+Впервые собрал и прогнал сайт локально.
+
+* `npm run build` проходит: Next 16.3, TypeScript без ошибок, 46 маршрутов.
+* `npm test` — 14 тестов в двух файлах, все проходят.
+* Единственное предупреждение сборки было про `metadataBase`. **Исправлено:** без него Next разрешал картинку превью относительно `localhost:3000`, то есть ссылка на сайт приходила в Telegram без изображения. Теперь берётся `NEXT_PUBLIC_SITE_URL`, а по умолчанию канонический `https://www.smartnutrition-ai.ru`. Проверено на поднятом сервере: в мета-тегах `og:image` и `twitter:image` абсолютный адрес.
+* Сборка Next 16 при запуске переписывает `tsconfig.json` и `next-env.d.ts`. Это её штатное поведение, коммитить эти изменения не нужно.
+
 ### Как проверять без скриншотов
 
 Результат виден в базе: `meals_draft.candidates` за нужную дату, поля `dish`, `grams`, `nutrition_source`. `official_catalog` и `verified_catalog` означают попадание в каталог, `estimate` — визуальную оценку.
