@@ -2,7 +2,14 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
 
+// Без этого Next разрешает картинки превью относительно localhost,
+// и ссылка на сайт приходит в Telegram без изображения.
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.smartnutrition-ai.ru")
+  .trim()
+  .replace(/\/$/, "");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "TeddY",
     template: "%s · TeddY",
