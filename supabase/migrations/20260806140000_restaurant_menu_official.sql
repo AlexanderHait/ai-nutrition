@@ -95,3 +95,74 @@ revoke execute on function public.import_vit_official_menu() from public, anon, 
 
 -- Запуск (выполнено 06.08.2026: 328 позиций):
 --   select * from public.import_vit_official_menu();
+
+-- Подбор позиции чека по официальному меню: имя строки и её цена.
+-- Цена сама по себе не опознаёт товар (за 85 ₽ в меню несколько разных позиций),
+-- поэтому засчитывается только вместе с общим содержательным словом.
+create or replace function public.lookup_restaurant_menu_official(_queries jsonb)
+returns table(
+  idx integer, raw text, menu_id bigint, official_name text, portion_grams numeric,
+  price_rub numeric, price_matches boolean, match_type text, source_url text
+)
+language sql
+stable
+security definer
+set search_path = public, extensions
+as $$
+  with q as (
+    select
+      coalesce((x->>'idx')::integer, ordinality::integer - 1) as idx,
+      x->>'raw' as raw,
+      nullif(x->>'price','')::numeric as price,
+      translate(public.normalize_food_query_with_brand_v2(x->>'raw', x->>'brand'), 'ё', 'е') as norm
+    from jsonb_array_elements(coalesce(_queries, '[]'::jsonb)) with ordinality as e(x, ordinality)
+  ),
+  qq as (
+    select q.*, regexp_replace(q.norm,
+      '^(rostics|kfc|вкусно и точка|теремок|шоколадница|додо|spar|вкусвилл|дикси|ашан|пятерочка|чижик|самокат|лавка|drinkit)\s+','') as qc
+    from q
+  ),
+  m as (
+    select r.id, r.name, r.portion_grams, r.price_rub, r.source_url,
+           translate(r.normalized_name, 'ё', 'е') as nc,
+           regexp_replace(translate(r.normalized_name, 'ё', 'е'),
+             '^(rostics|kfc|вкусно и точка|теремок|шоколадница|додо|spar|вкусвилл|дикси|ашан|пятерочка|чижик|самокат|лавка|drinkit)\s+','') as mc
+    from public.restaurant_menu_official r
+  ),
+  cand as (
+    select qq.idx, qq.raw, m.id, m.name, m.portion_grams, m.price_rub, m.source_url,
+           (qq.price is not null and abs(m.price_rub - qq.price) <= 0.5) as price_ok,
+           levenshtein(m.mc, qq.qc) as dist,
+           exists (
+             select 1 from unnest(string_to_array(qq.qc,' ')) t
+             where length(t) >= 4 and (' '||m.mc||' ') like ('% '||t||' %')
+           ) as shares_word,
+           qq.qc, m.mc
+    from qq join m on true
+    where length(qq.qc) >= 3
+  ),
+  typed as (
+    select c.*,
+      case
+        when c.mc = c.qc then 'name_exact'
+        when regexp_replace(c.mc,'[^a-zа-я0-9]','','g') = regexp_replace(c.qc,'[^a-zа-я0-9]','','g') then 'name_compact'
+        when c.price_ok and c.shares_word then 'name_price'
+        when c.mc ~ ('^' || (select string_agg(t || '[^ ]*', ' ' order by o)
+                             from unnest(string_to_array(c.qc,' ')) with ordinality u(t,o) where t <> '')) then 'name_prefix'
+        when c.dist <= greatest(1, least(3, (greatest(length(c.mc), length(c.qc)) * 0.15)::int)) then 'name_typo'
+      end as mt
+    from cand c
+  ),
+  best as (
+    select t.*,
+      row_number() over (partition by t.idx order by
+        case t.mt when 'name_exact' then 0 when 'name_compact' then 1 when 'name_price' then 2
+                  when 'name_prefix' then 3 when 'name_typo' then 4 end,
+        (not t.price_ok), t.dist, length(t.name)) rn
+    from typed t where t.mt is not null
+  )
+  select b.idx, b.raw, b.id, b.name, b.portion_grams, b.price_rub, b.price_ok, b.mt, b.source_url
+  from best b where b.rn = 1;
+$$;
+
+revoke execute on function public.lookup_restaurant_menu_official(jsonb) from public, anon, authenticated;
