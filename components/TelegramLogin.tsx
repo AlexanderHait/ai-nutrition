@@ -28,7 +28,6 @@ declare global {
 
 const SCRIPT_ID = "telegram-login-library";
 const SCRIPT_SRC = "https://oauth.telegram.org/js/telegram-login.js?3";
-const SCRIPT_LOAD_TIMEOUT_MS = 3500;
 
 function isMobileBrowser() {
   if (typeof navigator === "undefined") return false;
@@ -54,46 +53,25 @@ function loadTelegramLibrary(): Promise<void> {
     const existing = document.getElementById(
       SCRIPT_ID,
     ) as HTMLScriptElement | null;
-    const script = existing ?? document.createElement("script");
-    let settled = false;
-    let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
 
-    const cleanup = () => {
-      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
-      script.removeEventListener("load", handleLoad);
-      script.removeEventListener("error", handleError);
-    };
-
-    const finish = (error?: Error) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      if (error) reject(error);
-      else resolve();
-    };
-
-    const handleLoad = () => {
-      if (window.Telegram?.Login?.auth) finish();
-      else finish(new Error("Telegram library unavailable"));
-    };
-
-    const handleError = () =>
-      finish(new Error("Telegram library failed"));
-
-    script.addEventListener("load", handleLoad, { once: true });
-    script.addEventListener("error", handleError, { once: true });
-
-    timeoutId = window.setTimeout(() => {
-      script.remove();
-      finish(new Error("Telegram library timeout"));
-    }, SCRIPT_LOAD_TIMEOUT_MS);
-
-    if (!existing) {
-      script.id = SCRIPT_ID;
-      script.src = SCRIPT_SRC;
-      script.async = true;
-      document.head.appendChild(script);
+    if (existing) {
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error("Telegram library failed")),
+        { once: true },
+      );
+      return;
     }
+
+    const script = document.createElement("script");
+    script.id = SCRIPT_ID;
+    script.src = SCRIPT_SRC;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () =>
+      reject(new Error("Telegram library failed"));
+    document.head.appendChild(script);
   });
 }
 
