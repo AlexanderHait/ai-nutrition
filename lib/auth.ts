@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -100,7 +101,7 @@ async function accountSessionFromLegacy(raw: Session) {
  * - Telegram clients resolve to a canonical customer account.
  * - Email/password clients are validated by Supabase Auth on every request.
  */
-export async function session(): Promise<Session | null> {
+async function resolveSession(): Promise<Session | null> {
   const cookieStore = await cookies();
   const legacy = readSession(cookieStore.get(COOKIE)?.value);
 
@@ -145,6 +146,8 @@ export async function session(): Promise<Session | null> {
     return null;
   }
 }
+
+export const session = cache(resolveSession);
 
 export async function requireAdmin() {
   const value = await session();
