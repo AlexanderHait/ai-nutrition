@@ -44,8 +44,9 @@ function isMobileBrowser() {
 }
 
 function loadTelegramLibrary(): Promise<void> {
-  if (typeof window === "undefined")
+  if (typeof window === "undefined") {
     return Promise.reject(new Error("browser only"));
+  }
 
   if (window.Telegram?.Login?.auth) return Promise.resolve();
 
@@ -53,25 +54,41 @@ function loadTelegramLibrary(): Promise<void> {
     const existing = document.getElementById(
       SCRIPT_ID,
     ) as HTMLScriptElement | null;
+    const script = existing || document.createElement("script");
+    let settled = false;
+    let timer = 0;
 
-    if (existing) {
-      existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener(
-        "error",
-        () => reject(new Error("Telegram library failed")),
-        { once: true },
-      );
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.id = SCRIPT_ID;
-    script.src = SCRIPT_SRC;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () =>
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      script.removeEventListener("load", onLoad);
+      script.removeEventListener("error", onError);
+    };
+    const onLoad = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      window.Telegram?.Login?.auth
+        ? resolve()
+        : reject(new Error("Telegram library unavailable"));
+    };
+    const onError = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      script.remove();
       reject(new Error("Telegram library failed"));
-    document.head.appendChild(script);
+    };
+
+    script.addEventListener("load", onLoad, { once: true });
+    script.addEventListener("error", onError, { once: true });
+    timer = window.setTimeout(onError, 4500);
+
+    if (!existing) {
+      script.id = SCRIPT_ID;
+      script.src = SCRIPT_SRC;
+      script.async = true;
+      document.head.appendChild(script);
+    }
   });
 }
 
