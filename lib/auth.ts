@@ -65,7 +65,7 @@ async function accountSessionFromLegacy(raw: Session) {
   if (!account || account.status !== "active") return null;
 
   const chatId = account.telegram_id ? Number(account.telegram_id) : undefined;
-  if (chatId) {
+  if (chatId && raw.role === "admin") {
     const { data: adminRole } = await db
       .from("admin_users")
       .select("is_active")
