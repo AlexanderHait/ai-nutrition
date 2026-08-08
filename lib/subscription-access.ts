@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export type SubscriptionPlan = "free" | "basic" | "premium";
@@ -37,7 +38,7 @@ const FREE_FALLBACK: Omit<SubscriptionAccess, "account_id" | "chat_id" | "period
   can_ai_request: true,
 };
 
-export async function subscriptionAccess(identity: string | number): Promise<SubscriptionAccess> {
+async function resolveSubscriptionAccess(identity: string | number): Promise<SubscriptionAccess> {
   const db = getSupabaseAdmin();
   const byAccount = typeof identity === "string";
   const { data, error } = byAccount
@@ -61,6 +62,8 @@ export async function subscriptionAccess(identity: string | number): Promise<Sub
   }
   return data as SubscriptionAccess;
 }
+
+export const subscriptionAccess = cache(resolveSubscriptionAccess);
 
 export async function hasPremiumAccess(identity: string | number) {
   return (await subscriptionAccess(identity)).premium;

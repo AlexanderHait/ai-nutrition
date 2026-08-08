@@ -9,12 +9,11 @@ import {
 } from "lucide-react";
 import { requireClient } from "@/lib/auth";
 import {
-  clientHomeAccountData,
+  clientDashboardAccountData,
   clientPremiumAccountData,
   premiumIntelligenceAccountData,
 } from "@/lib/account-data";
 import { subscriptionAccess } from "@/lib/subscription-access";
-import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals, type Meal } from "@/lib/data";
 import FoodIcon from "@/components/FoodIcon";
 import SimplifiedSections from "@/components/SimplifiedSections";
@@ -48,24 +47,19 @@ function average(values: number[]) {
 
 export default async function Page() {
   const session = await requireClient();
-  const db = getSupabaseAdmin();
-  const from = new Date();
-  from.setDate(from.getDate() - 13);
-  const fromDay = dayKey(from);
-
-  const [data, access, premiumData, intelligence, fortnightResult] = await Promise.all([
-    clientHomeAccountData(session.accountId!),
+  const [data, access] = await Promise.all([
+    clientDashboardAccountData(session.accountId!),
     subscriptionAccess(session.accountId!),
-    clientPremiumAccountData(session.accountId!),
-    premiumIntelligenceAccountData(session.accountId!),
-    db.from("meals")
-      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted")
-      .eq("account_id", session.accountId!)
-      .eq("deleted", false)
-      .gte("eaten_day", fromDay)
-      .order("eaten_at", { ascending: false })
-      .limit(1000),
   ]);
+
+  let premiumData: Awaited<ReturnType<typeof clientPremiumAccountData>> | null = null;
+  let intelligence: Awaited<ReturnType<typeof premiumIntelligenceAccountData>> | null = null;
+  if (access.premium) {
+    [premiumData, intelligence] = await Promise.all([
+      clientPremiumAccountData(session.accountId!),
+      premiumIntelligenceAccountData(session.accountId!),
+    ]);
+  }
 
   const today = dayKey();
   const todayMeals = (data.meals as Meal[]).filter((meal: Meal) => mealDay(meal) === today);
@@ -80,7 +74,7 @@ export default async function Page() {
   const remainingProtein = Math.max(0, proteinTarget - total.prot);
   const premium = access.premium;
 
-  const allMeals = (fortnightResult.data || []) as Meal[];
+  const allMeals = data.meals as Meal[];
 
   // Последние 7 дней калорий — для столбчатого графика.
   const weekSeries = Array.from({ length: 7 }, (_, index) => {
@@ -144,7 +138,7 @@ export default async function Page() {
             text: "Продолжай обычный режим и ориентируйся на голод. Специально корректировать рацион сейчас не нужно.",
           };
 
-  const weightDelta = Number(intelligence.context?.weight_trend?.delta);
+  const weightDelta = Number(intelligence?.context?.weight_trend?.delta);
   const goal = String(settings.goal || "");
   const signals: Array<{ title: string; text: string; tone: string }> = [];
 
@@ -183,13 +177,13 @@ export default async function Page() {
     });
   }
 
-  const todayPlan = premiumData.plan?.content_md
-    ? excerpt(premiumData.plan.content_md)
+  const todayPlan = premiumData?.plan?.content_md
+    ? excerpt(premiumData.plan!.content_md)
     : remainingKcal > 0
       ? `На остаток дня около ${fmt(remainingKcal)} ккал${remainingProtein ? ` и ${fmt(remainingProtein)} г белка` : ""}. Распредели их без резких ограничений.`
       : "Калорийная цель уже закрыта. Ориентируйся на голод и не пытайся компенсировать день жёсткими ограничениями.";
-  const weeklyFocus = premiumData.report?.content_md
-    ? excerpt(premiumData.report.content_md, 220)
+  const weeklyFocus = premiumData?.report?.content_md
+    ? excerpt(premiumData.report!.content_md, 220)
     : currentDays.length < 3
       ? "Собери хотя бы три обычных дня питания. После этого TeddY сможет отличать случайность от устойчивой привычки."
       : currentAvgKcal < kcalTarget * 0.85

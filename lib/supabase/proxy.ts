@@ -5,6 +5,13 @@ import { supabasePublishableKey, supabaseUrl } from "@/lib/supabase/config";
 export async function updateSupabaseSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // Telegram/code sessions are verified by requireClient(). Refreshing an
+  // unrelated Supabase Auth session here only delays every page request.
+  if (request.cookies.get("ain_session")?.value) {
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
+  }
+
   const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
     cookies: {
       getAll() {
