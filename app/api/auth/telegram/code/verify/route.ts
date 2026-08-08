@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { sessionCookie, signSession } from "@/lib/auth";
+import { resolveTelegramLoginAccount } from "@/lib/telegram-login-account";
 
 export const dynamic = "force-dynamic";
 
@@ -37,16 +38,12 @@ export async function POST(request: Request) {
   }
 
   const db = getSupabaseAdmin();
-  let accountQuery = db
-    .from("customer_accounts")
-    .select("id,telegram_id,email,display_name,status")
-    .eq("status", "active");
-
-  accountQuery = identifier.includes("@")
-    ? accountQuery.ilike("email", identifier)
-    : accountQuery.ilike("login", identifier);
-
-  const { data: account } = await accountQuery.maybeSingle();
+  let account = null;
+  try {
+    account = await resolveTelegramLoginAccount(identifier);
+  } catch (error) {
+    console.error("telegram login code account lookup failed", error);
+  }
   if (!account?.id || !account.telegram_id) {
     return NextResponse.redirect(loginUrl(request.url, {
       error: "telegram_code_invalid",

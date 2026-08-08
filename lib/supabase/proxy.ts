@@ -12,6 +12,21 @@ export async function updateSupabaseSession(request: NextRequest) {
     return response;
   }
 
+  // Public pages and Telegram-code login do not use Supabase Auth cookies.
+  // Avoid a remote Auth request on every navigation when there is no
+  // Supabase session to refresh.
+  const hasSupabaseAuthCookie = request.cookies.getAll().some(({ name }) =>
+    name.startsWith("sb-") && (
+      name.includes("auth-token") ||
+      name.endsWith("-access-token") ||
+      name.endsWith("-refresh-token")
+    ),
+  );
+  if (!hasSupabaseAuthCookie) {
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
+  }
+
   const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
     cookies: {
       getAll() {

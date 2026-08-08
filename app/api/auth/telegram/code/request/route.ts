@@ -1,11 +1,11 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { resolveTelegramLoginAccount, type TelegramLoginAccount } from "@/lib/telegram-login-account";
 
 export const dynamic = "force-dynamic";
 
 const IDENTIFIER_RE = /^.{3,254}$/;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CODE_TTL_MINUTES = 10;
 const MAX_REQUESTS_PER_15_MINUTES = 3;
 
@@ -24,61 +24,6 @@ function loginUrl(requestUrl: string, params: Record<string, string>) {
   return url;
 }
 
-type LoginAccount = {
-  id: string;
-  telegram_id: string | number | null;
-  display_name: string | null;
-};
-
-async function resolveAccount(identifier: string): Promise<LoginAccount | null> {
-  const db = getSupabaseAdmin();
-  const normalized = identifier.trim().toLowerCase();
-  const username = normalized.replace(/^@+/, "");
-
-  if (EMAIL_RE.test(normalized)) {
-    const { data, error } = await db
-      .from("customer_accounts")
-      .select("id,telegram_id,display_name")
-      .eq("status", "active")
-      .ilike("email", normalized)
-      .maybeSingle();
-    if (error) throw error;
-    return data;
-  }
-
-  const { data: account, error: accountError } = await db
-    .from("customer_accounts")
-    .select("id,telegram_id,display_name")
-    .eq("status", "active")
-    .ilike("login", username)
-    .maybeSingle();
-  if (accountError) throw accountError;
-  if (account) return account;
-
-  const { data: profile, error: profileError } = await db
-    .from("profiles")
-    .select("account_id,telegram_id")
-    .is("deleted_at", null)
-    .ilike("username", username)
-    .maybeSingle();
-  if (profileError) throw profileError;
-  if (!profile?.account_id) return null;
-
-  const { data: linkedAccount, error: linkedError } = await db
-    .from("customer_accounts")
-    .select("id,telegram_id,display_name")
-    .eq("id", profile.account_id)
-    .eq("status", "active")
-    .maybeSingle();
-  if (linkedError) throw linkedError;
-  if (!linkedAccount) return null;
-
-  return {
-    ...linkedAccount,
-    telegram_id: linkedAccount.telegram_id || profile.telegram_id,
-  };
-}
-
 export async function POST(request: Request) {
   const form = await request.formData();
   const identifier = String(form.get("identifier") || "").trim().toLowerCase();
@@ -88,10 +33,10 @@ export async function POST(request: Request) {
   }
 
   const db = getSupabaseAdmin();
-  let account: LoginAccount | null = null;
+  let account: TelegramLoginAccount | null = null;
 
   try {
-    account = await resolveAccount(identifier);
+    account = await resolveTelegramLoginAccount(identifier);
   } catch (error) {
     console.error("telegram login code account lookup failed", error);
     return NextResponse.redirect(loginUrl(request.url, { error: "telegram_code_unavailable" }), 303);
