@@ -17,7 +17,8 @@ const errors: Record<string, string> = {
   telegram_callback: "Telegram вернул неполный ответ. Попробуй ещё раз.",
   telegram: "Не удалось войти через Telegram. Попробуй ещё раз.",
   telegram_code_identifier: "Укажи email, логин TeddY или Telegram username.",
-  telegram_code_not_linked: "Аккаунт не найден или Telegram ещё не связан с ним. Открой бота TeddY, отправь /start и повтори.",
+  telegram_code_no_account: "Такого аккаунта у нас нет. Аккаунт создаётся сам, когда впервые пишешь боту TeddY: открой его, отправь /start и вернись сюда.",
+  telegram_code_not_linked: "Аккаунт найден, но Telegram к нему ещё не привязан. Войди по паролю — или открой бота TeddY, отправь /start.",
   telegram_code_invalid: "Код неверный. Проверь сообщение от бота и попробуй ещё раз.",
   telegram_code_expired: "Код истёк или использован. Запроси новый.",
   telegram_code_rate: "Слишком много запросов. Подожди 15 минут и попробуй снова.",
@@ -25,6 +26,16 @@ const errors: Record<string, string> = {
   telegram_code_unavailable: "Вход по коду временно недоступен. Попробуй вход по паролю.",
   admin: "Неверный пароль администратора.",
 };
+
+// Тупик «аккаунт не найден» без ссылки на бота — самая частая жалоба на вход:
+// человек не знает, что аккаунт заводится именно в боте.
+const BOT_LINK = "https://t.me/TeddyRIZ_bot";
+const BOT_ERRORS = new Set([
+  "telegram_code_no_account",
+  "telegram_code_not_linked",
+  "telegram_code_delivery",
+  "telegram_unknown",
+]);
 
 export default async function Login({
   searchParams,
@@ -42,7 +53,7 @@ export default async function Login({
     <main className="login loginV2">
       <style>{`
         .loginV2{--login-bg:var(--bg);--login-panel:var(--panel);--login-panel-soft:var(--surface-soft);--login-border:var(--line);--login-text:var(--text);--login-muted:var(--muted);--login-muted-strong:var(--body,var(--text));--login-gold:var(--gold);min-height:100svh;padding:28px 16px 48px;background:radial-gradient(700px 360px at 50% -120px,color-mix(in srgb,var(--gold) 16%,transparent),transparent 62%),linear-gradient(180deg,var(--bg),var(--panel));color:var(--login-text);display:grid;place-items:center}
-        .loginV2 .loginCard{width:min(520px,100%);padding:30px;border:1px solid var(--login-border);border-radius:24px;background:linear-gradient(180deg,rgba(18,36,31,.98),rgba(11,25,22,.99));box-shadow:0 28px 80px rgba(0,0,0,.34)}
+        .loginV2 .loginCard{width:min(520px,100%);padding:30px;border:1px solid var(--login-border);border-radius:24px;background:var(--login-panel);box-shadow:var(--shadow)}
         .loginV2 .logoMark{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold-btn),var(--gold-btn2));color:var(--on-gold);font-weight:900;font-size:17px}
         .loginV2 h1{margin:0;text-align:center;font-size:36px;letter-spacing:-1px;color:var(--login-text)}
         .loginV2>.loginCard>.muted{margin:6px 0 24px;text-align:center;color:var(--login-muted)!important;font-size:15px}
@@ -76,7 +87,19 @@ export default async function Login({
         <h1>TeddY</h1>
         <p className="muted">Питание и прогресс без лишнего</p>
 
-        {error ? <div className="notice">{errors[error] || "Не удалось выполнить вход."}</div> : null}
+        {error ? (
+          <div className="notice">
+            {errors[error] || "Не удалось выполнить вход."}
+            {BOT_ERRORS.has(error) ? (
+              <>
+                {" "}
+                <a className="textLink" href={BOT_LINK} target="_blank" rel="noopener noreferrer">
+                  Открыть бота TeddY
+                </a>
+              </>
+            ) : null}
+          </div>
+        ) : null}
         {query.registered === "1" ? <div className="successNotice">Аккаунт создан. Подтверди email по письму и войди.</div> : null}
         {query.confirmation === "sent" ? <div className="successNotice">Письмо подтверждения отправлено повторно.</div> : null}
         {query.reset === "sent" ? <div className="successNotice">Если такой email зарегистрирован, ссылка для восстановления уже отправлена.</div> : null}

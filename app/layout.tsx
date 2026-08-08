@@ -79,7 +79,7 @@ const themeCss = `
   --green:#8abd9c;
   --red:#df8585;
   --shadow:0 18px 46px rgba(2,12,11,.28);
-  --nav:rgba(15,25,24,.94);
+  --nav:#0f1918;
   --accent-soft:#20261e;
   --gold-btn:#d9bd68;
   --gold-btn2:#b99442;
@@ -114,7 +114,7 @@ const themeCss = `
   --green:#487d5f;
   --red:#b95353;
   --shadow:0 12px 32px rgba(38,61,54,.08);
-  --nav:rgba(250,251,248,.95);
+  --nav:#fafbf8;
   --accent-soft:#f5efe0;
   --gold-btn:#8a6618;
   --gold-btn2:#6d4f11;

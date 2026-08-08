@@ -74,7 +74,7 @@ export default function ClientExperienceCenter({ setupRequired }: { setupRequire
         .experienceNoticeList{display:grid;gap:7px}
         .experienceNotice{display:grid;grid-template-columns:31px minmax(0,1fr) 15px;gap:10px;align-items:start;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
         .experienceNotice>i{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;background:var(--surface-soft);color:var(--muted)}
-        .experienceNotice.warning>i{background:#1c1712;color:var(--gold)}.experienceNotice.good>i{background:color-mix(in srgb,var(--green) 16%,var(--surface));color:var(--green)}
+        .experienceNotice.warning>i{background:var(--accent-soft);color:var(--gold2)}.experienceNotice.good>i{background:color-mix(in srgb,var(--green) 16%,var(--surface));color:var(--green)}
         .experienceNotice b{display:block;font-size:13px}.experienceNotice small{display:block;margin-top:3px;color:var(--muted2);font-size:13px;line-height:1.4}
         .experienceNotice>svg{margin-top:7px;color:var(--muted2)}
         .experienceSectionTitle{margin:15px 0 8px;color:var(--muted2);font-size:12.5px;text-transform:uppercase;letter-spacing:.11em;font-weight:800}

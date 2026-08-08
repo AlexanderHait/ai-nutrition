@@ -30,10 +30,32 @@ type LoginAccount = {
   display_name: string | null;
 };
 
+// Telegram может быть привязан к аккаунту через профиль бота, а в самой
+// customer_accounts остаться пустым. Без этой добивки человек с настоящей
+// привязкой получал «Telegram ещё не связан» и упирался в тупик.
+async function withProfileTelegram(db: ReturnType<typeof getSupabaseAdmin>, account: LoginAccount) {
+  if (account.telegram_id) return account;
+  const { data: profile } = await db
+    .from("profiles")
+    .select("telegram_id")
+    .eq("account_id", account.id)
+    .is("deleted_at", null)
+    .not("telegram_id", "is", null)
+    .limit(1)
+    .maybeSingle();
+  return profile?.telegram_id
+    ? { ...account, telegram_id: profile.telegram_id }
+    : account;
+}
+
 async function resolveAccount(identifier: string): Promise<LoginAccount | null> {
   const db = getSupabaseAdmin();
   const normalized = identifier.trim().toLowerCase();
   const username = normalized.replace(/^@+/, "");
+
+  // limit(1) вместо maybeSingle: два аккаунта с похожим логином — это не повод
+  // отвечать «вход временно недоступен», как было раньше.
+  const pick = <T,>(rows: T[] | null) => (rows && rows.length ? rows[0] : null);
 
   if (EMAIL_RE.test(normalized)) {
     const { data, error } = await db
@@ -41,36 +63,40 @@ async function resolveAccount(identifier: string): Promise<LoginAccount | null> 
       .select("id,telegram_id,display_name")
       .eq("status", "active")
       .ilike("email", normalized)
-      .maybeSingle();
+      .limit(1);
     if (error) throw error;
-    return data;
+    const account = pick(data);
+    return account ? withProfileTelegram(db, account) : null;
   }
 
-  const { data: account, error: accountError } = await db
+  const { data: byLogin, error: accountError } = await db
     .from("customer_accounts")
     .select("id,telegram_id,display_name")
     .eq("status", "active")
     .ilike("login", username)
-    .maybeSingle();
+    .limit(1);
   if (accountError) throw accountError;
-  if (account) return account;
+  const account = pick(byLogin);
+  if (account) return withProfileTelegram(db, account);
 
-  const { data: profile, error: profileError } = await db
+  const { data: profiles, error: profileError } = await db
     .from("profiles")
     .select("account_id,telegram_id")
     .is("deleted_at", null)
     .ilike("username", username)
-    .maybeSingle();
+    .limit(1);
   if (profileError) throw profileError;
+  const profile = pick(profiles);
   if (!profile?.account_id) return null;
 
-  const { data: linkedAccount, error: linkedError } = await db
+  const { data: linked, error: linkedError } = await db
     .from("customer_accounts")
     .select("id,telegram_id,display_name")
     .eq("id", profile.account_id)
     .eq("status", "active")
-    .maybeSingle();
+    .limit(1);
   if (linkedError) throw linkedError;
+  const linkedAccount = pick(linked);
   if (!linkedAccount) return null;
 
   return {
@@ -97,7 +123,16 @@ export async function POST(request: Request) {
     return NextResponse.redirect(loginUrl(request.url, { error: "telegram_code_unavailable" }), 303);
   }
 
-  if (!account?.id || !account.telegram_id) {
+  // Два разных случая, и человеку нужно разное действие: аккаунта нет вовсе —
+  // надо начать с бота; аккаунт есть, но без Telegram — надо войти паролем.
+  if (!account?.id) {
+    return NextResponse.redirect(loginUrl(request.url, {
+      error: "telegram_code_no_account",
+      identifier,
+    }), 303);
+  }
+
+  if (!account.telegram_id) {
     return NextResponse.redirect(loginUrl(request.url, {
       error: "telegram_code_not_linked",
       identifier,
