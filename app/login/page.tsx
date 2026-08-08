@@ -146,7 +146,7 @@ export default async function Login({
               </div>
             </form>
 
-            <details className="loginMethodDetails">
+            <details className="loginMethodDetails" open={telegramCodeSent}>
               <summary>Войти по @тегу или коду из Telegram</summary>
               <section className="loginBlock">
                 <p>Укажи email, логин TeddY или Telegram username — бот пришлёт одноразовый код.</p>
