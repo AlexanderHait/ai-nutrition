@@ -36,6 +36,40 @@ export async function clientDashboardAccountData(accountId: string) {
   return { profile, settings, meals: (meals || []) as Meal[] };
 }
 
+
+export async function clientPremiumHomeAccountData(accountId: string) {
+  const db = getSupabaseAdmin();
+  const today = dayKey();
+
+  const [{ data: plan }, { data: report }, { data: weights }] = await Promise.all([
+    db.from("premium_daily_plans")
+      .select("content_md")
+      .eq("account_id", accountId)
+      .eq("for_date", today)
+      .maybeSingle(),
+    db.from("premium_weekly_reports")
+      .select("content_md")
+      .eq("account_id", accountId)
+      .order("week_end", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    db.from("weight_logs")
+      .select("id,weight_kg,measured_at")
+      .eq("account_id", accountId)
+      .order("measured_at", { ascending: false })
+      .limit(12),
+  ]);
+
+  const rows = weights || [];
+  const latest = rows[0];
+  const oldest = rows[rows.length - 1];
+  const weightDelta = latest && oldest && latest.id !== oldest.id
+    ? Number(latest.weight_kg) - Number(oldest.weight_kg)
+    : null;
+
+  return { plan, report, weightDelta };
+}
+
 export async function clientHomeAccountData(accountId: string) {
   const db = getSupabaseAdmin();
   const date = new Date();
