@@ -52,8 +52,14 @@ export default function ThemeToggle() {
       setTheme(next);
       applyTheme(next);
     };
-    media.addEventListener("change", onSystemChange);
-    return () => media.removeEventListener("change", onSystemChange);
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", onSystemChange);
+      return () => media.removeEventListener("change", onSystemChange);
+    }
+
+    // Older Android WebView and Samsung Internet only expose this API.
+    media.addListener(onSystemChange);
+    return () => media.removeListener(onSystemChange);
   }, []);
 
   function toggle() {
