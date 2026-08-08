@@ -28,6 +28,7 @@ declare global {
 
 const SCRIPT_ID = "telegram-login-library";
 const SCRIPT_SRC = "https://oauth.telegram.org/js/telegram-login.js?3";
+const SCRIPT_LOAD_TIMEOUT_MS = 3500;
 
 function isMobileBrowser() {
   if (typeof navigator === "undefined") return false;
@@ -53,54 +54,56 @@ function loadTelegramLibrary(): Promise<void> {
     const existing = document.getElementById(
       SCRIPT_ID,
     ) as HTMLScriptElement | null;
+    const script = existing ?? document.createElement("script");
+    let settled = false;
+    let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
 
-    if (existing) {
-      existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener(
-        "error",
-        () => reject(new Error("Telegram library failed")),
-        { once: true },
-      );
-      return;
+    const cleanup = () => {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      script.removeEventListener("load", handleLoad);
+      script.removeEventListener("error", handleError);
+    };
+
+    const finish = (error?: Error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      if (error) reject(error);
+      else resolve();
+    };
+
+    const handleLoad = () => {
+      if (window.Telegram?.Login?.auth) finish();
+      else finish(new Error("Telegram library unavailable"));
+    };
+
+    const handleError = () =>
+      finish(new Error("Telegram library failed"));
+
+    script.addEventListener("load", handleLoad, { once: true });
+    script.addEventListener("error", handleError, { once: true });
+
+    timeoutId = window.setTimeout(() => {
+      script.remove();
+      finish(new Error("Telegram library timeout"));
+    }, SCRIPT_LOAD_TIMEOUT_MS);
+
+    if (!existing) {
+      script.id = SCRIPT_ID;
+      script.src = SCRIPT_SRC;
+      script.async = true;
+      document.head.appendChild(script);
     }
-
-    const script = document.createElement("script");
-    script.id = SCRIPT_ID;
-    script.src = SCRIPT_SRC;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () =>
-      reject(new Error("Telegram library failed"));
-    document.head.appendChild(script);
   });
 }
 
 export default function TelegramLogin() {
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const mounted = useRef(true);
 
   useEffect(() => {
     mounted.current = true;
-
-    // Mobile uses the redirect flow, so the popup SDK does not need to block
-    // rendering while it loads.
-    if (isMobileBrowser()) {
-      setReady(true);
-      return () => {
-        mounted.current = false;
-      };
-    }
-
-    loadTelegramLibrary()
-      .then(() => mounted.current && setReady(true))
-      .catch(
-        () =>
-          mounted.current &&
-          setError("Telegram-вход пока не загрузился."),
-      );
-
     return () => {
       mounted.current = false;
     };
@@ -189,7 +192,9 @@ export default function TelegramLogin() {
       );
     } catch {
       setLoading(false);
-      setError("Не удалось открыть веб-вход Telegram.");
+      setError(
+        "Веб-вход Telegram недоступен в этой сети. Используй вход кодом выше.",
+      );
     }
   }
 
@@ -207,9 +212,6 @@ export default function TelegramLogin() {
         </span>
       </button>
 
-      {!ready && !error && (
-        <small className="loginHint">Загрузка безопасного входа…</small>
-      )}
 
       {error && <small className="loginError">{error}</small>}
     </div>
