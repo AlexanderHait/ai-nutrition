@@ -36,6 +36,28 @@ export async function clientDashboardAccountData(accountId: string) {
   return { profile, settings, meals: (meals || []) as Meal[] };
 }
 
+
+export async function clientPremiumHomeAccountData(accountId: string) {
+  const db = getSupabaseAdmin();
+  const today = dayKey();
+
+  const [{ data: plan }, { data: report }] = await Promise.all([
+    db.from("premium_daily_plans")
+      .select("content_md")
+      .eq("account_id", accountId)
+      .eq("for_date", today)
+      .maybeSingle(),
+    db.from("premium_weekly_reports")
+      .select("content_md")
+      .eq("account_id", accountId)
+      .order("week_end", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  return { plan, report };
+}
+
 export async function clientHomeAccountData(accountId: string) {
   const db = getSupabaseAdmin();
   const date = new Date();
