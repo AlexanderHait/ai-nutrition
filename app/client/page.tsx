@@ -10,8 +10,7 @@ import {
 import { requireClient } from "@/lib/auth";
 import {
   clientDashboardAccountData,
-  clientPremiumAccountData,
-  premiumIntelligenceAccountData,
+  clientPremiumHomeAccountData,
 } from "@/lib/account-data";
 import { subscriptionAccess } from "@/lib/subscription-access";
 import { dayKey, fmt, mealDay, mealSessions, pluralMeals, sumMeals, type Meal } from "@/lib/data";
@@ -52,14 +51,9 @@ export default async function Page() {
     subscriptionAccess(session.accountId!),
   ]);
 
-  let premiumData: Awaited<ReturnType<typeof clientPremiumAccountData>> | null = null;
-  let intelligence: Awaited<ReturnType<typeof premiumIntelligenceAccountData>> | null = null;
-  if (access.premium) {
-    [premiumData, intelligence] = await Promise.all([
-      clientPremiumAccountData(session.accountId!),
-      premiumIntelligenceAccountData(session.accountId!),
-    ]);
-  }
+  const premiumData = access.premium
+    ? await clientPremiumHomeAccountData(session.accountId!)
+    : null;
 
   const today = dayKey();
   const todayMeals = (data.meals as Meal[]).filter((meal: Meal) => mealDay(meal) === today);
@@ -138,7 +132,7 @@ export default async function Page() {
             text: "Продолжай обычный режим и ориентируйся на голод. Специально корректировать рацион сейчас не нужно.",
           };
 
-  const weightDelta = Number(intelligence?.context?.weight_trend?.delta);
+  const weightDelta = Number(premiumData?.weightDelta);
   const goal = String(settings.goal || "");
   const signals: Array<{ title: string; text: string; tone: string }> = [];
 
