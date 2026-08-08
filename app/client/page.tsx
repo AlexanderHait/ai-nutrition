@@ -132,7 +132,6 @@ export default async function Page() {
             text: "Продолжай обычный режим и ориентируйся на голод. Специально корректировать рацион сейчас не нужно.",
           };
 
-  const weightDelta = Number(premiumData?.weightDelta);
   const goal = String(settings.goal || "");
   const signals: Array<{ title: string; text: string; tone: string }> = [];
 
@@ -149,17 +148,6 @@ export default async function Page() {
       text: `Среднее ${fmt(currentAvgProtein, 1)} г при цели ${fmt(proteinTarget, 1)} г. Лучше добавить стабильный белковый продукт в один из ежедневных приёмов.`,
       tone: "warn",
     });
-  }
-  if (Number.isFinite(weightDelta) && weightDelta !== 0) {
-    const againstGoal = (goal === "Набор массы" && weightDelta < 0)
-      || (goal === "Снижение веса" && weightDelta > 0);
-    if (againstGoal) {
-      signals.push({
-        title: "Вес движется против выбранной цели",
-        text: `${weightDelta > 0 ? "+" : ""}${fmt(weightDelta, 1)} кг по доступным измерениям. Проверь среднюю калорийность и регулярность записей.`,
-        tone: "warn",
-      });
-    }
   }
   if (!signals.length && currentDays.length >= 3) {
     signals.push({
