@@ -188,7 +188,7 @@ export default function TelegramLogin() {
     } catch {
       setLoading(false);
       setError(
-        "Веб-вход Telegram недоступен в этой сети. Используй вход кодом выше.",
+        "Веб-вход Telegram недоступен в этой сети. Открой вход по @тегу ниже.",
       );
     }
   }
