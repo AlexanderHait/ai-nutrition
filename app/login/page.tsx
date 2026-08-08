@@ -68,6 +68,24 @@ export default async function Login({
         .loginV2 details{margin-top:14px}
         .loginV2 details summary{cursor:pointer;color:var(--login-muted-strong);font-size:14px;font-weight:700}
         .loginV2 details[open] summary{margin-bottom:14px;color:var(--login-text)}
+        .loginV2 .telegramLoginWrap{display:grid;gap:9px}
+        .loginV2 .telegramLoginButton{width:100%;min-height:52px;border:0;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:10px;background:#2aabee;color:#fff;font-size:16px;font-weight:850;cursor:pointer}
+        .loginV2 .telegramLoginButton:disabled{opacity:.7;cursor:wait}
+        .loginV2 .loginError{color:var(--red);line-height:1.4}
+        .loginV2 .loginMethodDetails{margin-top:14px;padding:16px;border:1px solid var(--login-border);border-radius:17px;background:var(--login-panel-soft)}
+        .loginV2 .loginMethodDetails>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px}
+        .loginV2 .loginMethodDetails>summary::-webkit-details-marker{display:none}
+        .loginV2 .loginMethodDetails>summary:after{content:"+";font-size:20px;color:var(--login-gold)}
+        .loginV2 .loginMethodDetails[open]>summary:after{content:"−"}
+        .loginV2 .loginMethodDetails .loginBlock{padding:0;border:0;background:transparent}
+        .loginV2 .adminSecretLogin{width:22px;margin:15px 0 0 auto!important;position:relative}
+        .loginV2 .adminSecretLogin[open]{width:100%}
+        .loginV2 .adminSecretLogin>summary{list-style:none;width:22px;height:22px;margin-left:auto;display:grid;place-items:center;border:1px solid var(--login-border);border-radius:50%;color:var(--login-muted);opacity:.16;font-size:10px;cursor:pointer}
+        .loginV2 .adminSecretLogin>summary::-webkit-details-marker{display:none}
+        .loginV2 .adminSecretLogin>summary:hover,.loginV2 .adminSecretLogin[open]>summary{opacity:.55}
+        .loginV2 .adminSecretLogin[open]>summary{margin:0 0 9px auto!important}
+        .loginV2 .adminSecretPanel{padding:14px;border:1px solid var(--login-border);border-radius:15px;background:var(--login-panel-soft)}
+        .loginV2 .adminSecretPanel .loginBlock{padding:0;border:0;background:transparent}
         @media(max-width:560px){.loginV2{padding:18px 12px 32px;place-items:start center}.loginV2 .loginCard{padding:21px 16px;border-radius:20px}.loginV2 h1{font-size:32px}.loginV2 section.loginBlock,.loginV2 form.loginBlock,.loginV2 .adminLoginDetails{padding:16px}}
       `}</style>
 
@@ -109,29 +127,10 @@ export default async function Login({
           </form>
         ) : (
           <>
-            <section className="loginBlock">
-              <h3>Вход кодом из Telegram</h3>
-              <p>Введи email, логин TeddY или свой Telegram username. Работает без VPN.</p>
-
-              {telegramCodeSent ? (
-                <>
-                  <div className="successNotice">Код отправлен ботом TeddY. Он действует 10 минут.</div>
-                  <form action="/api/auth/telegram/code/verify" method="post" className="loginBlock">
-                    <input type="hidden" name="identifier" value={identifier} />
-                    <input name="code" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} placeholder="6-значный код" required autoFocus />
-                    <button className="primary">Войти в TeddY</button>
-                  </form>
-                  <form action="/api/auth/telegram/code/request" method="post">
-                    <input type="hidden" name="identifier" value={identifier} />
-                    <button className="secondaryBtn">Отправить новый код</button>
-                  </form>
-                </>
-              ) : (
-                <form action="/api/auth/telegram/code/request" method="post" className="loginBlock">
-                  <input name="identifier" type="text" autoComplete="username" defaultValue={identifier} placeholder="Email, логин или @username" required />
-                  <button className="primary">Получить код в Telegram</button>
-                </form>
-              )}
+            <section className="loginBlock telegramPrimary">
+              <h3>Вход через Telegram</h3>
+              <p>Быстрый вход в личный кабинет через официальный Telegram.</p>
+              <TelegramLogin />
             </section>
 
             <div className="divider">или</div>
@@ -147,22 +146,43 @@ export default async function Login({
               </div>
             </form>
 
-            <details className="adminLoginDetails">
-              <summary>Другой способ входа через Telegram</summary>
-              <div className="loginBlock">
-                <p>Открывает официальный Telegram OAuth. В некоторых сетях может потребоваться VPN.</p>
-                <TelegramLogin />
-              </div>
+            <details className="loginMethodDetails">
+              <summary>Войти по @тегу или коду из Telegram</summary>
+              <section className="loginBlock">
+                <p>Укажи email, логин TeddY или Telegram username — бот пришлёт одноразовый код.</p>
+
+                {telegramCodeSent ? (
+                  <>
+                    <div className="successNotice">Код отправлен ботом TeddY. Он действует 10 минут.</div>
+                    <form action="/api/auth/telegram/code/verify" method="post" className="loginBlock">
+                      <input type="hidden" name="identifier" value={identifier} />
+                      <input name="code" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} placeholder="6-значный код" required autoFocus />
+                      <button className="primary">Войти в TeddY</button>
+                    </form>
+                    <form action="/api/auth/telegram/code/request" method="post">
+                      <input type="hidden" name="identifier" value={identifier} />
+                      <button className="secondaryBtn">Отправить новый код</button>
+                    </form>
+                  </>
+                ) : (
+                  <form action="/api/auth/telegram/code/request" method="post" className="loginBlock">
+                    <input name="identifier" type="text" autoComplete="username" defaultValue={identifier} placeholder="Email, логин или @username" required />
+                    <button className="primary">Получить код в Telegram</button>
+                  </form>
+                )}
+              </section>
             </details>
           </>
         )}
 
-        <details className="adminLoginDetails">
-          <summary>Вход администратора</summary>
-          <form action="/api/auth/admin" method="post" className="loginBlock">
-            <input name="password" type="password" placeholder="Пароль администратора" required />
-            <button className="secondaryBtn">Войти в админку</button>
-          </form>
+        <details className="adminSecretLogin">
+          <summary aria-label="Служебный вход"><span aria-hidden="true">◆</span></summary>
+          <div className="adminSecretPanel">
+            <form action="/api/auth/admin" method="post" className="loginBlock">
+              <input name="password" type="password" autoComplete="current-password" placeholder="Пароль администратора" required />
+              <button className="secondaryBtn">Войти в админку</button>
+            </form>
+          </div>
         </details>
       </div>
     </main>
