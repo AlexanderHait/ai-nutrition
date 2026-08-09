@@ -63,7 +63,7 @@ export async function GET() {
   ] = await Promise.all([
     db.from("client_settings").select("*").eq("account_id", current.accountId).maybeSingle(),
     db.from("meals")
-      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted")
+      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check")
       .eq("account_id", current.accountId)
       .eq("deleted", false)
       .gte("eaten_day", fromDay)

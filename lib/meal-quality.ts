@@ -1,4 +1,4 @@
-import type { Meal } from "@/lib/data";
+import { TRUSTED_NUTRITION_SOURCES, TRUSTED_WEIGHT_SOURCES, type Meal } from "@/lib/data";
 
 export type MealQuality = {
   ok: boolean;
@@ -9,7 +9,10 @@ export type MealQuality = {
   kcalPer100: number;
 };
 
-export function mealQuality(meal: Pick<Meal,"dish"|"grams"|"kcal"|"prot"|"fat"|"carb">): MealQuality {
+export function mealQuality(
+  meal: Pick<Meal,"dish"|"grams"|"kcal"|"prot"|"fat"|"carb"> &
+    Partial<Pick<Meal,"nutrition_source"|"weight_source"|"needs_check">>,
+): MealQuality {
   const grams=Number(meal.grams||0);
   const kcal=Number(meal.kcal||0);
   const prot=Number(meal.prot||0);
@@ -35,6 +38,21 @@ export function mealQuality(meal: Pick<Meal,"dish"|"grams"|"kcal"|"prot"|"fat"|"
   else if(/хлеб|булоч|выпеч|лаваш|батончик/.test(s)){min=100;max=720}
   else if(/соус|майон|сметан|заправ/.test(s)){min=15;max=900}
   if(per100>0&&(per100<min||per100>max)) reasons.push("Необычная калорийность на 100 г");
+
+  // Арифметика не отличает точную запись от правдоподобной выдумки: у догадки
+  // модели БЖУ сходятся с калориями не хуже, чем у каталога. Поэтому смотрим на
+  // происхождение. Записи до 09.08.2026 его не хранят — там поля пустые,
+  // и оценка остаётся прежней, чисто арифметической.
+  const nutritionSource=meal.nutrition_source==null?null:String(meal.nutrition_source);
+  const weightSource=meal.weight_source==null?null:String(meal.weight_source);
+  if(nutritionSource!==null&&!TRUSTED_NUTRITION_SOURCES.has(nutritionSource)){
+    reasons.push("КБЖУ без источника — оценка AI");
+  }
+  if(weightSource!==null&&!TRUSTED_WEIGHT_SOURCES.has(weightSource)){
+    reasons.push("Вес определён на глаз");
+  }
+  // Бот показывал «⚠️ проверь» перед сохранением — не теряем эту пометку.
+  if(meal.needs_check===true&&!reasons.length) reasons.push("Бот просил проверить эту позицию");
 
   const severe=!Number.isFinite(grams)||grams<=0||!Number.isFinite(kcal)||kcal<=0||per100>1200;
   const level:MealQuality["level"]=severe?"bad":reasons.length?"check":"ok";

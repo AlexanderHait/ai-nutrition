@@ -59,7 +59,7 @@ export default async function Page() {
     clientPremiumAccountData(session.accountId!),
     premiumIntelligenceAccountData(session.accountId!),
     db.from("meals")
-      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted")
+      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check")
       .eq("account_id", session.accountId!)
       .eq("deleted", false)
       .gte("eaten_day", fromDay)

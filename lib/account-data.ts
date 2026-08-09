@@ -17,7 +17,7 @@ export async function clientHomeAccountData(accountId: string) {
     db.from("profiles").select("id,account_id,telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at").eq("account_id", accountId).maybeSingle(),
     db.from("client_settings").select("*").eq("account_id", accountId).maybeSingle(),
     db.from("subscriptions").select("plan,status,ends_at,created_at").eq("account_id", accountId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    db.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted").eq("account_id", accountId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(400),
+    db.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check").eq("account_id", accountId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(400),
     db.from("digests").select("id,for_date,kcal,summary_md").eq("account_id", accountId).order("for_date", { ascending: false }).limit(1),
     db.from("weight_logs").select("id,weight_kg,measured_at").eq("account_id", accountId).order("measured_at", { ascending: false }).limit(1),
   ]);
@@ -43,7 +43,7 @@ export async function clientProgressAccountData(accountId: string) {
   const fromDay = dayKey(date);
   const [{ data: settings }, { data: meals }, { data: weights }, { data: digests }, { data: subscription }] = await Promise.all([
     db.from("client_settings").select("*").eq("account_id", accountId).maybeSingle(),
-    db.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted").eq("account_id", accountId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(800),
+    db.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check").eq("account_id", accountId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(800),
     db.from("weight_logs").select("id,weight_kg,measured_at").eq("account_id", accountId).order("measured_at", { ascending: false }).limit(10),
     db.from("digests").select("id,for_date,kcal,summary_md").eq("account_id", accountId).order("for_date", { ascending: false }).limit(8),
     db.from("subscriptions").select("plan,status,ends_at,created_at").eq("account_id", accountId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
@@ -57,7 +57,7 @@ export async function clientNutritionAccountData(accountId: string, days = 45) {
   date.setDate(date.getDate() - (days - 1));
   const fromDay = dayKey(date);
   const { data, error } = await db.from("meals")
-    .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted")
+    .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check")
     .eq("account_id", accountId)
     .eq("deleted", false)
     .gte("eaten_day", fromDay)
@@ -108,7 +108,7 @@ export async function premiumIntelligenceAccountData(accountId: string) {
     { data: memory },
   ] = await Promise.all([
     db.from("client_settings").select("*").eq("account_id", accountId).maybeSingle(),
-    db.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted").eq("account_id", accountId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(1200),
+    db.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check").eq("account_id", accountId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(1200),
     db.from("weight_logs").select("id,weight_kg,measured_at").eq("account_id", accountId).order("measured_at", { ascending: false }).limit(12),
     db.from("premium_recommendations").select("*").eq("account_id", accountId).order("created_at", { ascending: false }).limit(8),
     db.from("premium_checkins").select("*").eq("account_id", accountId).order("week_end", { ascending: false }).limit(4),
