@@ -48,6 +48,7 @@ create or replace function public.search_shop_products_v1(
 returns table (
   product text,
   brand text,
+  category text,
   kcal_per_100 numeric,
   prot_per_100 numeric,
   fat_per_100 numeric,
@@ -116,6 +117,9 @@ hit as (
 select
   h.display_name,
   h.brand,
+  -- Категория нужна боту, чтобы не собрать «обед» из творога, йогурта
+  -- и снова творога. См. миграцию 20260811100000_food_category.sql.
+  public.food_category_ru(h.display_name),
   h.kcal_per_100, h.prot_per_100, h.fat_per_100, h.carb_per_100,
   h.pack_g,
   -- Готовые числа за упаковку. Модель умножает на 100 г с ошибкой: на реальном
