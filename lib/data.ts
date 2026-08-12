@@ -129,10 +129,19 @@ export async function supportMessages(chatId:number){
 
 export const n=(v:any)=>Number(v||0);
 export const fmt=(v:any,d=0)=>n(v).toLocaleString('ru-RU',{maximumFractionDigits:d});
-export function dayKey(d=new Date()){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(d)}
+// Сутки питания идут с 03:00 до 02:59: съеденное ночью относится к прошлому
+// дню. То же правило в базе — `nutrition_day()` и генерируемая колонка
+// `meals.eaten_day`, миграция 20260812080000_nutrition_day_starts_at_03.sql.
+// Оба места должны сдвигаться вместе, иначе приём уйдёт во вчера, а «сегодня»
+// на сайте останется новым днём.
+export const NUTRITION_DAY_START_HOUR=3;
+export function dayKey(d=new Date()){
+  const shifted=new Date(d.getTime()-NUTRITION_DAY_START_HOUR*3600000);
+  return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(shifted);
+}
 export function mealDay(m:Pick<Meal,'eaten_at'|'eaten_day'>){
   if(m.eaten_day)return String(m.eaten_day).slice(0,10);
-  return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(new Date(m.eaten_at));
+  return dayKey(new Date(m.eaten_at));
 }
 export function sumMeals(rows:Meal[]){return rows.reduce((a,m)=>({kcal:a.kcal+n(m.kcal),prot:a.prot+n(m.prot),fat:a.fat+n(m.fat),carb:a.carb+n(m.carb)}),{kcal:0,prot:0,fat:0,carb:0})}
 
