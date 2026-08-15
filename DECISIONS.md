@@ -310,13 +310,14 @@ CLAUDE.md — это летопись: как шло расследование,
 
 **Кого это било.** Всех, у кого нет личных поправок, то есть **всех новых пользователей**. У владельца поправок семь, поэтому у него фото работало всегда.
 
-**Осталось того же вида** (каждый требует проверки потребителя перед правкой):
+**Где ещё проверено — и что решено.** Правило не механическое: включать `alwaysOutputData` можно только там, где потребитель переживёт пустой элемент.
 
-| Узел | Что читает | Чем грозит пустой ответ |
+| Узел | Что читает | Решение |
 | --- | --- | --- |
-| `Read motivation state` (текст) | `client_settings` | `/m` молча ничего не делает |
-| `GET PostMeal subscription` | `subscription_lifecycle` | не приходит разбор после приёма пищи |
-| `GET 1/2/3`, `GET await_dish`, `GET await_weight`, `GET edit draft start/action` | `meals_draft` | кнопка редактора молчит, если черновик исчез |
+| `GET Personal Food Overrides` (фото) | `client_food_overrides` | **включено.** `Apply Personal Overrides` отсеивает пустышку фильтром |
+| `Read motivation state` (текст) | `client_settings` | **включено.** `Attach motivation state` уже написан под отсутствие настроек: ставит `motivation_settings_exists: false`, и ниже есть ветка `Create motivation state` |
+| `GET PostMeal subscription` | `subscription_lifecycle` | **не требуется.** Нет строки — человек не Premium, и `Allow Premium PostMeal` в любом случае вернёт пустой список. Поведение не изменится |
+| `GET 1/2/3`, `GET await_dish`, `GET await_weight`, `GET edit draft start/action` | `meals_draft` | **включать нельзя как есть.** `WEIGHT 1` берёт `items[0].json` без проверки: на пустом элементе выйдет карточка с `chat_id: undefined`, то есть ошибка вместо тишины. Сначала нужна защита в потребителе и честный ответ «карточка устарела» |
 
 ---
 
