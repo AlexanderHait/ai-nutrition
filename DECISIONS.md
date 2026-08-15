@@ -39,6 +39,7 @@ CLAUDE.md — это летопись: как шло расследование,
 | [Т-03](#т-03) | Текст | Товары только из каталога, арифметика на стороне базы |
 | [Т-04](#т-04) | Текст | Бот обязан ответить на любой текст |
 | [Д-01](#д-01) | Диагностика | Телеметрия пишет текст ошибки |
+| [Д-02](#д-02) | Диагностика | Проверка живости автоматизаций одним запросом |
 | [Б-01](#б-01) | База | Колонка в `food_catalog` ломает поиск |
 | [Б-02](#б-02) | База | Имя в каталоге хранится с брендом |
 | [Б-03](#б-03) | База | Магазинный срез Open Food Facts |
@@ -424,6 +425,33 @@ CLAUDE.md — это летопись: как шло расследование,
 select created_at, feature, error_code, error_message
 from ai_usage_events where not success order by created_at desc limit 20;
 ```
+
+---
+
+<a id="д-02"></a>
+## Д-02 · Проверка живости автоматизаций одним запросом
+
+**Зачем.** Молчаливый обрыв цепочки (см. Ф-14) не виден ни в ошибках, ни в списке выполнений: n8n помечает такой запуск успешным. Читать код всех workflow ради поиска таких мест — долго и даёт ложные срабатывания.
+
+**Правило: проверять не код, а выход.** У каждой автоматизации есть таблица, куда она пишет результат. Свежая строка означает, что цепочка дошла до конца. Это надёжнее любого разбора кода.
+
+```sql
+select 'утренний план Premium' as автоматизация, max(created_at at time zone 'Europe/Moscow')::text as последняя from premium_daily_plans
+union all select 'напоминания Premium',        max(sent_at    at time zone 'Europe/Moscow')::text from premium_nudges
+union all select 'дневной дайджест',           max(updated_at at time zone 'Europe/Moscow')::text from digests
+union all select 'недельный обзор',            max(created_at at time zone 'Europe/Moscow')::text from premium_weekly_reports
+union all select 'обновление Premium-контекста',max(refreshed_at at time zone 'Europe/Moscow')::text from premium_context_snapshots
+union all select 'AI Timeline',                max(created_at at time zone 'Europe/Moscow')::text from ai_timeline
+union all select 'распознавание фото',          max(created_at at time zone 'Europe/Moscow')::text from recognition_events
+union all select 'обучение личной памяти',      max(last_seen_at at time zone 'Europe/Moscow')::text from client_food_memory
+order by 2 desc nulls last;
+```
+
+**Как читать.** Ежедневные автоматизации должны показывать сегодня или вчера, недельные — не старше восьми дней. Всё, что отстало сильнее, требует разбора.
+
+**Чего эта проверка не показывает.** То, что запускает сам человек: поддержка, `/m`, AI-чат. Там свежесть зависит от того, пользовались ли функцией, а не от исправности. Такие пути проверяются только живой отправкой.
+
+**Результат прогона 15.08.2026:** все плановые автоматизации свежие. `support_messages` молчит с 01.08 — но это не поломка, а отсутствие обращений.
 
 ---
 
