@@ -42,7 +42,16 @@ export async function POST(request: Request) {
     return NextResponse.redirect(loginUrl(request.url, { error: "telegram_code_unavailable" }), 303);
   }
 
-  if (!account?.id || !account.telegram_id) {
+  // Два разных случая нельзя валить в одно сообщение: «аккаунта нет» лечится
+  // первым сообщением боту, а «Telegram не привязан» — входом по паролю.
+  if (!account?.id) {
+    return NextResponse.redirect(loginUrl(request.url, {
+      error: "telegram_code_no_account",
+      identifier,
+    }), 303);
+  }
+
+  if (!account.telegram_id) {
     return NextResponse.redirect(loginUrl(request.url, {
       error: "telegram_code_not_linked",
       identifier,

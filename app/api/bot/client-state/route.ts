@@ -31,7 +31,7 @@ export async function GET(req: Request) {
   ] = await Promise.all([
     s.from("profiles").select("telegram_id,first_name,username,avatar_url").eq("telegram_id", chatId).maybeSingle(),
     s.from("client_settings").select("*").eq("chat_id", chatId).maybeSingle(),
-    s.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted").eq("chat_id", chatId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(500),
+    s.from("meals").select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check").eq("chat_id", chatId).eq("deleted", false).gte("eaten_day", fromDay).order("eaten_at", { ascending: false }).limit(500),
     s.from("weight_logs").select("weight_kg,measured_at").eq("chat_id", chatId).order("measured_at", { ascending: false }).limit(1).maybeSingle(),
     s.from("subscriptions").select("plan,status,price_rub,started_at,ends_at,created_at").eq("chat_id", chatId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
     s.rpc("subscription_access_v1", { _chat_id: chatId }),

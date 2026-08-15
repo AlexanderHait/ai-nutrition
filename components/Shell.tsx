@@ -92,7 +92,7 @@ const calmUiCss = String.raw`
   .clientApp.calmUi.app{padding-bottom:76px}
   .calmUi .content{max-width:760px;padding:18px 14px 38px}
   .clientApp .content{padding-bottom:84px}
-  .calmUi .mobileTopbar{height:62px;background:var(--nav);border-color:var(--line);backdrop-filter:blur(16px)}
+  .calmUi .mobileTopbar{height:62px;background:var(--nav);border-color:var(--line)}
   .calmUi .mobileDrawer{background:var(--panel);border-color:var(--line)}
   .calmUi .mobileDrawerNav a{min-height:43px;border-radius:10px;font-size:13px}
   .calmUi .pageHead{margin-bottom:16px}

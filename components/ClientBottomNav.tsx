@@ -63,10 +63,8 @@ export default function ClientBottomNav() {
             padding:6px 4px;
             border:1px solid var(--line);
             border-radius:17px;
-            background:color-mix(in srgb,var(--surface) 94%,transparent);
+            background:var(--surface);
             box-shadow:var(--shadow);
-            backdrop-filter:blur(18px);
-            -webkit-backdrop-filter:blur(18px);
           }
           .clientBottomNav a{
             display:grid;

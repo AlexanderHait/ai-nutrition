@@ -9,8 +9,22 @@ export async function adminChatIds(){
 
 export type Meal={
   id:number;chat_id:number;dish:string;grams:number;kcal:number;prot:number;fat:number;carb:number;
-  eaten_at:string;eaten_day:string;deleted:boolean
+  eaten_at:string;eaten_day:string;deleted:boolean;
+  // Откуда взялись числа. У записей до 09.08.2026 этих полей нет — там null,
+  // и запись оценивается только по арифметике, как раньше.
+  nutrition_source?:string|null;weight_source?:string|null;needs_check?:boolean|null
 };
+// Источник — это ссылка на что-то внешнее: каталог, этикетка, чек, штрих-код,
+// официальное меню, поправка самого человека. Всё остальное — догадка модели.
+export const TRUSTED_NUTRITION_SOURCES=new Set([
+  "label","verified_catalog","official_catalog","restaurant_catalog","verified_reference",
+  "personal_override","receipt_line_sugar_free","barcode","client_memory","cache","user_correction",
+]);
+export const TRUSTED_WEIGHT_SOURCES=new Set([
+  "user","user_confirmed","caption","caption_portion","caption_item","caption_item_structured",
+  "receipt_explicit","explicit_count","catalog_portion","catalog_package","restaurant_catalog",
+  "official_menu","package_printed","exact_sku_package","standard_piece","personal_memory","barcode_package",
+]);
 export type Profile={id:number;telegram_id:number;first_name:string|null;username:string|null;locale:string|null;created_at:string;avatar_url?:string|null;avatar_file_id?:string|null;avatar_updated_at?:string|null};
 
 export async function allData(){
@@ -115,10 +129,19 @@ export async function supportMessages(chatId:number){
 
 export const n=(v:any)=>Number(v||0);
 export const fmt=(v:any,d=0)=>n(v).toLocaleString('ru-RU',{maximumFractionDigits:d});
-export function dayKey(d=new Date()){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(d)}
+// Сутки питания идут с 03:00 до 02:59: съеденное ночью относится к прошлому
+// дню. То же правило в базе — `nutrition_day()` и генерируемая колонка
+// `meals.eaten_day`, миграция 20260812080000_nutrition_day_starts_at_03.sql.
+// Оба места должны сдвигаться вместе, иначе приём уйдёт во вчера, а «сегодня»
+// на сайте останется новым днём.
+export const NUTRITION_DAY_START_HOUR=3;
+export function dayKey(d=new Date()){
+  const shifted=new Date(d.getTime()-NUTRITION_DAY_START_HOUR*3600000);
+  return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(shifted);
+}
 export function mealDay(m:Pick<Meal,'eaten_at'|'eaten_day'>){
   if(m.eaten_day)return String(m.eaten_day).slice(0,10);
-  return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(new Date(m.eaten_at));
+  return dayKey(new Date(m.eaten_at));
 }
 export function sumMeals(rows:Meal[]){return rows.reduce((a,m)=>({kcal:a.kcal+n(m.kcal),prot:a.prot+n(m.prot),fat:a.fat+n(m.fat),carb:a.carb+n(m.carb)}),{kcal:0,prot:0,fat:0,carb:0})}
 
@@ -198,7 +221,7 @@ export async function adminClientOverviewData(chatId:number){
     s.from('profiles').select('id,telegram_id,first_name,username,created_at,avatar_url,avatar_file_id,avatar_updated_at').eq('telegram_id',chatId).maybeSingle(),
     s.from('client_settings').select('*').eq('chat_id',chatId).maybeSingle(),
     s.from('subscriptions').select('plan,status,price_rub,started_at,ends_at,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
-    s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(1200),
+    s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(1200),
     s.from('weight_logs').select('id,weight_kg,measured_at').eq('chat_id',chatId).order('measured_at',{ascending:false}).limit(12),
     s.from('support_messages').select('id',{count:'exact',head:true}).eq('chat_id',chatId).eq('sender','client').is('read_by_admin_at',null),
     s.from('chat_logs').select('created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1),
@@ -214,7 +237,7 @@ export async function clientHomeData(chatId:number){
     s.from('profiles').select('id,telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at').eq('telegram_id',chatId).maybeSingle(),
     s.from('client_settings').select('*').eq('chat_id',chatId).maybeSingle(),
     s.from('subscriptions').select('plan,status,ends_at,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
-    s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(400),
+    s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(400),
     s.from('digests').select('id,for_date,kcal,summary_md').eq('chat_id',chatId).order('for_date',{ascending:false}).limit(1),
     s.from('weight_logs').select('id,weight_kg,measured_at').eq('chat_id',chatId).order('measured_at',{ascending:false}).limit(1)
   ]);
@@ -237,7 +260,7 @@ export async function clientProgressData(chatId:number){
   const d14=new Date();d14.setDate(d14.getDate()-13);const fromDay=dayKey(d14);
   const [{data:settings},{data:meals},{data:weights},{data:digests},{data:subscription}]=await Promise.all([
     s.from('client_settings').select('*').eq('chat_id',chatId).maybeSingle(),
-    s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(800),
+    s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(800),
     s.from('weight_logs').select('id,weight_kg,measured_at').eq('chat_id',chatId).order('measured_at',{ascending:false}).limit(10),
     s.from('digests').select('id,for_date,kcal,summary_md').eq('chat_id',chatId).order('for_date',{ascending:false}).limit(8),
     s.from('subscriptions').select('plan,status,ends_at,created_at').eq('chat_id',chatId).order('created_at',{ascending:false}).limit(1).maybeSingle()
@@ -248,7 +271,7 @@ export async function clientProgressData(chatId:number){
 export async function clientNutritionData(chatId:number,days=45){
   const s=getSupabaseAdmin();
   const d=new Date();d.setDate(d.getDate()-(days-1));const fromDay=dayKey(d);
-  const {data,error}=await s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(1800);
+  const {data,error}=await s.from('meals').select('id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check').eq('chat_id',chatId).eq('deleted',false).gte('eaten_day',fromDay).order('eaten_at',{ascending:false}).limit(1800);
   if(error)throw error;return (data||[]) as Meal[];
 }
 

@@ -31,9 +31,9 @@ const FREE_FALLBACK: Omit<SubscriptionAccess, "account_id" | "chat_id" | "period
   trial_ends_at: null,
   current_period_end: null,
   provider: "system_default",
-  limits: { photo_analysis: 3, ai_request: 5 },
+  limits: { photo_analysis: 10, ai_request: 10 },
   usage: { photo_analysis: 0, ai_request: 0 },
-  remaining: { photo_analysis: 3, ai_request: 5 },
+  remaining: { photo_analysis: 10, ai_request: 10 },
   can_photo_analysis: true,
   can_ai_request: true,
 };

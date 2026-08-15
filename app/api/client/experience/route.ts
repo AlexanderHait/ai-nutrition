@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { session } from "@/lib/auth";
 import { clientSetupComplete } from "@/lib/client-setup";
@@ -5,6 +6,19 @@ import { dayKey, mealDay, sumMeals, type Meal } from "@/lib/data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
+
+// Уведомление считается заново при каждом запросе, поэтому «удалить» его
+// буквально нельзя. Подпись — это отпечаток текста: пока он тот же, значит
+// сигнал тот же, и закрытое уведомление не показывается снова.
+const DISMISS_TTL_DAYS = 30;
+
+function noticeSignature(notice: { id: string; title: string; text: string }) {
+  return crypto
+    .createHash("sha256")
+    .update(`${notice.id}\n${notice.title}\n${notice.text}`)
+    .digest("hex")
+    .slice(0, 32);
+}
 
 type Notice = {
   id: string;
@@ -45,10 +59,11 @@ export async function GET() {
     { data: subscription },
     { data: digest },
     { count: reviewCount },
+    { data: dismissals },
   ] = await Promise.all([
     db.from("client_settings").select("*").eq("account_id", current.accountId).maybeSingle(),
     db.from("meals")
-      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted")
+      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check")
       .eq("account_id", current.accountId)
       .eq("deleted", false)
       .gte("eaten_day", fromDay)
@@ -76,6 +91,10 @@ export async function GET() {
       .eq("account_id", current.accountId)
       .eq("needs_confirmation", true)
       .gte("created_at", recognitionFrom),
+    db.from("client_notice_dismissals")
+      .select("notice_id,signature")
+      .eq("account_id", current.accountId)
+      .gte("dismissed_at", new Date(Date.now() - DISMISS_TTL_DAYS * 86400000).toISOString()),
   ]);
 
   const rows = (meals || []) as Meal[];
@@ -243,11 +262,53 @@ export async function GET() {
     }
   }
 
+  const hidden = new Map((dismissals || []).map((row) => [row.notice_id, row.signature]));
+  const visible = notices
+    .map((notice) => ({ ...notice, signature: noticeSignature(notice) }))
+    .filter((notice) => hidden.get(notice.id) !== notice.signature);
+
   return NextResponse.json({
     ok: true,
     setup_required: !clientSetupComplete(settings),
-    notices: notices.slice(0, 4),
+    notices: visible.slice(0, 4),
     achievements: achievements.slice(0, 3),
     premium_moment: premiumMoment,
   });
+}
+
+// Закрытие уведомления. Подпись приходит от клиента вместе с уведомлением,
+// поэтому закрывается ровно тот текст, который человек видел.
+export async function POST(request: Request) {
+  const current = await session();
+  if (current?.role !== "client" || !current.accountId) {
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => null) as
+    | { notice_id?: unknown; signature?: unknown }
+    | null;
+  const noticeId = String(body?.notice_id || "").trim().slice(0, 64);
+  const signature = String(body?.signature || "").trim().slice(0, 64);
+  if (!noticeId || !signature) {
+    return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
+  }
+
+  const { error } = await getSupabaseAdmin()
+    .from("client_notice_dismissals")
+    .upsert(
+      {
+        account_id: current.accountId,
+        notice_id: noticeId,
+        signature,
+        dismissed_at: new Date().toISOString(),
+      },
+      { onConflict: "account_id,notice_id" },
+    );
+
+  if (error) {
+    console.error("notice dismiss failed", { code: error.code, message: error.message });
+    return NextResponse.json({ ok: false, error: "save_failed" }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
 }
