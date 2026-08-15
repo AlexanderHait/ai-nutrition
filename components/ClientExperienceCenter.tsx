@@ -60,15 +60,21 @@ export default function ClientExperienceCenter({ setupRequired }: { setupRequire
       router.replace("/client/setup");
       return;
     }
-    if (pathname === "/client/setup") return;
+    if (pathname === "/client/setup" || data) return;
 
     let active = true;
-    fetch("/api/client/experience", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : null)
-      .then((payload) => { if (active && payload?.ok) setData(payload); })
-      .catch(() => undefined);
-    return () => { active = false; };
-  }, [pathname, router, setupRequired]);
+    const timer = window.setTimeout(() => {
+      fetch("/api/client/experience", { cache: "no-store" })
+        .then((response) => response.ok ? response.json() : null)
+        .then((payload) => { if (active && payload?.ok) setData(payload); })
+        .catch(() => undefined);
+    }, 600);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [data, pathname, router, setupRequired]);
 
   if (pathname === "/client/setup" || setupRequired || !data) return null;
 

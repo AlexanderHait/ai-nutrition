@@ -1,5 +1,62 @@
+import { cache } from "react";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { dayKey, mealDay, sumMeals, type Meal } from "@/lib/data";
+
+export const clientSettingsAccountData = cache(async (accountId: string) => {
+  const db = getSupabaseAdmin();
+  const { data } = await db
+    .from("client_settings")
+    .select("*")
+    .eq("account_id", accountId)
+    .maybeSingle();
+  return data;
+});
+
+export async function clientDashboardAccountData(accountId: string) {
+  const db = getSupabaseAdmin();
+  const date = new Date();
+  date.setDate(date.getDate() - 13);
+  const fromDay = dayKey(date);
+
+  const [{ data: profile }, settings, { data: meals }] = await Promise.all([
+    db.from("profiles")
+      .select("id,account_id,telegram_id,first_name,username,avatar_url,avatar_file_id,avatar_updated_at")
+      .eq("account_id", accountId)
+      .maybeSingle(),
+    clientSettingsAccountData(accountId),
+    db.from("meals")
+      .select("id,chat_id,dish,grams,kcal,prot,fat,carb,eaten_at,eaten_day,deleted,nutrition_source,weight_source,needs_check")
+      .eq("account_id", accountId)
+      .eq("deleted", false)
+      .gte("eaten_day", fromDay)
+      .order("eaten_at", { ascending: false })
+      .limit(1000),
+  ]);
+
+  return { profile, settings, meals: (meals || []) as Meal[] };
+}
+
+
+export async function clientPremiumHomeAccountData(accountId: string) {
+  const db = getSupabaseAdmin();
+  const today = dayKey();
+
+  const [{ data: plan }, { data: report }] = await Promise.all([
+    db.from("premium_daily_plans")
+      .select("content_md")
+      .eq("account_id", accountId)
+      .eq("for_date", today)
+      .maybeSingle(),
+    db.from("premium_weekly_reports")
+      .select("content_md")
+      .eq("account_id", accountId)
+      .order("week_end", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  return { plan, report };
+}
 
 export async function clientHomeAccountData(accountId: string) {
   const db = getSupabaseAdmin();
