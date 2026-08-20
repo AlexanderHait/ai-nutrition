@@ -15,6 +15,9 @@
 create or replace function public.ai_usage_events_normalize_metadata()
 returns trigger
 language plpgsql
+-- search_path задан явно: без него advisors ставят function_search_path_mutable,
+-- и это правило по проекту уже закрыто (см. «Открытые технические долги»).
+set search_path to 'public'
 as $function$
 begin
   -- Интересует ровно один случай: в jsonb лежит строка, а внутри неё JSON-объект.
