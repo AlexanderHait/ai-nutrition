@@ -22,10 +22,40 @@ export function pluralDays(days: number) {
   }
 }
 
+// Цифры и цена берутся из базы, а не из текста: лимиты живут в
+// subscription_products и subscription_plan_limits_v1, и если владелец их
+// поменяет, сообщение обязано измениться вместе с ними. Значения по умолчанию
+// равны сегодняшним — если справочник не прочитался, человек всё равно получит
+// корректное письмо, а не пустоту.
+export type TrialPlanFacts = {
+  priceRub: number;
+  photoLimit: number;
+  aiLimit: number;
+  freePhotoLimit: number;
+  freeAiLimit: number;
+};
+
+export const DEFAULT_TRIAL_PLAN_FACTS: TrialPlanFacts = {
+  priceRub: 990,
+  photoLimit: 40,
+  aiLimit: 20,
+  freePhotoLimit: 10,
+  freeAiLimit: 10,
+};
+
+// Пробел неразрывный: «990 ₽» не должно переноситься на другую строку.
+function money(rub: number) {
+  return `${Math.round(rub).toLocaleString("ru-RU").replace(/ /g, " ")} ₽`;
+}
+
 // Тексты без давления и без внутренних терминов: человек сам решает,
 // прижился дневник или нет. Цифры лимитов названы прямо, чтобы разница
 // между «до» и «после» была видна без похода на сайт.
-export function trialNoticeText(notice: Pick<TrialNotice, "kind" | "display_name" | "days_left">) {
+export function trialNoticeText(
+  notice: Pick<TrialNotice, "kind" | "display_name" | "days_left">,
+  facts: Partial<TrialPlanFacts> = {},
+) {
+  const f = { ...DEFAULT_TRIAL_PLAN_FACTS, ...facts };
   const name = String(notice.display_name || "").trim().split(/\s+/)[0];
   const hello = name ? `${name}, ` : "";
 
@@ -33,9 +63,9 @@ export function trialNoticeText(notice: Pick<TrialNotice, "kind" | "display_name
     return [
       "Пробный период закончился.",
       "",
-      `${hello}дневник, КБЖУ и статистика работают как прежде — остаётся 10 фото и 10 вопросов AI в месяц.`,
+      `${hello}дневник, КБЖУ и статистика работают как прежде — остаётся ${f.freePhotoLimit} фото и ${f.freeAiLimit} вопросов AI в месяц.`,
       "",
-      "Basic снимает этот потолок: 40 фото и 20 вопросов. Если считаешь питание каждый день, его хватает с запасом.",
+      `Basic — ${money(f.priceRub)} в месяц: ${f.photoLimit} фото и ${f.aiLimit} вопросов. Если считаешь питание каждый день, его хватает с запасом.`,
     ].join("\n");
   }
 
@@ -43,8 +73,8 @@ export function trialNoticeText(notice: Pick<TrialNotice, "kind" | "display_name
   return [
     `⏳ Пробный период заканчивается через ${days} ${pluralDays(days)}.`,
     "",
-    `${hello}сейчас у тебя 40 фото и 20 вопросов AI в месяц. После окончания останется 10 и 10.`,
+    `${hello}сейчас у тебя ${f.photoLimit} фото и ${f.aiLimit} вопросов AI в месяц. После окончания останется ${f.freePhotoLimit} и ${f.freeAiLimit}.`,
     "",
-    "Если дневник прижился — продли доступ, и ничего не изменится.",
+    `Если дневник прижился — Basic стоит ${money(f.priceRub)} в месяц, и ничего не изменится.`,
   ].join("\n");
 }

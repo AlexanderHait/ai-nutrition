@@ -48,4 +48,32 @@ describe("trialNoticeText", () => {
     expect(trialNoticeText({ kind: "trial_ending", display_name: null, days_left: 0 }))
       .toContain("через 1 день");
   });
+
+  it("называет цену — человек не должен идти на сайт, чтобы её узнать", () => {
+    const ending = trialNoticeText({ kind: "trial_ending", display_name: null, days_left: 2 });
+    const ended = trialNoticeText({ kind: "trial_ended", display_name: null, days_left: 0 });
+    expect(ending).toMatch(/990\s?₽/);
+    expect(ended).toMatch(/990\s?₽/);
+  });
+
+  it("берёт цену и лимиты из справочника, а не из текста", () => {
+    const facts = { priceRub: 1290, photoLimit: 60, aiLimit: 30, freePhotoLimit: 5, freeAiLimit: 3 };
+    const ending = trialNoticeText({ kind: "trial_ending", display_name: null, days_left: 3 }, facts);
+    expect(ending).toContain("60 фото и 30 вопросов");
+    expect(ending).toContain("останется 5 и 3");
+    expect(ending).toMatch(/1\s?290\s?₽/);
+
+    const ended = trialNoticeText({ kind: "trial_ended", display_name: null, days_left: 0 }, facts);
+    expect(ended).toContain("5 фото и 3 вопросов");
+    expect(ended).toContain("60 фото и 30 вопросов");
+    expect(ended).not.toContain("990");
+  });
+
+  it("частичный справочник не ломает остальные цифры", () => {
+    // Прочиталась только цена — лимиты должны остаться сегодняшними.
+    const text = trialNoticeText({ kind: "trial_ending", display_name: null, days_left: 3 }, { priceRub: 1490 });
+    expect(text).toContain("40 фото и 20 вопросов");
+    expect(text).toContain("останется 10 и 10");
+    expect(text).toMatch(/1\s?490\s?₽/);
+  });
 });
