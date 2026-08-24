@@ -8,6 +8,32 @@ export const TIERS: Record<TierKey, { name: string; promise: string }> = {
   premium: { name: "Premium", promise: "Личный нутрициолог, который ведёт тебя к цели" },
 };
 
+// Лимиты приходят из базы, а не живут в вёрстке. Так эта таблица однажды уже
+// устарела: 09.08 free подняли с 3/5 до 10/10, а страница продолжала обещать
+// 3 фото и 5 запросов — то есть занижала бесплатный план ровно там, где человек
+// решает, платить ли. Значения по умолчанию равны сегодняшним, чтобы страница
+// осталась осмысленной, даже если справочник не прочитался.
+export type PlanLimits = {
+  freePhoto: number;
+  freeAi: number;
+  basicPhoto: number;
+  basicAi: number;
+};
+
+export const DEFAULT_PLAN_LIMITS: PlanLimits = {
+  freePhoto: 10,
+  freeAi: 10,
+  basicPhoto: 40,
+  basicAi: 20,
+};
+
+// Обещание тарифа тоже содержит число, поэтому собирается из тех же данных.
+export function tierPromise(tier: TierKey, limits: Partial<PlanLimits> = {}) {
+  const l = { ...DEFAULT_PLAN_LIMITS, ...limits };
+  if (tier === "basic") return `Дневник без экономии: ${l.basicPhoto} фото в месяц`;
+  return TIERS[tier].promise;
+}
+
 // level: 0 — нет, 1 — ограниченно, 2 — свободно, 3 — без границ.
 // Уровень рисуется полосой, поэтому разницу видно, а не вычитываешь из текста.
 type Row = {
@@ -19,7 +45,7 @@ type Row = {
   premium: [number, string];
 };
 
-const ROWS: readonly Row[] = [
+const rowsFor = (l: PlanLimits): readonly Row[] => [
   {
     group: "Учёт питания",
     label: "Дневник: фото, текст, чек",
@@ -32,16 +58,16 @@ const ROWS: readonly Row[] = [
     group: "Учёт питания",
     label: "Фото-анализы в месяц",
     hint: "Распознавание блюда по снимку",
-    free: [1, "3"],
-    basic: [3, "40"],
+    free: [1, String(l.freePhoto)],
+    basic: [3, String(l.basicPhoto)],
     premium: [3, "Без лимита"],
   },
   {
     group: "Учёт питания",
     label: "AI-запросы в месяц",
     hint: "Вопросы про еду и питание",
-    free: [1, "5"],
-    basic: [2, "20"],
+    free: [1, String(l.freeAi)],
+    basic: [2, String(l.basicAi)],
     premium: [3, "Без лимита"],
   },
   {
@@ -125,14 +151,18 @@ export function PlanCompare({
   premiumPrice,
   basicDays,
   premiumDays,
+  limits,
 }: {
   current: TierKey;
   basicPrice: string | null;
   premiumPrice: string | null;
   basicDays: number | null;
   premiumDays: number | null;
+  limits?: Partial<PlanLimits>;
 }) {
-  const groups = Array.from(new Set(ROWS.map((row) => row.group)));
+  const planLimits = { ...DEFAULT_PLAN_LIMITS, ...(limits || {}) };
+  const rows = rowsFor(planLimits);
+  const groups = Array.from(new Set(rows.map((row) => row.group)));
 
   return (
     <section className="planCompare top">
@@ -147,7 +177,7 @@ export function PlanCompare({
               {tier === "premium" ? <span className="planColTag">Максимум пользы</span> : null}
               <b>{TIERS[tier].name}</b>
               <strong>{price}{days ? <small> / {days} дней</small> : null}</strong>
-              <p>{TIERS[tier].promise}</p>
+              <p>{tierPromise(tier, planLimits)}</p>
               {isCurrent ? (
                 <span className="planColCurrent">Твой тариф</span>
               ) : tier === "free" ? (
@@ -165,7 +195,7 @@ export function PlanCompare({
       {groups.map((group) => (
         <div className="planGroup" key={group}>
           <h3>{group}</h3>
-          {ROWS.filter((row) => row.group === group).map((row) => (
+          {rows.filter((row) => row.group === group).map((row) => (
             <div className="planRow" key={row.label}>
               <div className="planRowName">
                 <b>{row.label}</b>

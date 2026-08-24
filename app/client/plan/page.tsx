@@ -11,7 +11,7 @@ import { requireClient } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { subscriptionAccess } from "@/lib/subscription-access";
 import SimplifiedSections from "@/components/SimplifiedSections";
-import { planCompareCss, PlanCompare, TIERS, type TierKey } from "@/components/PlanCompare";
+import { planCompareCss, PlanCompare, TIERS, tierPromise, type TierKey } from "@/components/PlanCompare";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,8 @@ type Product = {
   price_rub: number;
   period_days: number;
   enabled: boolean;
+  photo_limit: number | null;
+  ai_request_limit: number | null;
 };
 
 export default async function Page({
@@ -33,7 +35,7 @@ export default async function Page({
   const [access, productsResult] = await Promise.all([
     subscriptionAccess(current.accountId!),
     db.from("subscription_products")
-      .select("plan,price_rub,period_days,enabled")
+      .select("plan,price_rub,period_days,enabled,photo_limit,ai_request_limit")
       .eq("enabled", true)
       .order("sort_order"),
   ]);
@@ -43,6 +45,19 @@ export default async function Page({
   );
   const basicProduct = products.get("basic");
   const premiumProduct = products.get("premium");
+
+  // Лимиты в таблице сравнения — из справочника, а не из вёрстки: она уже
+  // однажды устарела, обещая free 3 фото и 5 запросов вместо 10 и 10.
+  const freeLimits = await db.rpc("subscription_plan_limits_v1", { _plan: "free" });
+  const free = (Array.isArray(freeLimits.data) ? freeLimits.data[0] : freeLimits.data) as
+    | { photo_analysis?: number; ai_request?: number }
+    | null;
+  const planLimits = {
+    ...(Number(free?.photo_analysis) > 0 ? { freePhoto: Number(free!.photo_analysis) } : {}),
+    ...(Number(free?.ai_request) > 0 ? { freeAi: Number(free!.ai_request) } : {}),
+    ...(Number(basicProduct?.photo_limit) > 0 ? { basicPhoto: Number(basicProduct!.photo_limit) } : {}),
+    ...(Number(basicProduct?.ai_request_limit) > 0 ? { basicAi: Number(basicProduct!.ai_request_limit) } : {}),
+  };
 
   const tier: TierKey = access.premium ? "premium" : access.plan === "basic" ? "basic" : "free";
   const isTrial = access.premium && access.state === "trial";
@@ -96,7 +111,7 @@ export default async function Page({
             {tier === "premium" ? <Crown size={14} /> : tier === "basic" ? <Sparkles size={14} /> : <Brain size={14} />}
             {isTrial ? "Пробный Premium" : TIERS[tier].name}
           </span>
-          <b>{TIERS[tier].promise}</b>
+          <b>{tierPromise(tier, planLimits)}</b>
           <span className="planStatusWhen">
             {accessEnd
               ? `Действует до ${new Date(accessEnd).toLocaleDateString("ru-RU")}`
@@ -144,6 +159,7 @@ export default async function Page({
         premiumPrice={priceOf(premiumProduct)}
         basicDays={basicProduct?.period_days ?? null}
         premiumDays={premiumProduct?.period_days ?? null}
+        limits={planLimits}
       />
 
       {tier === "premium" ? (
