@@ -146,13 +146,15 @@ describe("GET /api/jarvis/day", () => {
     expect(await res.json()).toEqual({ day: "2026-10-01", kcal: 0, protein: 0, fat: 0, carbs: 0, meals: [] });
   });
 
-  it("без day берётся текущий день TeddY (сутки с 03:00 МСК)", async () => {
+  it("без day берётся текущий день TeddY (сутки с 00:00 МСК)", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
-    // 02:30 МСК 14.10 — по правилу Б-06 это ещё 13.10.
-    vi.setSystemTime(new Date("2026-10-14T02:30:00+03:00"));
-    const body = await (await call("")).json();
-    expect(body.day).toBe("2026-10-13");
-    expect(db.filters).toContainEqual(["eaten_day", "2026-10-13"]);
+    // 23:30 МСК 13.10 — ещё 13.10.
+    vi.setSystemTime(new Date("2026-10-13T23:30:00+03:00"));
+    expect((await (await call("")).json()).day).toBe("2026-10-13");
+    // 04:30 в Нячанге 14.10 = 00:30 МСК — по правилу Б-06 это уже 14.10.
+    vi.setSystemTime(new Date("2026-10-14T04:30:00+07:00"));
+    expect((await (await call("")).json()).day).toBe("2026-10-14");
+    expect(db.filters).toContainEqual(["eaten_day", "2026-10-14"]);
   });
 
   it("у всех ответов Cache-Control: no-store", async () => {

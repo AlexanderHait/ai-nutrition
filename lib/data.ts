@@ -129,12 +129,13 @@ export async function supportMessages(chatId:number){
 
 export const n=(v:any)=>Number(v||0);
 export const fmt=(v:any,d=0)=>n(v).toLocaleString('ru-RU',{maximumFractionDigits:d});
-// Сутки питания идут с 03:00 до 02:59: съеденное ночью относится к прошлому
-// дню. То же правило в базе — `nutrition_day()` и генерируемая колонка
-// `meals.eaten_day`, миграция 20260812080000_nutrition_day_starts_at_03.sql.
-// Оба места должны сдвигаться вместе, иначе приём уйдёт во вчера, а «сегодня»
-// на сайте останется новым днём.
-export const NUTRITION_DAY_START_HOUR=3;
+// Сутки питания идут с 00:00 до 23:59 по Москве (04:00 в Нячанге) — решение
+// владельца 13.10.2026, до этого день начинался в 03:00. То же правило в базе —
+// `nutrition_day()` и генерируемая колонка `meals.eaten_day`, миграция
+// 20261013140000_nutrition_day_starts_at_00.sql, и в трёх узлах бота (Б-06).
+// Все места должны сдвигаться вместе, иначе приём уйдёт в другой день, а
+// «сегодня» на сайте останется прежним.
+export const NUTRITION_DAY_START_HOUR=0;
 export function dayKey(d=new Date()){
   const shifted=new Date(d.getTime()-NUTRITION_DAY_START_HOUR*3600000);
   return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow'}).format(shifted);
