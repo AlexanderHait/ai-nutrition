@@ -253,6 +253,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
             <small>Путь к цели</small>
             <b>{fmt(currentWeight, 1)} кг <ArrowRight size={16} /> {fmt(targetWeight, 1)} кг</b>
             <p>{goalProgress == null ? "Нужно больше измерений для расчёта пути." : `Пройдено около ${goalProgress}% пути от первого доступного измерения.`}</p>
+            <Link className="textLink" href="/client/program">Разложить путь по неделям к дате →</Link>
           </div>
           <strong>{goalProgress == null ? "—" : `${goalProgress}%`}</strong>
           <i><em style={{ width: `${goalProgress || 0}%` }} /></i>

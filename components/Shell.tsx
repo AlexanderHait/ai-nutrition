@@ -162,6 +162,7 @@ export default async function Shell({
         ["/client", "Сегодня", "home"],
         ["/client/nutrition", "Питание", "nutrition"],
         ["/client/progress", "Прогресс", "progress"],
+        ["/client/program", "Программа", "program"],
         ["/client/coach", "TeddY Coach", "coach", { premium: true }],
       ],
     },
