@@ -9,9 +9,11 @@ export async function POST(request: Request) {
   }
 
   const form = await request.formData();
-  const weight = Number(form.get("weight_kg"));
+  // Возврат только на заранее известные страницы — адрес из формы не подставляем.
+  const fromProgram = form.get("return") === "program";
+  const weight = Number(String(form.get("weight_kg") || "").replace(",", "."));
   if (!Number.isFinite(weight) || weight < 30 || weight > 400) {
-    return NextResponse.redirect(new URL("/client/profile?error=weight", request.url), 303);
+    return NextResponse.redirect(new URL(fromProgram ? "/client/program?error=weight" : "/client/profile?error=weight", request.url), 303);
   }
 
   const db = getSupabaseAdmin();
@@ -37,7 +39,7 @@ export async function POST(request: Request) {
 
   if (logError || settingsError) {
     console.error("Saving weight failed", { logError, settingsError });
-    return NextResponse.redirect(new URL("/client/profile?error=weight", request.url), 303);
+    return NextResponse.redirect(new URL(fromProgram ? "/client/program?error=weight" : "/client/profile?error=weight", request.url), 303);
   }
-  return NextResponse.redirect(new URL("/client/progress", request.url), 303);
+  return NextResponse.redirect(new URL(fromProgram ? "/client/program?weighed=1" : "/client/progress", request.url), 303);
 }

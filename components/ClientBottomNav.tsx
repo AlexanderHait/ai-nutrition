@@ -16,6 +16,7 @@ function active(pathname: string, href: string) {
   if (href === "/client") return pathname === href;
   if (href === "/client/nutrition") return pathname.startsWith("/client/nutrition") || pathname.startsWith("/client/history");
   if (href === "/client/coach-v3") return pathname.startsWith("/client/coach");
+  if (href === "/client/progress") return pathname.startsWith("/client/progress") || pathname.startsWith("/client/program");
   if (href === "/client/profile") {
     return pathname.startsWith("/client/profile")
       || pathname.startsWith("/client/plan")
