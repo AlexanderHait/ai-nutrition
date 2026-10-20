@@ -39,14 +39,11 @@ create table if not exists public.nutrition_programs (
   close_reason text check (close_reason is null or close_reason in ('rebuild', 'finished', 'stopped', 'merged'))
 );
 
+-- Он же — индекс, по которому бот находит активную программу (через аккаунт,
+-- привязанный к Telegram, см. nutrition_program_context_v1).
 create unique index if not exists nutrition_programs_one_active_idx
   on public.nutrition_programs (account_id)
   where status = 'active';
-
--- Бот ищет программу по Telegram (chat_id).
-create index if not exists nutrition_programs_active_chat_idx
-  on public.nutrition_programs (chat_id)
-  where status = 'active' and chat_id is not null;
 
 create index if not exists nutrition_programs_account_idx
   on public.nutrition_programs (account_id, created_at desc);
