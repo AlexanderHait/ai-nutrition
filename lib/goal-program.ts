@@ -2,11 +2,11 @@
 // к соревнованиям: человек выбирает цель и дату, программа считает недели до
 // даты, раскладывает их по этапам и даёт ориентиры КБЖУ на каждую неделю.
 //
-// Всё считается здесь, детерминированно и без AI. В базе хранится только выбор
-// человека и снимок анкеты (таблица nutrition_programs), а недели и ориентиры
-// каждый раз выводятся из них по правилам каталога. Второй копии плана нет:
-// иначе сайт, бот и база разойдутся. Правила меняются только новой версией
-// каталога — старые программы продолжают считаться по своей.
+// Всё считается здесь, детерминированно и без AI. Расписание недель
+// считается один раз при старте и сохраняется целиком
+// (nutrition_programs.plan) — его читают сайт, бот и недельный разбор. Правила
+// меняются новой версией каталога; уже идущие программы живут по своему
+// сохранённому расписанию.
 
 import { kcalFloor, macroTargets, maintenanceKcal, type ActivityLevel } from "@/lib/client-setup";
 
@@ -142,9 +142,6 @@ export const PROGRAM_CATALOG_V1: ProgramCatalog = {
   },
 };
 
-export const PROGRAM_CATALOGS: Record<string, ProgramCatalog> = {
-  [PROGRAM_CATALOG_V1.version]: PROGRAM_CATALOG_V1,
-};
 export const CURRENT_PROGRAM_CATALOG = PROGRAM_CATALOG_V1;
 
 const ACTIVITY_LEVELS: readonly string[] = ["low", "light", "moderate", "high", "very_high"];
@@ -525,7 +522,20 @@ export function buildProgram(input: ProgramInput, catalog: ProgramCatalog = CURR
   };
 }
 
-// --- сохранённая программа → вход расчёта ---
+// --- сохранённая программа ---
+//
+// Расписание недель считается один раз — при старте или пересборке — и
+// сохраняется в nutrition_programs.plan. Дальше его читают все: страница
+// кабинета, бот и недельный разбор Premium (SQL nutrition_program_context_v1).
+// Копия одна: уже идущая программа не меняется от правок кода, а бот видит
+// ровно те же недели, что и человек.
+
+export type OkProgramPlan = Extract<ProgramPlan, { ok: true }>;
+export type StoredPlan = Pick<OkProgramPlan, "weeks" | "phases" | "summary">;
+
+export function storedPlan(plan: OkProgramPlan): StoredPlan {
+  return { weeks: plan.weeks, phases: plan.phases, summary: plan.summary };
+}
 
 export type ProgramRow = {
   goal_kind: string;
@@ -535,33 +545,43 @@ export type ProgramRow = {
   target_weight_kg: number | string;
   catalog_version: string;
   inputs: Record<string, unknown> | null;
+  plan: unknown;
 };
 
-export function programInputFromRow(row: ProgramRow): ProgramInput | null {
-  const goal = (["loss", "gain", "maintain"] as const).find((value) => value === row.goal_kind);
-  const inputs = row.inputs || {};
-  const activity = String(inputs.activity_level || "") as ActivityLevel;
-  if (!goal || !ACTIVITY_LEVELS.includes(activity)) return null;
-  return {
-    goal,
-    sex: inputs.sex === "female" ? "female" : "male",
-    age: Number(inputs.age_years),
-    heightCm: Number(inputs.height_cm),
-    activityLevel: activity,
-    startWeightKg: Number(row.start_weight_kg),
-    targetWeightKg: Number(row.target_weight_kg),
-    startDay: String(row.start_day).slice(0, 10),
-    targetDay: row.target_day ? String(row.target_day).slice(0, 10) : null,
-  };
+const PHASE_CODES: readonly string[] = ["entry", "main", "break", "hold"];
+const isNum = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
+
+function validWeek(value: unknown): value is ProgramWeek {
+  const w = value as ProgramWeek | null;
+  return Boolean(w)
+    && Number.isInteger(w!.index) && isDay(w!.startDay) && isDay(w!.endDay)
+    && Number.isInteger(w!.days) && w!.days > 0
+    && PHASE_CODES.includes(w!.phase) && typeof w!.title === "string" && typeof w!.afterTarget === "boolean"
+    && [w!.kcal, w!.protein, w!.fat, w!.carb, w!.plannedWeightStart, w!.plannedWeightEnd].every(isNum);
 }
 
-// Сохранённая программа пересчитывается по той версии правил, по которой её
-// создали. Неизвестная версия — null: показать ошибку, а не считать по чужим правилам.
-export function planFromRow(row: ProgramRow): ProgramPlan | null {
-  const catalog = PROGRAM_CATALOGS[row.catalog_version];
-  const input = programInputFromRow(row);
-  if (!catalog || !input) return null;
-  return buildProgram(input, catalog);
+function validPhase(value: unknown): value is ProgramPhaseSpan {
+  const p = value as ProgramPhaseSpan | null;
+  return Boolean(p) && PHASE_CODES.includes(p!.phase) && typeof p!.title === "string" && typeof p!.about === "string"
+    && isDay(p!.startDay) && isDay(p!.endDay) && Number.isInteger(p!.weeks);
+}
+
+function validSummary(value: unknown): value is OkProgramPlan["summary"] {
+  const s = value as OkProgramPlan["summary"] | null;
+  return Boolean(s) && isDay(s!.startDay) && isDay(s!.targetDay) && isDay(s!.endDay)
+    && [s!.startWeightKg, s!.targetWeightKg, s!.totalChangeKg, s!.maintenanceKcal, s!.dailyDeltaKcal, s!.weeklyRateKg, s!.kcalFloor].every(isNum);
+}
+
+// Сохранённое расписание → программа. Испорченная или неполная запись — null:
+// страница покажет понятную ошибку, а не подставит что-то своё.
+export function planFromRow(row: ProgramRow): OkProgramPlan | null {
+  const goal = (["loss", "gain", "maintain"] as const).find((value) => value === row.goal_kind);
+  const stored = row.plan as StoredPlan | null;
+  if (!goal || !stored || typeof stored !== "object") return null;
+  if (!Array.isArray(stored.weeks) || !stored.weeks.length || !stored.weeks.every(validWeek)) return null;
+  if (!Array.isArray(stored.phases) || !stored.phases.length || !stored.phases.every(validPhase)) return null;
+  if (!validSummary(stored.summary)) return null;
+  return { ok: true, goal, catalogVersion: row.catalog_version, weeks: stored.weeks, phases: stored.phases, summary: stored.summary };
 }
 
 // Ориентиры, которые должны стоять в профиле сегодня: неделя, в которую попал

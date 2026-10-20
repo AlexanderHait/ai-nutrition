@@ -55,7 +55,7 @@ const ERRORS: Record<string, string> = {
   targets: "Ориентиры не записались в профиль. Нажми «Применить ориентиры недели».",
   unavailable: "Раздел ещё готовится и скоро заработает.",
   fields: "Проверь цель, вес и дату. Ничего не было сохранено.",
-  format: "Эту программу не удалось пересчитать. Заверши её и создай новую.",
+  format: "Эту программу не удалось прочитать. Заверши её и создай новую.",
   weight: "Вес не записан. Проверь число: от 30 до 400 кг.",
 };
 
@@ -477,10 +477,10 @@ function RebuildPreview({ program, settings, latest, query, today }: { program: 
 
 async function ActiveProgram({ accountId, program, settings, latest, today }: { accountId: string; program: StoredProgram; settings: Settings; latest: Latest; today: string }) {
   const plan = planFromRow(program);
-  if (!plan || !plan.ok) {
+  if (!plan) {
     return (
       <>
-        <div className="pageHead"><div><p>Программа</p><h1>Программу не удалось пересчитать</h1><span>Она сохранена, но в этой версии сайта её не прочитать. Заверши её и создай новую — данные питания и веса не пострадают.</span></div></div>
+        <div className="pageHead"><div><p>Программа</p><h1>Программу не удалось прочитать</h1><span>Её расписание сохранилось неполным. Заверши программу и создай новую — данные питания и веса не пострадают.</span></div></div>
         <section className="card"><StopForm /></section>
       </>
     );

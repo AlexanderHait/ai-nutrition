@@ -8,7 +8,7 @@ export type StoredProgram = ProgramRow & {
   created_at: string;
 };
 
-const PROGRAM_COLUMNS = "id,status,goal_kind,start_day,target_day,start_weight_kg,target_weight_kg,inputs,catalog_version,created_at";
+const PROGRAM_COLUMNS = "id,status,goal_kind,start_day,target_day,start_weight_kg,target_weight_kg,inputs,catalog_version,plan,created_at";
 
 // Таблица nutrition_programs появляется миграцией 20261016120000. Пока её нет
 // в базе, раздел честно говорит «готовится», а не падает с ошибкой.

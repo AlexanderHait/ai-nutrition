@@ -11,6 +11,7 @@ import {
   programGoalFromLabel,
   programInputFromSettings,
   programProfileMissing,
+  storedPlan,
   weekTargetsFor,
   type ProgramPlan,
 } from "@/lib/goal-program";
@@ -142,6 +143,7 @@ export async function POST(request: Request) {
         activity_level: input.activityLevel,
       },
       catalog_version: CURRENT_PROGRAM_CATALOG.version,
+      plan: storedPlan(plan),
     });
     if (insertError) {
       if (action === "rebuild" && program) {
@@ -164,7 +166,7 @@ export async function POST(request: Request) {
   if (action === "apply") {
     if (!program) return to(request, "/client/program");
     const plan = planFromRow(program);
-    if (!plan?.ok) return to(request, "/client/program?error=format");
+    if (!plan) return to(request, "/client/program?error=format");
     const applied = await applyWeekTargets(accountId, current.chatId, plan, today);
     return to(request, applied ? "/client/program?applied=1" : "/client/program?error=targets");
   }
@@ -172,7 +174,7 @@ export async function POST(request: Request) {
   if (action === "stop") {
     if (!program) return to(request, "/client/program");
     const plan = planFromRow(program);
-    const finished = Boolean(plan?.ok && today >= plan.summary.targetDay);
+    const finished = Boolean(plan && today >= plan.summary.targetDay);
     const { data: closed, error } = await db.from("nutrition_programs")
       .update({
         status: finished ? "completed" : "archived",

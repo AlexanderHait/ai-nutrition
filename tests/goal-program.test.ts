@@ -6,9 +6,10 @@ import {
   buildProgram,
   daysBetween,
   isDay,
-  programInputFromRow,
+  planFromRow,
   programSignals,
   reviewWeeks,
+  storedPlan,
   type DayFact,
   type ProgramCatalog,
   type ProgramInput,
@@ -184,18 +185,24 @@ describe("каталог — единственный источник прав�
     expect(plan.phases.at(-1)?.title).toBe("Выход");
   });
 
-  it("сохранённая строка программы даёт тот же расчёт", () => {
-    const input = programInputFromRow({
-      goal_kind: "loss",
-      start_day: START,
-      target_day: loss.targetDay,
-      start_weight_kg: "80.0",
-      target_weight_kg: "74.0",
-      catalog_version: "v1",
-      inputs: { sex: "male", age_years: 30, height_cm: 175, activity_level: "moderate" },
-    });
-    expect(input).toEqual(loss);
-    expect(programInputFromRow({ goal_kind: "boom", start_day: START, target_day: null, start_weight_kg: 1, target_weight_kg: 1, catalog_version: "v1", inputs: {} })).toBeNull();
+  it("сохранённое расписание читается обратно без потерь — сайт и бот видят одно и то же", () => {
+    const plan = okPlan(buildProgram(loss));
+    // Как в базе: объект проходит через JSON (jsonb).
+    const json = JSON.parse(JSON.stringify(storedPlan(plan)));
+    const row = { goal_kind: "loss", start_day: START, target_day: loss.targetDay, start_weight_kg: "80.0", target_weight_kg: "74.0", catalog_version: "v1", inputs: {}, plan: json };
+    expect(planFromRow(row)).toEqual(plan);
+  });
+
+  it("испорченное или неполное расписание — null, а не подмена", () => {
+    const plan = okPlan(buildProgram(loss));
+    const base = { goal_kind: "loss", start_day: START, target_day: loss.targetDay, start_weight_kg: 80, target_weight_kg: 74, catalog_version: "v1", inputs: {} };
+    const broken = JSON.parse(JSON.stringify(storedPlan(plan)));
+    broken.weeks[3].kcal = "много";
+    expect(planFromRow({ ...base, plan: broken })).toBeNull();
+    expect(planFromRow({ ...base, plan: { ...storedPlan(plan), weeks: [] } })).toBeNull();
+    expect(planFromRow({ ...base, plan: { weeks: plan.weeks, phases: plan.phases } })).toBeNull();
+    expect(planFromRow({ ...base, plan: null })).toBeNull();
+    expect(planFromRow({ ...base, goal_kind: "boom", plan: storedPlan(plan) })).toBeNull();
   });
 });
 
